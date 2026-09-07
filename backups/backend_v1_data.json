@@ -1,0 +1,3820 @@
+[
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2026-08-27T15:54:20.729Z",
+    "user": 1,
+    "content_type": 9,
+    "object_id": "1",
+    "object_repr": "Ahmed Lahbib",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2026-08-27T15:55:13.235Z",
+    "user": 1,
+    "content_type": 9,
+    "object_id": "2",
+    "object_repr": "Sarah Blidi",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 3,
+  "fields": {
+    "action_time": "2026-08-27T15:55:46.565Z",
+    "user": 1,
+    "content_type": 9,
+    "object_id": "2",
+    "object_repr": "Sarah Blidi",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Capacity hours week\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 4,
+  "fields": {
+    "action_time": "2026-08-27T15:58:31.157Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "1",
+    "object_repr": "Python",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 5,
+  "fields": {
+    "action_time": "2026-08-27T15:58:46.273Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "2",
+    "object_repr": "Django",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 6,
+  "fields": {
+    "action_time": "2026-08-27T15:58:56.228Z",
+    "user": 1,
+    "content_type": 14,
+    "object_id": "3",
+    "object_repr": "SQL",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 7,
+  "fields": {
+    "action_time": "2026-08-27T16:00:56.295Z",
+    "user": 1,
+    "content_type": 10,
+    "object_id": "1",
+    "object_repr": "Sarah Blidi – SQL (level 2)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 8,
+  "fields": {
+    "action_time": "2026-08-27T16:01:48.969Z",
+    "user": 1,
+    "content_type": 10,
+    "object_id": "2",
+    "object_repr": "Sarah Blidi – Django (level 1)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 9,
+  "fields": {
+    "action_time": "2026-08-27T16:07:17.706Z",
+    "user": 1,
+    "content_type": 12,
+    "object_id": "1",
+    "object_repr": "HR platform",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 10,
+  "fields": {
+    "action_time": "2026-08-27T16:08:53.494Z",
+    "user": 1,
+    "content_type": 12,
+    "object_id": "1",
+    "object_repr": "HR platform",
+    "action_flag": 2,
+    "change_message": "[]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 11,
+  "fields": {
+    "action_time": "2026-08-27T16:13:00.200Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "1",
+    "object_repr": "HR platform requires SQL (level 5)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 12,
+  "fields": {
+    "action_time": "2026-08-27T16:14:19.945Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "2",
+    "object_repr": "HR platform requires Django (level 4)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 13,
+  "fields": {
+    "action_time": "2026-08-27T16:38:45.926Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "1",
+    "object_repr": "Sarah Blidi on HR platform (30%)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 14,
+  "fields": {
+    "action_time": "2026-08-27T17:07:39.372Z",
+    "user": 1,
+    "content_type": 13,
+    "object_id": "2",
+    "object_repr": "HR platform requires Django (level 2)",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Required level\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 15,
+  "fields": {
+    "action_time": "2026-08-27T17:07:52.799Z",
+    "user": 1,
+    "content_type": 10,
+    "object_id": "2",
+    "object_repr": "Sarah Blidi – Django (level 3)",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Level\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 16,
+  "fields": {
+    "action_time": "2026-08-27T17:08:19.465Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "1",
+    "object_repr": "Sarah Blidi on HR platform (30%)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 17,
+  "fields": {
+    "action_time": "2026-08-27T17:08:32.038Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "2",
+    "object_repr": "Sarah Blidi on HR platform (30%)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 18,
+  "fields": {
+    "action_time": "2026-08-27T17:08:46.578Z",
+    "user": 1,
+    "content_type": 15,
+    "object_id": "1",
+    "object_repr": "Sarah Blidi covers Django for HR platform",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 19,
+  "fields": {
+    "action_time": "2026-08-27T17:18:26.530Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "1",
+    "object_repr": "Sarah Blidi leave 2026-08-11–2026-08-12",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 20,
+  "fields": {
+    "action_time": "2026-08-27T17:19:03.998Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "2",
+    "object_repr": "Sarah Blidi leave 2026-08-27–2026-08-28",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 21,
+  "fields": {
+    "action_time": "2026-08-27T17:20:27.757Z",
+    "user": 1,
+    "content_type": 8,
+    "object_id": "1",
+    "object_repr": "Sarah Blidi attendance on 2026-08-27",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 22,
+  "fields": {
+    "action_time": "2026-08-27T17:46:50.993Z",
+    "user": 1,
+    "content_type": 12,
+    "object_id": "2",
+    "object_repr": "Project 2",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 23,
+  "fields": {
+    "action_time": "2026-08-27T17:47:32.105Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "3",
+    "object_repr": "Sarah Blidi on HR platform (50%)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 24,
+  "fields": {
+    "action_time": "2026-08-27T17:54:00.356Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "3",
+    "object_repr": "Sarah Blidi on HR platform (50%)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 25,
+  "fields": {
+    "action_time": "2026-08-27T17:54:26.430Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "4",
+    "object_repr": "Sarah Blidi on Project 2 (50%)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 26,
+  "fields": {
+    "action_time": "2026-08-27T18:49:52.776Z",
+    "user": 1,
+    "content_type": 12,
+    "object_id": "3",
+    "object_repr": "projet c",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 27,
+  "fields": {
+    "action_time": "2026-08-27T19:30:56.103Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "5",
+    "object_repr": "Sarah Blidi on projet c (20%)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 28,
+  "fields": {
+    "action_time": "2026-08-27T21:54:37.348Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "3",
+    "object_repr": "Sarah Blidi leave 2026-08-10–2026-08-17",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 29,
+  "fields": {
+    "action_time": "2026-08-27T21:54:51.790Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "3",
+    "object_repr": "Sarah Blidi leave 2026-08-10–2026-08-17",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Status\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 30,
+  "fields": {
+    "action_time": "2026-08-27T21:55:12.138Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "4",
+    "object_repr": "Sarah Blidi leave 2026-08-10–2026-08-13",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 31,
+  "fields": {
+    "action_time": "2026-08-27T21:55:23.659Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "4",
+    "object_repr": "Sarah Blidi leave 2026-08-10–2026-08-13",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 32,
+  "fields": {
+    "action_time": "2026-08-27T21:56:02.233Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "3",
+    "object_repr": "Sarah Blidi leave 2026-08-10–2026-08-17",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 33,
+  "fields": {
+    "action_time": "2026-08-27T21:56:11.631Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "2",
+    "object_repr": "Sarah Blidi leave 2026-08-10–2026-08-13",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Start date\", \"End date\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 34,
+  "fields": {
+    "action_time": "2026-08-27T21:59:24.832Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "6",
+    "object_repr": "Sarah Blidi on HR platform (10%)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 35,
+  "fields": {
+    "action_time": "2026-08-27T21:59:38.680Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "6",
+    "object_repr": "Sarah Blidi on HR platform (10%)",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 36,
+  "fields": {
+    "action_time": "2026-08-27T21:59:53.166Z",
+    "user": 1,
+    "content_type": 11,
+    "object_id": "5",
+    "object_repr": "Sarah Blidi leave 2026-08-27–2026-08-28",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 37,
+  "fields": {
+    "action_time": "2026-08-27T22:40:08.863Z",
+    "user": 1,
+    "content_type": 10,
+    "object_id": "3",
+    "object_repr": "Ahmed Lahbib – Django (level 1)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 38,
+  "fields": {
+    "action_time": "2026-08-27T22:41:20.699Z",
+    "user": 1,
+    "content_type": 10,
+    "object_id": "3",
+    "object_repr": "Ahmed Lahbib – Django (level 3)",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Level\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 39,
+  "fields": {
+    "action_time": "2026-08-27T22:41:39.803Z",
+    "user": 1,
+    "content_type": 7,
+    "object_id": "7",
+    "object_repr": "Ahmed Lahbib on HR platform (50%)",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$rCbu2ONY0D1iWDmSxMoQFN$Olhssqy7vFuVI7XrT9hGVXUM01+QkF/f+hEb6cNX+Ek=",
+    "last_login": "2026-08-25T15:25:16.931Z",
+    "is_superuser": true,
+    "username": "messu",
+    "first_name": "",
+    "last_name": "",
+    "email": "mayssem.lahbib7@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-08-25T15:23:55.773Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "aq34n3b3l94rnmkzedejjwqy2s504xjl",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-xD9K-pzB2ti7OIBsKU4qxN2RpRTQvpl5bxbh2Es8Om5xzezKJLv8bgukJ9YB8gPqvfHU6r6tCx8KP2nnc8v4up3u30GBXkYtg_KoUSDlbIm0cSG4MDlMyoCwgIQgSXgTyIrk9QQ6CDJeaq0kJPb5AvL3N-Q:1wyt1Y:aq6nxwmaAqlgz2uuFXqA6LkNvQPqSRFZix0qPzVhcQ0",
+    "expire_date": "2026-09-08T15:25:16.956Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "lzjyyie6o6eiia79biu32vajathpk3qh",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-xD9K-pzB2ti7OIBsKU4qxN2RpRTQvpl5bxbh2Es8Om5xzezKJLv8bgukJ9YB8gPqvfHU6r6tCx8KP2nnc8v4up3u30GBXkYtg_KoUSDlbIm0cSG4MDlMyoCwgIQgSXgTyIrk9QQ6CDJeaq0kJPb5AvL3N-Q:1wyt0s:ym2CcJD-ePuuY9L5fZF2sxc_MkbtVHZkdZM8Niv84uY",
+    "expire_date": "2026-09-08T15:24:34.531Z"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 13,
+  "fields": {
+    "first_name": "Lucie",
+    "last_name": "Marie",
+    "department": "IT",
+    "position": "Backend Developer",
+    "hire_date": "2021-09-01",
+    "experience_years": "5.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 14,
+  "fields": {
+    "first_name": "André",
+    "last_name": "Traore",
+    "department": "IT",
+    "position": "Backend Developer",
+    "hire_date": "2022-09-01",
+    "experience_years": "4.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 15,
+  "fields": {
+    "first_name": "Robert",
+    "last_name": "Moulin",
+    "department": "Data",
+    "position": "Data Analyst",
+    "hire_date": "2023-09-02",
+    "experience_years": "3.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 16,
+  "fields": {
+    "first_name": "Maurice",
+    "last_name": "Joly",
+    "department": "Data",
+    "position": "Data Scientist",
+    "hire_date": "2022-09-01",
+    "experience_years": "4.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 17,
+  "fields": {
+    "first_name": "Nathalie",
+    "last_name": "Henry",
+    "department": "IT",
+    "position": "Frontend Developer",
+    "hire_date": "2023-09-02",
+    "experience_years": "3.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 18,
+  "fields": {
+    "first_name": "Margaret",
+    "last_name": "Traore",
+    "department": "IT",
+    "position": "Full Stack Developer",
+    "hire_date": "2021-09-01",
+    "experience_years": "5.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 19,
+  "fields": {
+    "first_name": "Émilie",
+    "last_name": "Fernandez",
+    "department": "IT",
+    "position": "DevOps Engineer",
+    "hire_date": "2020-09-01",
+    "experience_years": "6.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 20,
+  "fields": {
+    "first_name": "Jeanne",
+    "last_name": "Briand",
+    "department": "IT",
+    "position": "Junior Backend Developer",
+    "hire_date": "2024-09-01",
+    "experience_years": "2.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 21,
+  "fields": {
+    "first_name": "Arthur",
+    "last_name": "Martinez",
+    "department": "Data",
+    "position": "Junior Data Analyst",
+    "hire_date": "2024-09-01",
+    "experience_years": "2.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.employee",
+  "pk": 22,
+  "fields": {
+    "first_name": "Éric",
+    "last_name": "Carpentier",
+    "department": "IT",
+    "position": "Frontend Developer",
+    "hire_date": "2024-09-01",
+    "experience_years": "2.0",
+    "capacity_hours_week": "40.00",
+    "status": "active"
+  }
+},
+{
+  "model": "core.skill",
+  "pk": 12,
+  "fields": {
+    "name": "Python",
+    "category": "Programming"
+  }
+},
+{
+  "model": "core.skill",
+  "pk": 13,
+  "fields": {
+    "name": "Django",
+    "category": "Backend"
+  }
+},
+{
+  "model": "core.skill",
+  "pk": 14,
+  "fields": {
+    "name": "SQL",
+    "category": "Database"
+  }
+},
+{
+  "model": "core.skill",
+  "pk": 15,
+  "fields": {
+    "name": "React",
+    "category": "Frontend"
+  }
+},
+{
+  "model": "core.skill",
+  "pk": 16,
+  "fields": {
+    "name": "Machine Learning",
+    "category": "AI"
+  }
+},
+{
+  "model": "core.skill",
+  "pk": 17,
+  "fields": {
+    "name": "Power BI",
+    "category": "Data Analytics"
+  }
+},
+{
+  "model": "core.skill",
+  "pk": 18,
+  "fields": {
+    "name": "Git",
+    "category": "Development Tools"
+  }
+},
+{
+  "model": "core.skill",
+  "pk": 19,
+  "fields": {
+    "name": "Docker",
+    "category": "DevOps"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 44,
+  "fields": {
+    "employee": 13,
+    "skill": 12,
+    "level": 5,
+    "years_experience": "4.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 45,
+  "fields": {
+    "employee": 13,
+    "skill": 13,
+    "level": 4,
+    "years_experience": "4.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 46,
+  "fields": {
+    "employee": 13,
+    "skill": 14,
+    "level": 4,
+    "years_experience": "4.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 47,
+  "fields": {
+    "employee": 13,
+    "skill": 18,
+    "level": 4,
+    "years_experience": "4.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 48,
+  "fields": {
+    "employee": 13,
+    "skill": 19,
+    "level": 3,
+    "years_experience": "2.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 49,
+  "fields": {
+    "employee": 14,
+    "skill": 12,
+    "level": 4,
+    "years_experience": "3.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 50,
+  "fields": {
+    "employee": 14,
+    "skill": 13,
+    "level": 4,
+    "years_experience": "3.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 51,
+  "fields": {
+    "employee": 14,
+    "skill": 14,
+    "level": 3,
+    "years_experience": "3.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 52,
+  "fields": {
+    "employee": 14,
+    "skill": 18,
+    "level": 4,
+    "years_experience": "3.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 53,
+  "fields": {
+    "employee": 14,
+    "skill": 19,
+    "level": 3,
+    "years_experience": "2.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 54,
+  "fields": {
+    "employee": 15,
+    "skill": 12,
+    "level": 3,
+    "years_experience": "2.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 55,
+  "fields": {
+    "employee": 15,
+    "skill": 14,
+    "level": 5,
+    "years_experience": "3.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 56,
+  "fields": {
+    "employee": 15,
+    "skill": 17,
+    "level": 5,
+    "years_experience": "2.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 57,
+  "fields": {
+    "employee": 15,
+    "skill": 18,
+    "level": 3,
+    "years_experience": "2.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 58,
+  "fields": {
+    "employee": 16,
+    "skill": 12,
+    "level": 4,
+    "years_experience": "3.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 59,
+  "fields": {
+    "employee": 16,
+    "skill": 14,
+    "level": 4,
+    "years_experience": "3.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 60,
+  "fields": {
+    "employee": 16,
+    "skill": 16,
+    "level": 5,
+    "years_experience": "4.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 61,
+  "fields": {
+    "employee": 16,
+    "skill": 18,
+    "level": 3,
+    "years_experience": "2.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 62,
+  "fields": {
+    "employee": 17,
+    "skill": 15,
+    "level": 5,
+    "years_experience": "3.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 63,
+  "fields": {
+    "employee": 17,
+    "skill": 18,
+    "level": 4,
+    "years_experience": "2.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 64,
+  "fields": {
+    "employee": 17,
+    "skill": 14,
+    "level": 2,
+    "years_experience": "1.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 65,
+  "fields": {
+    "employee": 18,
+    "skill": 12,
+    "level": 4,
+    "years_experience": "4.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 66,
+  "fields": {
+    "employee": 18,
+    "skill": 13,
+    "level": 3,
+    "years_experience": "3.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 67,
+  "fields": {
+    "employee": 18,
+    "skill": 15,
+    "level": 4,
+    "years_experience": "3.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 68,
+  "fields": {
+    "employee": 18,
+    "skill": 14,
+    "level": 4,
+    "years_experience": "4.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 69,
+  "fields": {
+    "employee": 18,
+    "skill": 18,
+    "level": 4,
+    "years_experience": "4.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 70,
+  "fields": {
+    "employee": 19,
+    "skill": 19,
+    "level": 5,
+    "years_experience": "5.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 71,
+  "fields": {
+    "employee": 19,
+    "skill": 18,
+    "level": 5,
+    "years_experience": "5.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 72,
+  "fields": {
+    "employee": 19,
+    "skill": 12,
+    "level": 3,
+    "years_experience": "3.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 73,
+  "fields": {
+    "employee": 19,
+    "skill": 14,
+    "level": 2,
+    "years_experience": "1.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 74,
+  "fields": {
+    "employee": 20,
+    "skill": 12,
+    "level": 3,
+    "years_experience": "2.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 75,
+  "fields": {
+    "employee": 20,
+    "skill": 13,
+    "level": 3,
+    "years_experience": "1.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 76,
+  "fields": {
+    "employee": 20,
+    "skill": 14,
+    "level": 3,
+    "years_experience": "1.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 77,
+  "fields": {
+    "employee": 20,
+    "skill": 18,
+    "level": 3,
+    "years_experience": "2.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 78,
+  "fields": {
+    "employee": 21,
+    "skill": 14,
+    "level": 4,
+    "years_experience": "2.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 79,
+  "fields": {
+    "employee": 21,
+    "skill": 17,
+    "level": 4,
+    "years_experience": "1.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 80,
+  "fields": {
+    "employee": 21,
+    "skill": 12,
+    "level": 2,
+    "years_experience": "1.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 81,
+  "fields": {
+    "employee": 22,
+    "skill": 15,
+    "level": 4,
+    "years_experience": "2.0"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 82,
+  "fields": {
+    "employee": 22,
+    "skill": 18,
+    "level": 3,
+    "years_experience": "1.5"
+  }
+},
+{
+  "model": "core.employeeskill",
+  "pk": 83,
+  "fields": {
+    "employee": 22,
+    "skill": 14,
+    "level": 2,
+    "years_experience": "1.0"
+  }
+},
+{
+  "model": "core.project",
+  "pk": 7,
+  "fields": {
+    "name": "HR Platform",
+    "description": "Human resources management and workforce platform.",
+    "start_date": "2026-09-01",
+    "end_date": "2026-10-31",
+    "estimated_hours": "480.00",
+    "status": "in_progress",
+    "priority": "high",
+    "criticality": "high"
+  }
+},
+{
+  "model": "core.project",
+  "pk": 8,
+  "fields": {
+    "name": "Analytics Dashboard",
+    "description": "Business intelligence and analytics dashboard.",
+    "start_date": "2026-09-15",
+    "end_date": "2026-10-15",
+    "estimated_hours": "240.00",
+    "status": "planned",
+    "priority": "medium",
+    "criticality": "medium"
+  }
+},
+{
+  "model": "core.project",
+  "pk": 9,
+  "fields": {
+    "name": "Recruitment Portal",
+    "description": "Web recruitment and candidate management portal.",
+    "start_date": "2026-10-01",
+    "end_date": "2026-11-15",
+    "estimated_hours": "320.00",
+    "status": "planned",
+    "priority": "high",
+    "criticality": "medium"
+  }
+},
+{
+  "model": "core.projectskillrequirement",
+  "pk": 12,
+  "fields": {
+    "project": 7,
+    "skill": 12,
+    "required_level": 4,
+    "priority": "high",
+    "is_mandatory": true,
+    "required_quantity": 2,
+    "estimated_effort_hours": "220.00"
+  }
+},
+{
+  "model": "core.projectskillrequirement",
+  "pk": 13,
+  "fields": {
+    "project": 7,
+    "skill": 13,
+    "required_level": 3,
+    "priority": "high",
+    "is_mandatory": true,
+    "required_quantity": 1,
+    "estimated_effort_hours": "160.00"
+  }
+},
+{
+  "model": "core.projectskillrequirement",
+  "pk": 14,
+  "fields": {
+    "project": 7,
+    "skill": 14,
+    "required_level": 3,
+    "priority": "medium",
+    "is_mandatory": true,
+    "required_quantity": 1,
+    "estimated_effort_hours": "100.00"
+  }
+},
+{
+  "model": "core.projectskillrequirement",
+  "pk": 15,
+  "fields": {
+    "project": 8,
+    "skill": 14,
+    "required_level": 4,
+    "priority": "high",
+    "is_mandatory": true,
+    "required_quantity": 1,
+    "estimated_effort_hours": "120.00"
+  }
+},
+{
+  "model": "core.projectskillrequirement",
+  "pk": 16,
+  "fields": {
+    "project": 8,
+    "skill": 17,
+    "required_level": 4,
+    "priority": "high",
+    "is_mandatory": true,
+    "required_quantity": 1,
+    "estimated_effort_hours": "120.00"
+  }
+},
+{
+  "model": "core.projectskillrequirement",
+  "pk": 17,
+  "fields": {
+    "project": 8,
+    "skill": 12,
+    "required_level": 3,
+    "priority": "medium",
+    "is_mandatory": false,
+    "required_quantity": 1,
+    "estimated_effort_hours": "0.00"
+  }
+},
+{
+  "model": "core.projectskillrequirement",
+  "pk": 18,
+  "fields": {
+    "project": 9,
+    "skill": 15,
+    "required_level": 4,
+    "priority": "high",
+    "is_mandatory": true,
+    "required_quantity": 1,
+    "estimated_effort_hours": "180.00"
+  }
+},
+{
+  "model": "core.projectskillrequirement",
+  "pk": 19,
+  "fields": {
+    "project": 9,
+    "skill": 13,
+    "required_level": 3,
+    "priority": "high",
+    "is_mandatory": true,
+    "required_quantity": 1,
+    "estimated_effort_hours": "140.00"
+  }
+},
+{
+  "model": "core.projectskillrequirement",
+  "pk": 20,
+  "fields": {
+    "project": 9,
+    "skill": 14,
+    "required_level": 3,
+    "priority": "medium",
+    "is_mandatory": false,
+    "required_quantity": 1,
+    "estimated_effort_hours": "0.00"
+  }
+},
+{
+  "model": "core.leave",
+  "pk": 9,
+  "fields": {
+    "employee": 20,
+    "start_date": "2026-06-15",
+    "end_date": "2026-06-17",
+    "type": "annual",
+    "status": "approved"
+  }
+},
+{
+  "model": "core.leave",
+  "pk": 10,
+  "fields": {
+    "employee": 21,
+    "start_date": "2026-06-22",
+    "end_date": "2026-06-22",
+    "type": "sick",
+    "status": "approved"
+  }
+},
+{
+  "model": "core.leave",
+  "pk": 11,
+  "fields": {
+    "employee": 22,
+    "start_date": "2026-06-25",
+    "end_date": "2026-06-27",
+    "type": "annual",
+    "status": "pending"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 212,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-03",
+    "status": "present",
+    "arrival_time": "08:21:00",
+    "departure_time": "17:23:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 213,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-03",
+    "status": "present",
+    "arrival_time": "08:34:00",
+    "departure_time": "17:04:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 214,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-03",
+    "status": "present",
+    "arrival_time": "08:54:00",
+    "departure_time": "17:02:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 215,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-03",
+    "status": "present",
+    "arrival_time": "08:22:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 216,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-03",
+    "status": "present",
+    "arrival_time": "08:34:00",
+    "departure_time": "17:16:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 217,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-03",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:06:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 218,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-03",
+    "status": "present",
+    "arrival_time": "08:54:00",
+    "departure_time": "17:13:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 219,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-03",
+    "status": "present",
+    "arrival_time": "08:37:00",
+    "departure_time": "17:25:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 220,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-03",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 221,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-03",
+    "status": "present",
+    "arrival_time": "08:30:00",
+    "departure_time": "17:22:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 222,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-04",
+    "status": "present",
+    "arrival_time": "08:37:00",
+    "departure_time": "17:04:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 223,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-04",
+    "status": "present",
+    "arrival_time": "08:41:00",
+    "departure_time": "17:03:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 224,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-04",
+    "status": "present",
+    "arrival_time": "08:26:00",
+    "departure_time": "17:11:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 225,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-04",
+    "status": "late",
+    "arrival_time": "09:43:00",
+    "departure_time": "17:16:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 226,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-04",
+    "status": "late",
+    "arrival_time": "09:34:00",
+    "departure_time": "17:34:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 227,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-04",
+    "status": "present",
+    "arrival_time": "08:44:00",
+    "departure_time": "17:02:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 228,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-04",
+    "status": "present",
+    "arrival_time": "08:43:00",
+    "departure_time": "17:18:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 229,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-04",
+    "status": "present",
+    "arrival_time": "08:24:00",
+    "departure_time": "17:01:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 230,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-04",
+    "status": "present",
+    "arrival_time": "08:38:00",
+    "departure_time": "17:02:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 231,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-04",
+    "status": "late",
+    "arrival_time": "09:11:00",
+    "departure_time": "17:24:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 232,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-05",
+    "status": "present",
+    "arrival_time": "08:43:00",
+    "departure_time": "17:05:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 233,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-05",
+    "status": "present",
+    "arrival_time": "08:33:00",
+    "departure_time": "17:21:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 234,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-05",
+    "status": "present",
+    "arrival_time": "08:24:00",
+    "departure_time": "17:19:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 235,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-05",
+    "status": "present",
+    "arrival_time": "08:54:00",
+    "departure_time": "17:23:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 236,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-05",
+    "status": "present",
+    "arrival_time": "08:49:00",
+    "departure_time": "17:12:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 237,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-05",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 238,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-05",
+    "status": "present",
+    "arrival_time": "08:23:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 239,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-05",
+    "status": "late",
+    "arrival_time": "09:25:00",
+    "departure_time": "17:25:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 240,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-05",
+    "status": "present",
+    "arrival_time": "08:33:00",
+    "departure_time": "17:29:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 241,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-05",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 242,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-06",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 243,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-06",
+    "status": "present",
+    "arrival_time": "08:51:00",
+    "departure_time": "17:12:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 244,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-06",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 245,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-06",
+    "status": "present",
+    "arrival_time": "08:29:00",
+    "departure_time": "17:08:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 246,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-06",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:17:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 247,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-06",
+    "status": "present",
+    "arrival_time": "08:47:00",
+    "departure_time": "17:28:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 248,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-06",
+    "status": "present",
+    "arrival_time": "08:43:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 249,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-06",
+    "status": "half_day",
+    "arrival_time": "09:00:00",
+    "departure_time": "13:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 250,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-06",
+    "status": "present",
+    "arrival_time": "08:51:00",
+    "departure_time": "17:02:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 251,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-06",
+    "status": "present",
+    "arrival_time": "08:27:00",
+    "departure_time": "17:04:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 252,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-07",
+    "status": "present",
+    "arrival_time": "08:47:00",
+    "departure_time": "17:19:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 253,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-07",
+    "status": "present",
+    "arrival_time": "08:44:00",
+    "departure_time": "17:19:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 254,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-07",
+    "status": "half_day",
+    "arrival_time": "09:00:00",
+    "departure_time": "13:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 255,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-07",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:27:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 256,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-07",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 257,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-07",
+    "status": "present",
+    "arrival_time": "08:27:00",
+    "departure_time": "17:21:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 258,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-07",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 259,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-07",
+    "status": "present",
+    "arrival_time": "08:41:00",
+    "departure_time": "17:03:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 260,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-07",
+    "status": "present",
+    "arrival_time": "08:30:00",
+    "departure_time": "17:14:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 261,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-07",
+    "status": "present",
+    "arrival_time": "08:36:00",
+    "departure_time": "17:16:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 262,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-10",
+    "status": "present",
+    "arrival_time": "08:52:00",
+    "departure_time": "17:29:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 263,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-10",
+    "status": "present",
+    "arrival_time": "08:39:00",
+    "departure_time": "17:26:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 264,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-10",
+    "status": "present",
+    "arrival_time": "08:32:00",
+    "departure_time": "17:04:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 265,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-10",
+    "status": "present",
+    "arrival_time": "08:30:00",
+    "departure_time": "17:17:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 266,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-10",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 267,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-10",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 268,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-10",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 269,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-10",
+    "status": "present",
+    "arrival_time": "08:51:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 270,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-10",
+    "status": "present",
+    "arrival_time": "08:43:00",
+    "departure_time": "17:28:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 271,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-10",
+    "status": "half_day",
+    "arrival_time": "09:00:00",
+    "departure_time": "13:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 272,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-11",
+    "status": "late",
+    "arrival_time": "09:20:00",
+    "departure_time": "17:03:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 273,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-11",
+    "status": "present",
+    "arrival_time": "08:25:00",
+    "departure_time": "17:02:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 274,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-11",
+    "status": "present",
+    "arrival_time": "08:24:00",
+    "departure_time": "17:24:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 275,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-11",
+    "status": "present",
+    "arrival_time": "08:28:00",
+    "departure_time": "17:04:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 276,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-11",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:05:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 277,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-11",
+    "status": "present",
+    "arrival_time": "08:47:00",
+    "departure_time": "17:30:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 278,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-11",
+    "status": "present",
+    "arrival_time": "08:54:00",
+    "departure_time": "17:24:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 279,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-11",
+    "status": "present",
+    "arrival_time": "08:32:00",
+    "departure_time": "17:22:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 280,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-11",
+    "status": "present",
+    "arrival_time": "08:43:00",
+    "departure_time": "17:14:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 281,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-11",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 282,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-12",
+    "status": "present",
+    "arrival_time": "08:35:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 283,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-12",
+    "status": "present",
+    "arrival_time": "08:21:00",
+    "departure_time": "17:18:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 284,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-12",
+    "status": "present",
+    "arrival_time": "08:34:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 285,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-12",
+    "status": "present",
+    "arrival_time": "08:23:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 286,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-12",
+    "status": "present",
+    "arrival_time": "08:22:00",
+    "departure_time": "17:27:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 287,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-12",
+    "status": "present",
+    "arrival_time": "08:52:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 288,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-12",
+    "status": "present",
+    "arrival_time": "08:51:00",
+    "departure_time": "17:06:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 289,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-12",
+    "status": "present",
+    "arrival_time": "08:50:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 290,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-12",
+    "status": "late",
+    "arrival_time": "09:31:00",
+    "departure_time": "17:12:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 291,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-12",
+    "status": "present",
+    "arrival_time": "08:47:00",
+    "departure_time": "17:11:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 292,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-13",
+    "status": "present",
+    "arrival_time": "08:49:00",
+    "departure_time": "17:27:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 293,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-13",
+    "status": "present",
+    "arrival_time": "08:26:00",
+    "departure_time": "17:01:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 294,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-13",
+    "status": "present",
+    "arrival_time": "08:41:00",
+    "departure_time": "17:25:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 295,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-13",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 296,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-13",
+    "status": "present",
+    "arrival_time": "08:32:00",
+    "departure_time": "17:17:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 297,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-13",
+    "status": "present",
+    "arrival_time": "08:47:00",
+    "departure_time": "17:05:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 298,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-13",
+    "status": "present",
+    "arrival_time": "08:35:00",
+    "departure_time": "17:27:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 299,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-13",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 300,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-13",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:03:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 301,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-13",
+    "status": "present",
+    "arrival_time": "08:54:00",
+    "departure_time": "17:26:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 302,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-14",
+    "status": "present",
+    "arrival_time": "08:25:00",
+    "departure_time": "17:29:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 303,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-14",
+    "status": "present",
+    "arrival_time": "08:35:00",
+    "departure_time": "17:05:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 304,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-14",
+    "status": "present",
+    "arrival_time": "08:50:00",
+    "departure_time": "17:06:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 305,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-14",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 306,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-14",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 307,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-14",
+    "status": "present",
+    "arrival_time": "08:20:00",
+    "departure_time": "17:12:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 308,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-14",
+    "status": "present",
+    "arrival_time": "08:49:00",
+    "departure_time": "17:09:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 309,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-14",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:21:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 310,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-14",
+    "status": "present",
+    "arrival_time": "08:29:00",
+    "departure_time": "17:06:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 311,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-14",
+    "status": "present",
+    "arrival_time": "08:23:00",
+    "departure_time": "17:18:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 312,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-17",
+    "status": "present",
+    "arrival_time": "08:23:00",
+    "departure_time": "17:23:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 313,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-17",
+    "status": "present",
+    "arrival_time": "08:23:00",
+    "departure_time": "17:18:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 314,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-17",
+    "status": "present",
+    "arrival_time": "08:53:00",
+    "departure_time": "17:05:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 315,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-17",
+    "status": "present",
+    "arrival_time": "08:52:00",
+    "departure_time": "17:02:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 316,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-17",
+    "status": "late",
+    "arrival_time": "09:09:00",
+    "departure_time": "17:38:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 317,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-17",
+    "status": "present",
+    "arrival_time": "08:35:00",
+    "departure_time": "17:12:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 318,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-17",
+    "status": "present",
+    "arrival_time": "08:35:00",
+    "departure_time": "17:18:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 319,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-17",
+    "status": "present",
+    "arrival_time": "08:25:00",
+    "departure_time": "17:13:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 320,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-17",
+    "status": "present",
+    "arrival_time": "08:53:00",
+    "departure_time": "17:10:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 321,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-17",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 322,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-18",
+    "status": "present",
+    "arrival_time": "08:40:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 323,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-18",
+    "status": "present",
+    "arrival_time": "08:28:00",
+    "departure_time": "17:21:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 324,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-18",
+    "status": "present",
+    "arrival_time": "08:49:00",
+    "departure_time": "17:10:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 325,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-18",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 326,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-18",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 327,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-18",
+    "status": "present",
+    "arrival_time": "08:26:00",
+    "departure_time": "17:02:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 328,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-18",
+    "status": "present",
+    "arrival_time": "08:52:00",
+    "departure_time": "17:08:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 329,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-18",
+    "status": "present",
+    "arrival_time": "08:42:00",
+    "departure_time": "17:28:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 330,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-18",
+    "status": "present",
+    "arrival_time": "08:35:00",
+    "departure_time": "17:11:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 331,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-18",
+    "status": "present",
+    "arrival_time": "08:48:00",
+    "departure_time": "17:26:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 332,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-19",
+    "status": "present",
+    "arrival_time": "08:39:00",
+    "departure_time": "17:19:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 333,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-19",
+    "status": "half_day",
+    "arrival_time": "09:00:00",
+    "departure_time": "13:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 334,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-19",
+    "status": "late",
+    "arrival_time": "09:38:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 335,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-19",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:09:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 336,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-19",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 337,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-19",
+    "status": "present",
+    "arrival_time": "08:28:00",
+    "departure_time": "17:08:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 338,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-19",
+    "status": "present",
+    "arrival_time": "08:26:00",
+    "departure_time": "17:23:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 339,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-19",
+    "status": "present",
+    "arrival_time": "08:37:00",
+    "departure_time": "17:09:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 340,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-19",
+    "status": "present",
+    "arrival_time": "08:41:00",
+    "departure_time": "17:06:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 341,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-19",
+    "status": "present",
+    "arrival_time": "08:36:00",
+    "departure_time": "17:16:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 342,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-20",
+    "status": "present",
+    "arrival_time": "08:23:00",
+    "departure_time": "17:02:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 343,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-20",
+    "status": "present",
+    "arrival_time": "08:37:00",
+    "departure_time": "17:01:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 344,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-20",
+    "status": "present",
+    "arrival_time": "08:28:00",
+    "departure_time": "17:20:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 345,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-20",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 346,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-20",
+    "status": "present",
+    "arrival_time": "08:48:00",
+    "departure_time": "17:17:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 347,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-20",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 348,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-20",
+    "status": "present",
+    "arrival_time": "08:29:00",
+    "departure_time": "17:17:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 349,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-20",
+    "status": "present",
+    "arrival_time": "08:43:00",
+    "departure_time": "17:18:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 350,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-20",
+    "status": "present",
+    "arrival_time": "08:47:00",
+    "departure_time": "17:04:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 351,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-20",
+    "status": "present",
+    "arrival_time": "08:43:00",
+    "departure_time": "17:28:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 352,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-21",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 353,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-21",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 354,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-21",
+    "status": "present",
+    "arrival_time": "08:42:00",
+    "departure_time": "17:06:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 355,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-21",
+    "status": "present",
+    "arrival_time": "08:26:00",
+    "departure_time": "17:11:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 356,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-21",
+    "status": "late",
+    "arrival_time": "09:31:00",
+    "departure_time": "17:39:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 357,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-21",
+    "status": "present",
+    "arrival_time": "08:35:00",
+    "departure_time": "17:27:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 358,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-21",
+    "status": "present",
+    "arrival_time": "08:31:00",
+    "departure_time": "17:28:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 359,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-21",
+    "status": "present",
+    "arrival_time": "08:31:00",
+    "departure_time": "17:23:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 360,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-21",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 361,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-21",
+    "status": "late",
+    "arrival_time": "09:31:00",
+    "departure_time": "17:15:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 362,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-24",
+    "status": "present",
+    "arrival_time": "08:26:00",
+    "departure_time": "17:12:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 363,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-24",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 364,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-24",
+    "status": "late",
+    "arrival_time": "09:19:00",
+    "departure_time": "17:12:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 365,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-24",
+    "status": "late",
+    "arrival_time": "09:34:00",
+    "departure_time": "17:22:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 366,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-24",
+    "status": "present",
+    "arrival_time": "08:34:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 367,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-24",
+    "status": "present",
+    "arrival_time": "08:32:00",
+    "departure_time": "17:12:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 368,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-24",
+    "status": "present",
+    "arrival_time": "08:24:00",
+    "departure_time": "17:30:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 369,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-24",
+    "status": "present",
+    "arrival_time": "08:42:00",
+    "departure_time": "17:20:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 370,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-24",
+    "status": "present",
+    "arrival_time": "08:54:00",
+    "departure_time": "17:10:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 371,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-24",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 372,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:36:00",
+    "departure_time": "17:05:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 373,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:36:00",
+    "departure_time": "17:01:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 374,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:47:00",
+    "departure_time": "17:11:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 375,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:40:00",
+    "departure_time": "17:13:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 376,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:52:00",
+    "departure_time": "17:03:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 377,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:32:00",
+    "departure_time": "17:08:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 378,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:47:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 379,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:54:00",
+    "departure_time": "17:21:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 380,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:32:00",
+    "departure_time": "17:11:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 381,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-25",
+    "status": "present",
+    "arrival_time": "08:41:00",
+    "departure_time": "17:19:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 382,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-26",
+    "status": "present",
+    "arrival_time": "08:27:00",
+    "departure_time": "17:23:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 383,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-26",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 384,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-26",
+    "status": "present",
+    "arrival_time": "08:46:00",
+    "departure_time": "17:10:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 385,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-26",
+    "status": "present",
+    "arrival_time": "08:38:00",
+    "departure_time": "17:17:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 386,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-26",
+    "status": "present",
+    "arrival_time": "08:46:00",
+    "departure_time": "17:21:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 387,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-26",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 388,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-26",
+    "status": "present",
+    "arrival_time": "08:31:00",
+    "departure_time": "17:19:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 389,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-26",
+    "status": "present",
+    "arrival_time": "08:45:00",
+    "departure_time": "17:17:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 390,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-26",
+    "status": "late",
+    "arrival_time": "09:24:00",
+    "departure_time": "17:18:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 391,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-26",
+    "status": "present",
+    "arrival_time": "08:40:00",
+    "departure_time": "17:14:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 392,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-27",
+    "status": "present",
+    "arrival_time": "08:33:00",
+    "departure_time": "17:16:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 393,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-27",
+    "status": "present",
+    "arrival_time": "08:30:00",
+    "departure_time": "17:21:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 394,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-27",
+    "status": "present",
+    "arrival_time": "08:52:00",
+    "departure_time": "17:21:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 395,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-27",
+    "status": "present",
+    "arrival_time": "08:41:00",
+    "departure_time": "17:02:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 396,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-27",
+    "status": "late",
+    "arrival_time": "09:20:00",
+    "departure_time": "17:19:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 397,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-27",
+    "status": "present",
+    "arrival_time": "08:32:00",
+    "departure_time": "17:04:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 398,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-27",
+    "status": "present",
+    "arrival_time": "08:35:00",
+    "departure_time": "17:15:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 399,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-27",
+    "status": "present",
+    "arrival_time": "08:24:00",
+    "departure_time": "17:14:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 400,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-27",
+    "status": "present",
+    "arrival_time": "08:32:00",
+    "departure_time": "17:22:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 401,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-27",
+    "status": "present",
+    "arrival_time": "08:51:00",
+    "departure_time": "17:12:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 402,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-28",
+    "status": "present",
+    "arrival_time": "08:20:00",
+    "departure_time": "17:28:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 403,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-28",
+    "status": "present",
+    "arrival_time": "08:26:00",
+    "departure_time": "17:24:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 404,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-28",
+    "status": "present",
+    "arrival_time": "08:31:00",
+    "departure_time": "17:25:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 405,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-28",
+    "status": "remote",
+    "arrival_time": "09:00:00",
+    "departure_time": "17:00:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 406,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-28",
+    "status": "present",
+    "arrival_time": "08:23:00",
+    "departure_time": "17:17:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 407,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-28",
+    "status": "present",
+    "arrival_time": "08:27:00",
+    "departure_time": "17:14:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 408,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-28",
+    "status": "present",
+    "arrival_time": "08:49:00",
+    "departure_time": "17:21:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 409,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-28",
+    "status": "present",
+    "arrival_time": "08:55:00",
+    "departure_time": "17:19:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 410,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-28",
+    "status": "present",
+    "arrival_time": "08:48:00",
+    "departure_time": "17:19:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 411,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-28",
+    "status": "late",
+    "arrival_time": "09:37:00",
+    "departure_time": "17:27:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 412,
+  "fields": {
+    "employee": 13,
+    "date": "2026-08-31",
+    "status": "late",
+    "arrival_time": "09:40:00",
+    "departure_time": "17:28:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 413,
+  "fields": {
+    "employee": 14,
+    "date": "2026-08-31",
+    "status": "absent",
+    "arrival_time": null,
+    "departure_time": null
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 414,
+  "fields": {
+    "employee": 15,
+    "date": "2026-08-31",
+    "status": "present",
+    "arrival_time": "08:50:00",
+    "departure_time": "17:14:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 415,
+  "fields": {
+    "employee": 16,
+    "date": "2026-08-31",
+    "status": "present",
+    "arrival_time": "08:35:00",
+    "departure_time": "17:26:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 416,
+  "fields": {
+    "employee": 17,
+    "date": "2026-08-31",
+    "status": "present",
+    "arrival_time": "08:53:00",
+    "departure_time": "17:15:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 417,
+  "fields": {
+    "employee": 18,
+    "date": "2026-08-31",
+    "status": "present",
+    "arrival_time": "08:37:00",
+    "departure_time": "17:14:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 418,
+  "fields": {
+    "employee": 19,
+    "date": "2026-08-31",
+    "status": "present",
+    "arrival_time": "08:38:00",
+    "departure_time": "17:07:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 419,
+  "fields": {
+    "employee": 20,
+    "date": "2026-08-31",
+    "status": "present",
+    "arrival_time": "08:40:00",
+    "departure_time": "17:28:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 420,
+  "fields": {
+    "employee": 21,
+    "date": "2026-08-31",
+    "status": "present",
+    "arrival_time": "08:28:00",
+    "departure_time": "17:04:00"
+  }
+},
+{
+  "model": "core.attendance",
+  "pk": 421,
+  "fields": {
+    "employee": 22,
+    "date": "2026-08-31",
+    "status": "present",
+    "arrival_time": "08:29:00",
+    "departure_time": "17:22:00"
+  }
+},
+{
+  "model": "core.assignment",
+  "pk": 15,
+  "fields": {
+    "employee": 13,
+    "project": 7,
+    "start_date": "2026-09-01",
+    "end_date": "2026-10-31",
+    "allocation_percentage": 50,
+    "role_on_project": "Senior Backend Developer",
+    "status": "active"
+  }
+},
+{
+  "model": "core.assignment",
+  "pk": 16,
+  "fields": {
+    "employee": 14,
+    "project": 7,
+    "start_date": "2026-09-01",
+    "end_date": "2026-10-31",
+    "allocation_percentage": 40,
+    "role_on_project": "Backend Developer",
+    "status": "active"
+  }
+},
+{
+  "model": "core.assignment",
+  "pk": 17,
+  "fields": {
+    "employee": 18,
+    "project": 7,
+    "start_date": "2026-09-01",
+    "end_date": "2026-10-31",
+    "allocation_percentage": 30,
+    "role_on_project": "Full Stack Developer",
+    "status": "active"
+  }
+},
+{
+  "model": "core.assignment",
+  "pk": 18,
+  "fields": {
+    "employee": 15,
+    "project": 8,
+    "start_date": "2026-09-15",
+    "end_date": "2026-10-15",
+    "allocation_percentage": 50,
+    "role_on_project": "Data Analyst",
+    "status": "planned"
+  }
+},
+{
+  "model": "core.assignment",
+  "pk": 19,
+  "fields": {
+    "employee": 16,
+    "project": 8,
+    "start_date": "2026-09-15",
+    "end_date": "2026-10-15",
+    "allocation_percentage": 30,
+    "role_on_project": "Data Scientist",
+    "status": "planned"
+  }
+},
+{
+  "model": "core.assignment",
+  "pk": 20,
+  "fields": {
+    "employee": 17,
+    "project": 9,
+    "start_date": "2026-10-01",
+    "end_date": "2026-11-15",
+    "allocation_percentage": 50,
+    "role_on_project": "Frontend Developer",
+    "status": "planned"
+  }
+},
+{
+  "model": "core.assignment",
+  "pk": 21,
+  "fields": {
+    "employee": 18,
+    "project": 9,
+    "start_date": "2026-10-01",
+    "end_date": "2026-11-15",
+    "allocation_percentage": 40,
+    "role_on_project": "Full Stack Developer",
+    "status": "planned"
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 12,
+  "fields": {
+    "assignment": 15,
+    "project_skill_requirement": 12
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 13,
+  "fields": {
+    "assignment": 15,
+    "project_skill_requirement": 13
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 14,
+  "fields": {
+    "assignment": 16,
+    "project_skill_requirement": 12
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 15,
+  "fields": {
+    "assignment": 17,
+    "project_skill_requirement": 14
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 16,
+  "fields": {
+    "assignment": 18,
+    "project_skill_requirement": 15
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 17,
+  "fields": {
+    "assignment": 18,
+    "project_skill_requirement": 16
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 18,
+  "fields": {
+    "assignment": 19,
+    "project_skill_requirement": 17
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 19,
+  "fields": {
+    "assignment": 20,
+    "project_skill_requirement": 18
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 20,
+  "fields": {
+    "assignment": 21,
+    "project_skill_requirement": 19
+  }
+},
+{
+  "model": "core.assignmentskill",
+  "pk": 21,
+  "fields": {
+    "assignment": 21,
+    "project_skill_requirement": 20
+  }
+}
+]
