@@ -1,0 +1,87 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{% block meta_description %}Workforce capacity, project demand, and team planning in one secure workspace.{% endblock %}">
+  <title>{% block title %}Workforce Planning{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'frontend/vendor/bootstrap-5.3.8.min.css' %}">
+  <link rel="stylesheet" href="{% static 'frontend/css/theme.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% if user.is_authenticated %}app-body{% else %}auth-body{% endif %}">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  {% if not user.is_authenticated %}
+    <div class="auth-shell">
+      <section class="auth-brand-panel" aria-labelledby="auth-product-title">
+        {% include "frontend/components/brand.html" %}
+        <div class="auth-brand-panel__copy">
+          <p class="auth-brand-panel__eyebrow">Plan with confidence</p>
+          <h1 id="auth-product-title">Align people, capacity, and project demand.</h1>
+          <p>A focused planning workspace for managers making clear, evidence-based workforce decisions.</p>
+        </div>
+        <p class="auth-brand-panel__foot">Secure access for authorized workforce planning teams.</p>
+      </section>
+      <main class="auth-main" id="main-content" tabindex="-1">
+        <div class="auth-card">
+  {% else %}
+    <div class="app-shell">
+      <aside class="app-sidebar" aria-label="Application sidebar">
+        {% include "frontend/components/navigation.html" %}
+      </aside>
+
+      <header class="mobile-topbar d-lg-none">
+        {% include "frontend/components/brand.html" %}
+        <button class="mobile-menu-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobile-navigation" aria-controls="mobile-navigation" aria-label="Open navigation menu">
+          <span aria-hidden="true"></span>
+        </button>
+      </header>
+
+      <div class="offcanvas offcanvas-start app-offcanvas" tabindex="-1" id="mobile-navigation" aria-labelledby="mobile-navigation-title">
+        <div class="offcanvas-header">
+          <p class="offcanvas-title fs-6 fw-semibold mb-0" id="mobile-navigation-title">Navigation</p>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close navigation menu"></button>
+        </div>
+        <div class="offcanvas-body">
+          {% include "frontend/components/navigation.html" with compact=True %}
+        </div>
+      </div>
+
+      <div class="app-workspace">
+        <header class="app-topbar d-none d-lg-flex">
+          <div class="workspace-indicator">
+            <span class="workspace-indicator__dot" aria-hidden="true"></span>
+            <span>Workforce planning workspace</span>
+          </div>
+          <div class="topbar-user">
+            <span>Signed in as</span>
+            <strong>{{ user.get_username }}</strong>
+          </div>
+        </header>
+
+        <main class="app-main" id="main-content" tabindex="-1">
+          <div class="app-content-frame">
+            {% include "frontend/components/breadcrumbs.html" with items=breadcrumbs %}
+  {% endif %}
+
+            {% include "frontend/components/messages.html" %}
+            {% block content %}{% endblock %}
+
+  {% if not user.is_authenticated %}
+        </div>
+      </main>
+    </div>
+  {% else %}
+          </div>
+        </main>
+      </div>
+    </div>
+  {% endif %}
+
+  <script src="{% static 'frontend/vendor/bootstrap-5.3.8.bundle.min.js' %}"></script>
+  <script src="{% static 'frontend/js/app.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

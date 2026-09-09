@@ -1,0 +1,61 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Skill Directory | Workforce Planning{% endblock %}
+{% block meta_description %}Browse and maintain workforce skills grouped by category.{% endblock %}
+
+{% block content %}
+  {% if perms.core.add_skill %}
+    {% url 'frontend:skill_create' as skill_create_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Workforce" title="Skill directory" description="Maintain the shared capability catalogue used by employee profiles and project requirements." action_url=skill_create_url action_label="Add skill" only %}
+  {% else %}
+    {% include "frontend/components/page_header.html" with eyebrow="Workforce" title="Skill directory" description="Browse the shared capability catalogue used by employee profiles and project requirements." only %}
+  {% endif %}
+
+  {% include "frontend/components/workforce_tabs.html" %}
+
+  <section class="directory-filter-panel" aria-labelledby="skill-filter-title">
+    <h2 class="visually-hidden" id="skill-filter-title">Filter skills</h2>
+    <form method="get" action="{% url 'frontend:skill_list' %}">
+      <div class="skill-filter-grid">
+        {% include "frontend/components/form_field.html" with field=filter_form.category only %}
+        <div class="directory-filter-actions">
+          <button class="btn btn-primary" type="submit">Apply filter</button>
+          <a class="btn btn-outline-secondary" href="{% url 'frontend:skill_list' %}">Clear</a>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <div class="directory-toolbar" role="status" aria-live="polite">
+    <div>
+      <strong>{{ page_obj.paginator.count }} skill{{ page_obj.paginator.count|pluralize }}</strong>
+      {% if page_obj.paginator.count %}
+        <span>Showing {{ page_obj.start_index }}&ndash;{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
+      {% endif %}
+    </div>
+    <span class="directory-toolbar__note">Grouped by capability category</span>
+  </div>
+
+  {% if skill_groups %}
+    <div class="skill-category-stack">
+      {% for group in skill_groups %}
+        <section class="skill-category-panel" aria-labelledby="skill-category-{{ forloop.counter }}">
+          <div class="skill-category-panel__header">
+            <div>
+              <p class="profile-kicker">Capability category</p>
+              <h2 id="skill-category-{{ forloop.counter }}">{{ group.category }}</h2>
+            </div>
+            <span>{{ group.skill_count }} skill{{ group.skill_count|pluralize }}</span>
+          </div>
+          {% include "frontend/components/table.html" with caption=group.category|add:" skills" headers=skill_headers rows=group.skills row_template="frontend/skills/_skill_row.html" only %}
+        </section>
+      {% endfor %}
+    </div>
+    {% include "frontend/components/pagination.html" with page_obj=page_obj pagination_label="Skill directory pages" only %}
+  {% elif has_active_filters %}
+    {% url 'frontend:skill_list' as skill_list_url %}
+    {% include "frontend/components/empty_state.html" with state_id="skill-filter-empty" title="No skills match this category" message="Choose another category or clear the filter to review the complete skill directory." action_url=skill_list_url action_label="Clear filter" only %}
+  {% else %}
+    {% include "frontend/components/empty_state.html" with state_id="skill-directory-empty" title="No skills yet" message="Skills will appear here once the shared capability catalogue has been started." action_url=skill_create_url action_label="Add the first skill" only %}
+  {% endif %}
+{% endblock %}

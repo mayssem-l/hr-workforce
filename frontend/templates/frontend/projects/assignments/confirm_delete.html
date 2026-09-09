@@ -1,0 +1,30 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}Delete {{ target_name }} Assignment | {{ project.name }}{% endblock %}
+{% block meta_description %}Review what will be deleted with {{ target_name }}'s assignment on {{ project.name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Project workforce" title="Delete assignment" description=project.name only %}
+
+  <div class="proficiency-confirmation-context surface-card">
+    <div>
+      <span>Employee</span>
+      <strong>{{ assignment.employee }}</strong>
+      <small>{{ assignment.employee.position }} · {{ assignment.employee.department }}</small>
+    </div>
+    <div>
+      <span>Assignment</span>
+      <strong>{{ assignment.role_on_project }}</strong>
+      <small>{{ assignment.get_status_display }} · {{ assignment.allocation_percentage|percentage }} allocated</small>
+    </div>
+    <div>
+      <span>Schedule</span>
+      <strong>{{ assignment.start_date|workforce_date }} to {{ assignment.end_date|workforce_date }}</strong>
+      <small>{{ project.name }}</small>
+    </div>
+  </div>
+
+  {% include "frontend/components/cascade_impact.html" with impact=impact only %}
+  {% include "frontend/components/confirmation_state.html" with state_id="delete-assignment-confirmation" title="Delete this assignment?" message=confirmation_message action_url=delete_url action_label="Delete assignment" cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

@@ -1,0 +1,5 @@
+root = true
+
+[*.{py,md,html,css,js}]
+charset = utf-8
+insert_final_newline = true

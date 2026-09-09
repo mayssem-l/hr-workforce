@@ -1,0 +1,52 @@
+<form method="post" novalidate data-loading-form>
+  {% csrf_token %}
+  {% if form.employee %}{{ form.employee }}{% endif %}
+
+  {% if form.non_field_errors %}
+    <div class="employee-form-alert" role="alert">
+      <strong>Proficiency details could not be saved.</strong>
+      {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+    </div>
+  {% endif %}
+
+  <section class="proficiency-form-section surface-card" aria-labelledby="proficiency-fields-title">
+    <div class="employee-form-section__header">
+      <span aria-hidden="true">01</span>
+      <div>
+        <h2 id="proficiency-fields-title">Skill proficiency</h2>
+        <p>Record the skill level and experience exactly as they should appear in workforce planning.</p>
+      </div>
+    </div>
+
+    <div class="proficiency-context">
+      <div>
+        <span>Employee</span>
+        <strong>{{ employee_name }}</strong>
+      </div>
+      {% if employee_skill %}
+        <div>
+          <span>Skill</span>
+          <strong>{{ employee_skill.skill }}</strong>
+          <small>{{ employee_skill.skill.category }}</small>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="proficiency-form-grid">
+      {% if form.skill %}
+        <div class="proficiency-form-grid__skill">
+          {% include "frontend/components/form_field.html" with field=form.skill only %}
+        </div>
+      {% endif %}
+      {% include "frontend/components/form_field.html" with field=form.level only %}
+      {% include "frontend/components/form_field.html" with field=form.years_experience only %}
+    </div>
+  </section>
+
+  <div class="employee-form-actions proficiency-form-actions">
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+    <button class="btn btn-primary" type="submit" data-loading-label="Saving proficiency…">
+      {{ submit_label }}
+    </button>
+  </div>
+</form>

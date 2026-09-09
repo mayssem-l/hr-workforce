@@ -1,0 +1,64 @@
+<form method="post" novalidate data-loading-form>
+  {% csrf_token %}
+  {{ form.assignment }}
+
+  {% if form.non_field_errors %}
+    <div class="employee-form-alert" role="alert">
+      <strong>Requirement coverage could not be saved.</strong>
+      {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+    </div>
+  {% endif %}
+
+  {% if form.assignment.errors %}
+    <div class="employee-form-alert" id="{{ form.assignment.id_for_label }}_error" role="alert">
+      <strong>This coverage conflicts with the assignment context.</strong>
+      {% for error in form.assignment.errors %}<span>{{ error }}</span>{% endfor %}
+    </div>
+  {% endif %}
+
+  <section class="employee-form-section surface-card" aria-labelledby="coverage-fields-title">
+    <div class="employee-form-section__header">
+      <span aria-hidden="true">01</span>
+      <div>
+        <h2 id="coverage-fields-title">Coverage link</h2>
+        <p>Choose the project requirement this employee will support through this assignment.</p>
+      </div>
+    </div>
+
+    <div class="proficiency-context">
+      <div>
+        <span>Employee</span>
+        <strong>{{ assignment.employee }}</strong>
+        <small>{{ assignment.employee.position }} · {{ assignment.employee.department }}</small>
+      </div>
+      <div>
+        <span>Assignment</span>
+        <strong>{{ assignment.role_on_project }}</strong>
+        <small>{{ project.name }} · {{ assignment.get_status_display }}</small>
+      </div>
+    </div>
+
+    <div class="planning-input-state planning-input-state--neutral" role="note">
+      <strong>Coverage checks</strong>
+      <p>Only this project's requirements can be selected. The employee's skill ownership and proficiency, existing coverage, and the number of people needed are checked when you save.</p>
+    </div>
+
+    {% if available_requirement_count %}
+      <div class="employee-form-grid">
+        {% include "frontend/components/form_field.html" with field=form.project_skill_requirement only %}
+      </div>
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>No unlinked requirements</strong>
+        <p>Every project requirement is already linked to this assignment, or the project has no requirements.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <div class="employee-form-actions">
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+    {% if available_requirement_count %}
+      <button class="btn btn-primary" type="submit" data-loading-label="Adding coverage…">Add coverage</button>
+    {% endif %}
+  </div>
+</form>

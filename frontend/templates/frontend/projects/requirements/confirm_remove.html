@@ -1,0 +1,27 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Remove {{ requirement.skill }} Requirement | {{ project.name }}{% endblock %}
+{% block meta_description %}Confirm removal of a project skill requirement.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Project skill demand" title="Remove skill requirement" description=project.name only %}
+
+  <div class="proficiency-confirmation-context surface-card">
+    <div>
+      <span>Project</span>
+      <strong>{{ project.name }}</strong>
+    </div>
+    <div>
+      <span>Skill</span>
+      <strong>{{ requirement.skill.name }}</strong>
+      <small>{{ requirement.skill.category }}</small>
+    </div>
+    <div>
+      <span>Current requirement</span>
+      <strong>Level {{ requirement.required_level }} of 5 · {{ requirement.required_quantity }} person{{ requirement.required_quantity|pluralize }}</strong>
+      <small>{% if requirement.is_mandatory %}Mandatory{% else %}Optional{% endif %} · {{ coverage_count }} linked assignment{{ coverage_count|pluralize }}</small>
+    </div>
+  </div>
+
+  {% include "frontend/components/confirmation_state.html" with state_id="remove-project-requirement-confirmation" title="Remove this skill requirement?" message=confirmation_message action_url=remove_url action_label="Remove requirement" cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

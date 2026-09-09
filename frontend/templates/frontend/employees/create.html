@@ -1,0 +1,9 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Add Employee | Workforce Planning{% endblock %}
+{% block meta_description %}Add an employee to the workforce directory.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Workforce maintenance" title="Add employee" description="Create a workforce profile with the employment details used throughout planning." only %}
+  {% include "frontend/employees/_employee_form.html" with form=form cancel_url=cancel_url submit_label="Add employee" csrf_token=csrf_token only %}
+{% endblock %}

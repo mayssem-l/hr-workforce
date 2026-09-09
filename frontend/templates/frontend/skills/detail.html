@@ -1,0 +1,55 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}{{ skill.name }} | Workforce Planning{% endblock %}
+{% block meta_description %}Review the {{ skill.name }} workforce skill.{% endblock %}
+
+{% block content %}
+  {% if perms.core.change_skill and perms.core.delete_skill %}
+    {% url 'frontend:skill_update' skill.skill_id as skill_update_url %}
+    {% url 'frontend:skill_delete' skill.skill_id as skill_delete_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Skill profile" title=skill.name description="Review this capability definition and its current workforce usage." action_url=skill_update_url action_label="Edit skill" secondary_action_url=skill_delete_url secondary_action_label="Delete skill" secondary_action_class="btn-outline-danger" only %}
+  {% elif perms.core.change_skill %}
+    {% url 'frontend:skill_update' skill.skill_id as skill_update_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Skill profile" title=skill.name description="Review this capability definition and its current workforce usage." action_url=skill_update_url action_label="Edit skill" only %}
+  {% elif perms.core.delete_skill %}
+    {% url 'frontend:skill_delete' skill.skill_id as skill_delete_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Skill profile" title=skill.name description="Review this capability definition and its current workforce usage." action_url=skill_delete_url action_label="Delete skill" action_class="btn-outline-danger" only %}
+  {% else %}
+    {% include "frontend/components/page_header.html" with eyebrow="Skill profile" title=skill.name description="Review this capability definition and its current workforce usage." only %}
+  {% endif %}
+
+  {% include "frontend/components/workforce_tabs.html" %}
+
+  <section class="skill-profile-card surface-card" aria-labelledby="skill-overview-title">
+    <div class="skill-profile-card__heading">
+      <span class="skill-profile-card__mark" aria-hidden="true">SK</span>
+      <div>
+        <p class="profile-kicker">Skill #{{ skill.skill_id|stringformat:"04d" }}</p>
+        <h2 id="skill-overview-title">Capability overview</h2>
+        <p>{{ skill.name }} is grouped under {{ skill.category }}.</p>
+      </div>
+    </div>
+    <dl class="skill-facts">
+      <div>
+        <dt>Skill name</dt>
+        <dd>{{ skill.name }}</dd>
+      </div>
+      <div>
+        <dt>Category</dt>
+        <dd><span class="skill-category-badge">{{ skill.category }}</span></dd>
+      </div>
+      <div>
+        <dt>Employee profiles</dt>
+        <dd>{{ skill.employee_count }}</dd>
+      </div>
+    </dl>
+    {% if skill.employee_count %}
+      <p class="skill-profile-note">This read-only count shows how many employee profiles currently reference the skill. Proficiency maintenance remains part of the employee workflow.</p>
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>No employee profiles use this skill yet</strong>
+        <p>The skill is available in the catalogue and can be assigned through the employee proficiency workflow when that workflow is introduced.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

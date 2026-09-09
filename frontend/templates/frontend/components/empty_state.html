@@ -1,0 +1,10 @@
+<section class="state-card state-card--empty" aria-labelledby="{{ state_id|default:'empty-state-title' }}">
+  <span class="state-card__icon" aria-hidden="true">+</span>
+  <div class="state-card__body">
+    <h2 id="{{ state_id|default:'empty-state-title' }}">{{ title|default:"Nothing here yet" }}</h2>
+    <p>{{ message|default:"Add the first record when you are ready." }}</p>
+    {% if action_url and action_label %}
+      <a class="btn btn-primary" href="{{ action_url }}">{{ action_label }}</a>
+    {% endif %}
+  </div>
+</section>

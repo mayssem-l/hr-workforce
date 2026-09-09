@@ -1,0 +1,25 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}Sign in | Workforce Planning{% endblock %}
+{% block meta_description %}Sign in to the secure workforce planning workspace.{% endblock %}
+
+{% block content %}
+  <p class="auth-card__eyebrow">Secure workspace</p>
+  <h2>Welcome back</h2>
+  <p class="auth-card__intro">Sign in with your workforce planning account to continue.</p>
+
+  {% if form.errors %}
+    <div class="auth-error" role="alert">The username or password is incorrect. Please try again.</div>
+  {% endif %}
+
+  <form method="post" action="{% url 'frontend:login' %}" data-loading-form>
+    {% csrf_token %}
+    {% include "frontend/components/form_field.html" with field=form.username only %}
+    {% include "frontend/components/form_field.html" with field=form.password only %}
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+    <button class="btn btn-primary w-100" type="submit">Sign in</button>
+  </form>
+{% endblock %}

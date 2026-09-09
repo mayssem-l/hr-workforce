@@ -1,0 +1,22 @@
+<nav class="workforce-tabs" aria-label="Workforce sections">
+  <a class="workforce-tabs__item{% if request.resolver_match.url_name == 'employee_list' or request.resolver_match.url_name == 'employee_detail' or request.resolver_match.url_name == 'employee_create' or request.resolver_match.url_name == 'employee_update' or request.resolver_match.url_name == 'employee_delete' or request.resolver_match.url_name == 'employee_skill_create' or request.resolver_match.url_name == 'employee_skill_update' or request.resolver_match.url_name == 'employee_skill_remove' %} is-active{% endif %}"
+     href="{% url 'frontend:employee_list' %}"
+     {% if request.resolver_match.url_name == 'employee_list' or request.resolver_match.url_name == 'employee_detail' or request.resolver_match.url_name == 'employee_create' or request.resolver_match.url_name == 'employee_update' or request.resolver_match.url_name == 'employee_delete' or request.resolver_match.url_name == 'employee_skill_create' or request.resolver_match.url_name == 'employee_skill_update' or request.resolver_match.url_name == 'employee_skill_remove' %}aria-current="page"{% endif %}>
+    Employees
+  </a>
+  <a class="workforce-tabs__item{% if request.resolver_match.url_name == 'skill_list' or request.resolver_match.url_name == 'skill_detail' or request.resolver_match.url_name == 'skill_create' or request.resolver_match.url_name == 'skill_update' or request.resolver_match.url_name == 'skill_delete' %} is-active{% endif %}"
+     href="{% url 'frontend:skill_list' %}"
+     {% if request.resolver_match.url_name == 'skill_list' or request.resolver_match.url_name == 'skill_detail' or request.resolver_match.url_name == 'skill_create' or request.resolver_match.url_name == 'skill_update' or request.resolver_match.url_name == 'skill_delete' %}aria-current="page"{% endif %}>
+    Skills
+  </a>
+  <a class="workforce-tabs__item{% if request.resolver_match.url_name == 'leave_list' or request.resolver_match.url_name == 'leave_create' or request.resolver_match.url_name == 'leave_update' or request.resolver_match.url_name == 'leave_delete' %} is-active{% endif %}"
+     href="{% url 'frontend:leave_list' %}"
+     {% if request.resolver_match.url_name == 'leave_list' or request.resolver_match.url_name == 'leave_create' or request.resolver_match.url_name == 'leave_update' or request.resolver_match.url_name == 'leave_delete' %}aria-current="page"{% endif %}>
+    Leave
+  </a>
+  <a class="workforce-tabs__item{% if request.resolver_match.url_name == 'attendance_list' or request.resolver_match.url_name == 'attendance_create' or request.resolver_match.url_name == 'attendance_update' or request.resolver_match.url_name == 'attendance_delete' %} is-active{% endif %}"
+     href="{% url 'frontend:attendance_list' %}"
+     {% if request.resolver_match.url_name == 'attendance_list' or request.resolver_match.url_name == 'attendance_create' or request.resolver_match.url_name == 'attendance_update' or request.resolver_match.url_name == 'attendance_delete' %}aria-current="page"{% endif %}>
+    Attendance
+  </a>
+</nav>

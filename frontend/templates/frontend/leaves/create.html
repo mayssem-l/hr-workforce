@@ -1,0 +1,9 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Add Leave | Workforce Planning{% endblock %}
+{% block meta_description %}Add a dated employee leave record.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Leave maintenance" title="Add leave" description="Record a dated leave period without changing the employee's employment status." only %}
+  {% include "frontend/leaves/_leave_form.html" with form=form cancel_url=cancel_url submit_label="Add leave" csrf_token=csrf_token only %}
+{% endblock %}

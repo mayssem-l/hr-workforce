@@ -1,0 +1,12 @@
+{% load frontend_format %}
+{% if messages %}
+  <div class="app-messages" aria-live="polite" aria-atomic="true">
+    {% for message in messages %}
+      <div class="alert app-alert {{ message.tags|message_alert_class }}" role="{% if 'error' in message.tags %}alert{% else %}status{% endif %}">
+        <span class="app-alert__mark" aria-hidden="true"></span>
+        <div class="app-alert__copy">{{ message }}</div>
+        <button type="button" class="app-alert__close" data-bs-dismiss="alert" aria-label="Close message">&times;</button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

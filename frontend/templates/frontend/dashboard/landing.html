@@ -1,0 +1,94 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Workforce Overview | Workforce Planning{% endblock %}
+{% block meta_description %}Set the reporting period and workforce filters for the management dashboard.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Dashboard" title="Workforce overview" description="Set a reporting period and focus the workforce and project context for this management view." only %}
+
+  <section class="directory-filter-panel" aria-labelledby="dashboard-filter-title">
+    <div class="section-heading dashboard-filter-heading">
+      <div>
+        <h2 id="dashboard-filter-title">Reporting filters</h2>
+        <p>The current calendar month is used by default. Start and end dates are both included.</p>
+      </div>
+    </div>
+    <form method="get" action="{% url 'frontend:landing' %}">
+      <div class="dashboard-filter-grid">
+        {% include "frontend/components/form_field.html" with field=filter_form.start_date only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.end_date only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.department only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.employee_status only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.project_status only %}
+        <div class="directory-filter-actions">
+          <button class="btn btn-primary" type="submit">Apply filters</button>
+          <a class="btn btn-outline-secondary" href="{% url 'frontend:landing' %}">Reset</a>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  {% if filter_context %}
+    <div class="directory-toolbar" role="status" aria-live="polite">
+      <div>
+        <strong>{{ filter_context.start_date_label }} &ndash; {{ filter_context.end_date_label }}</strong>
+        {% if filter_context.active_optional_filter_count %}
+          <span>{{ filter_context.active_optional_filter_count }} additional filter{{ filter_context.active_optional_filter_count|pluralize }} applied</span>
+        {% else %}
+          <span>All departments and statuses</span>
+        {% endif %}
+      </div>
+      <span class="directory-toolbar__note">Inclusive period &middot; Monday&ndash;Friday planning</span>
+    </div>
+
+    <section class="workspace-intro" aria-labelledby="workspace-intro-title">
+      <div class="workspace-intro__copy">
+        <p class="page-eyebrow">Current reporting context</p>
+        <h2 id="workspace-intro-title">A consistent starting point for workforce insight.</h2>
+        <p>
+          Department: <strong>{{ filter_context.department_label }}</strong><br>
+          Employee status: <strong>{{ filter_context.employee_status_label }}</strong><br>
+          Project status: <strong>{{ filter_context.project_status_label }}</strong>
+        </p>
+      </div>
+      <div class="workspace-intro__signal">
+        <small>Reporting period</small>
+        <strong>{{ filter_context.start_date_label }} &ndash; {{ filter_context.end_date_label }}</strong>
+        <span class="signal-line">Both boundary dates are included</span>
+        <a class="link-light mt-3" href="{{ dashboard_filter_url }}">Current reporting view</a>
+      </div>
+    </section>
+
+    <section aria-labelledby="reporting-scope-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="reporting-scope-title">Reporting scope</h2>
+          <p>The shared context is ready for workforce, capacity, and project insight.</p>
+        </div>
+      </div>
+      <div class="module-grid module-grid--three">
+        <article class="module-card">
+          <span class="module-card__number">01 / WORKFORCE</span>
+          <h3>Employee context</h3>
+          <p>{{ filter_context.department_label }} and {{ filter_context.employee_status_label|lower }} are selected for workforce reporting.</p>
+          <span class="module-card__state">Filter context ready</span>
+        </article>
+        <article class="module-card">
+          <span class="module-card__number">02 / PROJECTS</span>
+          <h3>Project context</h3>
+          <p>{{ filter_context.project_status_label }} will define the project scope for later dashboard evidence.</p>
+          <span class="module-card__state">Filter context ready</span>
+        </article>
+        <article class="module-card">
+          <span class="module-card__number">03 / PERIOD</span>
+          <h3>Weekday planning period</h3>
+          <p>The selected inclusive dates use the existing Monday-to-Friday planning assumptions, without a holiday calendar.</p>
+          <span class="module-card__state">Date context ready</span>
+        </article>
+      </div>
+    </section>
+  {% else %}
+    {% url 'frontend:landing' as dashboard_url %}
+    {% include "frontend/components/error_state.html" with state_id="dashboard-filter-errors" title="Reporting filters need attention" message="Correct the highlighted dates before using this reporting view." action_url=dashboard_url action_label="Reset filters" only %}
+  {% endif %}
+{% endblock %}

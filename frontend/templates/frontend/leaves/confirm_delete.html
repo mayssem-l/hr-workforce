@@ -1,0 +1,29 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}Delete {{ employee_name }} Leave | Workforce Planning{% endblock %}
+{% block meta_description %}Review the dated leave record that will be deleted for {{ employee_name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Leave maintenance" title="Delete leave" description=employee_name only %}
+
+  <div class="proficiency-confirmation-context surface-card">
+    <div>
+      <span>Employee</span>
+      <strong>{{ employee_name }}</strong>
+      <small>{{ leave.employee.department }}</small>
+    </div>
+    <div>
+      <span>Leave type</span>
+      <strong>{{ leave_type }}</strong>
+      <small>{{ leave.get_status_display }}</small>
+    </div>
+    <div>
+      <span>Dates</span>
+      <strong>{{ leave.start_date|workforce_date }} to {{ leave.end_date|workforce_date }}</strong>
+      <small>Dated leave record only</small>
+    </div>
+  </div>
+
+  {% include "frontend/components/confirmation_state.html" with state_id="delete-leave-confirmation" title="Delete this leave record?" message=confirmation_message action_url=delete_url action_label="Delete leave" cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

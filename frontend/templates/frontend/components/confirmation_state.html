@@ -1,0 +1,16 @@
+<section class="state-card state-card--confirmation" role="alert" aria-labelledby="{{ state_id|default:'confirmation-title' }}">
+  <span class="state-card__icon" aria-hidden="true">!</span>
+  <div class="state-card__body">
+    <h2 id="{{ state_id|default:'confirmation-title' }}">{{ title|default:"Confirm this action" }}</h2>
+    <p>{{ message|default:"Review the details before continuing." }}</p>
+    <div class="state-card__actions">
+      {% if action_url %}
+        <form method="post" action="{{ action_url }}" data-loading-form>
+          {% csrf_token %}
+          <button class="btn btn-danger" type="submit">{{ action_label|default:"Confirm" }}</button>
+        </form>
+      {% endif %}
+      {% if cancel_url %}<a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>{% endif %}
+    </div>
+  </div>
+</section>

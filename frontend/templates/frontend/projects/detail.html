@@ -1,0 +1,136 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}{{ profile.project.name }} | Workforce Planning{% endblock %}
+{% block meta_description %}Review planning demand, skill requirements, and assignments for {{ profile.project.name }}.{% endblock %}
+
+{% block content %}
+  {% if perms.core.change_project and perms.core.delete_project %}
+    {% url 'frontend:project_update' profile.project.project_id as project_update_url %}
+    {% url 'frontend:project_delete' profile.project.project_id as project_delete_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Project profile" title=profile.project.name description=profile.project.description action_url=project_update_url action_label="Edit project" secondary_action_url=project_delete_url secondary_action_label="Delete project" secondary_action_class="btn-outline-danger" only %}
+  {% elif perms.core.change_project %}
+    {% url 'frontend:project_update' profile.project.project_id as project_update_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Project profile" title=profile.project.name description=profile.project.description action_url=project_update_url action_label="Edit project" only %}
+  {% elif perms.core.delete_project %}
+    {% url 'frontend:project_delete' profile.project.project_id as project_delete_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Project profile" title=profile.project.name description=profile.project.description action_url=project_delete_url action_label="Delete project" action_class="btn-outline-danger" only %}
+  {% else %}
+    {% include "frontend/components/page_header.html" with eyebrow="Project profile" title=profile.project.name description=profile.project.description only %}
+  {% endif %}
+
+  <section class="employee-profile-card surface-card" aria-labelledby="project-overview-title">
+    <div class="employee-profile-card__identity">
+      <span class="employee-profile-card__avatar" aria-hidden="true">PR</span>
+      <div>
+        <p class="profile-kicker">Project #{{ profile.project.project_id|stringformat:"04d" }}</p>
+        <h2 id="project-overview-title">Project overview</h2>
+        <p>{{ profile.project.start_date|workforce_date }} to {{ profile.project.end_date|workforce_date }}</p>
+      </div>
+      <div class="employee-profile-card__status">
+        <span>Project status</span>
+        {% include "frontend/components/status_badge.html" with status=profile.project.status only %}
+      </div>
+    </div>
+
+    <dl class="employee-facts">
+      <div>
+        <dt>Start date</dt>
+        <dd>{{ profile.project.start_date|workforce_date }}</dd>
+      </div>
+      <div>
+        <dt>End date</dt>
+        <dd>{{ profile.project.end_date|workforce_date }}</dd>
+      </div>
+      <div>
+        <dt>Priority</dt>
+        <dd>{{ profile.project.get_priority_display }}</dd>
+      </div>
+      <div>
+        <dt>Criticality</dt>
+        <dd>{{ profile.project.get_criticality_display }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="planning-inputs-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Demand definition</p>
+        <h2 id="planning-inputs-title">Planning inputs</h2>
+      </div>
+      <span>{{ profile.mandatory_requirement_count }} mandatory requirement{{ profile.mandatory_requirement_count|pluralize }}</span>
+    </div>
+
+    <dl class="skill-facts project-planning-facts">
+      <div>
+        <dt>Project estimate</dt>
+        <dd>{{ profile.project.estimated_hours|decimal_hours }}</dd>
+      </div>
+      <div>
+        <dt>Mandatory skill effort</dt>
+        <dd>{{ profile.mandatory_effort_hours|decimal_hours }}</dd>
+      </div>
+      <div>
+        <dt>Requirements covered</dt>
+        <dd>{{ profile.coverage_count }}</dd>
+      </div>
+    </dl>
+
+    <div class="planning-input-state planning-input-state--{{ profile.readiness.tone }}" role="status">
+      <strong>{{ profile.readiness.label }}</strong>
+      <p>{{ profile.readiness.message }}</p>
+      {% if profile.preflight.blockers %}
+        <ul>
+          {% for blocker in profile.preflight.blockers %}<li>{{ blocker.message }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="project-requirements-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Skill demand</p>
+        <h2 id="project-requirements-title">Skill requirements</h2>
+      </div>
+      <div class="skill-profile-toolbar">
+        <span>{{ profile.requirements|length }} requirement{{ profile.requirements|length|pluralize }}</span>
+        {% if perms.core.add_projectskillrequirement %}
+          <a class="btn btn-sm btn-primary" href="{% url 'frontend:project_requirement_create' profile.project.project_id %}">Add requirement</a>
+        {% endif %}
+      </div>
+    </div>
+    {% if profile.requirements %}
+      {% include "frontend/components/table.html" with caption="Project skill requirements" headers=requirement_headers rows=profile.requirements row_template="frontend/projects/_requirement_row.html" perms=perms only %}
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>No skill requirements defined</strong>
+        <p>This project does not yet describe the skills or proficiency levels needed for delivery.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="project-assignments-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Assigned workforce</p>
+        <h2 id="project-assignments-title">Project assignments</h2>
+      </div>
+      <div class="skill-profile-toolbar">
+        <span>{{ profile.assignments|length }} assignment{{ profile.assignments|length|pluralize }}</span>
+        {% if perms.core.add_assignment %}
+          <a class="btn btn-sm btn-primary" href="{% url 'frontend:project_assignment_create' profile.project.project_id %}">Add assignment</a>
+        {% endif %}
+      </div>
+    </div>
+    {% if profile.assignments %}
+      {% include "frontend/components/table.html" with caption="Project assignments and requirement coverage" headers=assignment_headers rows=profile.assignments row_template="frontend/projects/_assignment_row.html" perms=perms only %}
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>No employees assigned</strong>
+        <p>No employee has been assigned to this project yet.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

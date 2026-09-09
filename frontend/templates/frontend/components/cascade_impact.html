@@ -1,0 +1,113 @@
+<section class="cascade-impact surface-card" aria-labelledby="cascade-impact-title">
+  <div class="cascade-impact__header">
+    <span class="cascade-impact__mark" aria-hidden="true">!</span>
+    <div>
+      <p class="profile-kicker">Permanent action</p>
+      <h2 id="cascade-impact-title">What will be deleted</h2>
+      <p>{{ impact.summary }}</p>
+    </div>
+    <strong>{{ impact.badge_label }}</strong>
+  </div>
+
+  {% if impact.has_related_information %}
+    <dl class="cascade-impact__list">
+      {% if impact.kind == "employee" %}
+        <div>
+          <dt>
+            <span>Employee skills</span>
+            {% for skill in impact.skills %}
+              <small>{{ skill.name }} &mdash; Level {{ skill.level }} of 5</small>
+            {% empty %}
+              <small>No skills are listed for this employee.</small>
+            {% endfor %}
+          </dt>
+          <dd>{{ impact.skills|length }}</dd>
+        </div>
+        <div>
+          <dt>
+            <span>Project assignments</span>
+            <small>{{ impact.assignment_count }} assignment{{ impact.assignment_count|pluralize }}</small>
+          </dt>
+          <dd>{{ impact.assignment_count }}</dd>
+        </div>
+        <div>
+          <dt>
+            <span>Leave</span>
+            <small>{{ impact.leave_count }} leave entr{{ impact.leave_count|pluralize:"y,ies" }}</small>
+          </dt>
+          <dd>{{ impact.leave_count }}</dd>
+        </div>
+        <div>
+          <dt>
+            <span>Attendance history</span>
+            <small>{{ impact.attendance_count }} attendance entr{{ impact.attendance_count|pluralize:"y,ies" }}</small>
+          </dt>
+          <dd>{{ impact.attendance_count }}</dd>
+        </div>
+      {% elif impact.kind == "skill" %}
+        <div>
+          <dt>
+            <span>Employees with this skill</span>
+            {% for employee in impact.employees %}
+              <small>{{ employee.name }} &mdash; Level {{ employee.level }} of 5</small>
+            {% empty %}
+              <small>No employee profiles currently include this skill.</small>
+            {% endfor %}
+          </dt>
+          <dd>{{ impact.employees|length }}</dd>
+        </div>
+        <div>
+          <dt>
+            <span>Project requirements</span>
+            <small>{{ impact.project_requirement_count }} project requirement{{ impact.project_requirement_count|pluralize }}</small>
+          </dt>
+          <dd>{{ impact.project_requirement_count }}</dd>
+        </div>
+      {% elif impact.kind == "project" %}
+        <div>
+          <dt>
+            <span>Skill requirements</span>
+            {% for requirement in impact.requirements %}
+              <small>{{ requirement.name }} &mdash; Level {{ requirement.level }} · {{ requirement.quantity }} {{ requirement.quantity|pluralize:"person,people" }} needed{% if requirement.is_mandatory %} · Mandatory{% else %} · Optional{% endif %}</small>
+            {% empty %}
+              <small>No skill requirements are defined for this project.</small>
+            {% endfor %}
+          </dt>
+          <dd>{{ impact.requirements|length }}</dd>
+        </div>
+        <div>
+          <dt>
+            <span>Employee assignments</span>
+            {% for assignment in impact.assignments %}
+              <small>{{ assignment.employee }} &mdash; {{ assignment.role }} · {{ assignment.status }}</small>
+            {% empty %}
+              <small>No employees are assigned to this project.</small>
+            {% endfor %}
+          </dt>
+          <dd>{{ impact.assignments|length }}</dd>
+        </div>
+        <div>
+          <dt>
+            <span>Requirement coverage</span>
+            <small>{{ impact.coverage_count }} coverage link{{ impact.coverage_count|pluralize }}</small>
+          </dt>
+          <dd>{{ impact.coverage_count }}</dd>
+        </div>
+      {% elif impact.kind == "assignment" %}
+        <div>
+          <dt>
+            <span>Requirement coverage</span>
+            {% for coverage in impact.coverage %}
+              <small>{{ coverage.name }} &mdash; Level {{ coverage.level }} requirement</small>
+            {% empty %}
+              <small>No project requirements are linked to this assignment.</small>
+            {% endfor %}
+          </dt>
+          <dd>{{ impact.coverage_count }}</dd>
+        </div>
+      {% endif %}
+    </dl>
+  {% endif %}
+
+  <p class="cascade-impact__notice">{{ impact.retained_message }}</p>
+</section>

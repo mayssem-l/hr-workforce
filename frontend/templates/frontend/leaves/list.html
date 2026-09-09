@@ -1,0 +1,53 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Leave Directory | Workforce Planning{% endblock %}
+{% block meta_description %}Filter and maintain dated employee leave records.{% endblock %}
+
+{% block content %}
+  {% if perms.core.add_leave %}
+    {% url 'frontend:leave_create' as leave_create_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Workforce availability" title="Leave directory" description="Review dated employee leave by type, approval status, and schedule." action_url=leave_create_url action_label="Add leave" only %}
+  {% else %}
+    {% include "frontend/components/page_header.html" with eyebrow="Workforce availability" title="Leave directory" description="Review dated employee leave by type, approval status, and schedule." only %}
+  {% endif %}
+
+  {% include "frontend/components/workforce_tabs.html" %}
+
+  <section class="directory-filter-panel" aria-labelledby="leave-filter-title">
+    <h2 class="visually-hidden" id="leave-filter-title">Filter leave records</h2>
+    <form method="get" action="{% url 'frontend:leave_list' %}">
+      <div class="project-filter-grid">
+        {% include "frontend/components/form_field.html" with field=filter_form.employee only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.leave_type only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.status only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.from_date only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.to_date only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.sort only %}
+        <div class="directory-filter-actions">
+          <button class="btn btn-primary" type="submit">Apply filters</button>
+          <a class="btn btn-outline-secondary" href="{% url 'frontend:leave_list' %}">Clear</a>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <div class="directory-toolbar" role="status" aria-live="polite">
+    <div>
+      <strong>{{ page_obj.paginator.count }} leave record{{ page_obj.paginator.count|pluralize }}</strong>
+      {% if page_obj.paginator.count %}
+        <span>Showing {{ page_obj.start_index }}&ndash;{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
+      {% endif %}
+    </div>
+    <span class="directory-toolbar__note">Approved dated leave informs availability; employment status remains separate</span>
+  </div>
+
+  {% if page_obj.object_list %}
+    {% include "frontend/components/table.html" with caption="Leave directory results" headers=leave_headers rows=page_obj.object_list row_template="frontend/leaves/_leave_row.html" perms=perms only %}
+    {% include "frontend/components/pagination.html" with page_obj=page_obj pagination_label="Leave directory pages" only %}
+  {% elif has_active_filters %}
+    {% url 'frontend:leave_list' as leave_list_url %}
+    {% include "frontend/components/empty_state.html" with state_id="leave-filter-empty" title="No leave records match these filters" message="Try a different employee, leave type, approval status, or date period." action_url=leave_list_url action_label="Clear filters" only %}
+  {% else %}
+    {% include "frontend/components/empty_state.html" with state_id="leave-directory-empty" title="No leave records yet" message="Dated leave will appear here once it has been added." action_url=leave_create_url action_label="Add the first leave record" only %}
+  {% endif %}
+{% endblock %}

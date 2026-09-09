@@ -8,6 +8,8 @@ from ortools.sat.python import cp_model
 from core.services.effective_availability import (
     calculate_available_hours_for_project,
 )
+from core.services.recommendation_preflight import get_recommendation_preflight
+
 
 def employee_can_cover_requirement(employee, requirement):
     """
@@ -1838,7 +1840,14 @@ def find_all_feasible_teams(project):
     Les informations stables du projet sont précalculées une fois.
     Les équipes manifestement impossibles sont rejetées avant
     d'appeler OR-Tools.
+
+    Un projet qui échoue au preflight ne lance aucune énumération.
     """
+
+    preflight = get_recommendation_preflight(project)
+
+    if not preflight["can_generate_recommendations"]:
+        return []
 
     context = build_optimization_context(project)
     employees = context["employees"]

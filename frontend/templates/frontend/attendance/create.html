@@ -1,0 +1,9 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Add Attendance | Workforce Planning{% endblock %}
+{% block meta_description %}Add a descriptive employee attendance record.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Attendance maintenance" title="Add attendance" description="Record operational attendance history without changing staffing recommendations." only %}
+  {% include "frontend/attendance/_attendance_form.html" with form=form cancel_url=cancel_url submit_label="Add attendance" csrf_token=csrf_token only %}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Remove {{ employee_skill.skill }} from {{ employee_name }} | Workforce Planning{% endblock %}
+{% block meta_description %}Confirm removal of an employee skill proficiency relationship.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Employee skill profile" title="Remove proficiency" description=employee_name only %}
+  {% include "frontend/components/workforce_tabs.html" %}
+
+  <div class="proficiency-confirmation-context surface-card">
+    <div>
+      <span>Employee</span>
+      <strong>{{ employee_name }}</strong>
+    </div>
+    <div>
+      <span>Skill</span>
+      <strong>{{ employee_skill.skill }}</strong>
+      <small>{{ employee_skill.skill.category }}</small>
+    </div>
+    <div>
+      <span>Current proficiency</span>
+      <strong>Level {{ employee_skill.level }} of 5</strong>
+      <small>{{ employee_skill.years_experience|floatformat:1 }} years of experience</small>
+    </div>
+  </div>
+
+  {% include "frontend/components/confirmation_state.html" with state_id="remove-proficiency-confirmation" title="Remove this proficiency?" message=confirmation_message action_url=remove_url action_label="Remove proficiency" cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

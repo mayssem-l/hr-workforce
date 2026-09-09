@@ -1,0 +1,13 @@
+<tr>
+  <td>
+    <div class="skill-directory-identity">
+      <a href="{% url 'frontend:skill_detail' row.skill_id %}">
+        <strong>{{ row.name }}</strong>
+      </a>
+      <small>Skill #{{ row.skill_id|stringformat:"04d" }}</small>
+    </div>
+  </td>
+  <td class="data-table__number">
+    {{ row.employee_count }} employee profile{{ row.employee_count|pluralize }}
+  </td>
+</tr>

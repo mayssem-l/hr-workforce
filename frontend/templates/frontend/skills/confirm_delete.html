@@ -1,0 +1,12 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Delete {{ target_name }} | Workforce Planning{% endblock %}
+{% block meta_description %}Review where {{ target_name }} is used before deleting it.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Workforce maintenance" title="Delete skill" description=target_name only %}
+  {% include "frontend/components/workforce_tabs.html" %}
+
+  {% include "frontend/components/cascade_impact.html" with impact=impact only %}
+  {% include "frontend/components/confirmation_state.html" with state_id="delete-skill-confirmation" title="Delete this skill?" message=confirmation_message action_url=delete_url action_label="Delete skill" cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

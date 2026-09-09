@@ -1,0 +1,28 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Remove {{ requirement.skill }} Coverage | {{ assignment.employee }}{% endblock %}
+{% block meta_description %}Confirm removal of assignment requirement coverage.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Assignment coverage" title="Remove requirement coverage" description=project.name only %}
+
+  <div class="proficiency-confirmation-context surface-card">
+    <div>
+      <span>Employee</span>
+      <strong>{{ assignment.employee }}</strong>
+      <small>{{ assignment.role_on_project }}</small>
+    </div>
+    <div>
+      <span>Project</span>
+      <strong>{{ project.name }}</strong>
+      <small>{{ assignment.get_status_display }} assignment</small>
+    </div>
+    <div>
+      <span>Requirement</span>
+      <strong>{{ requirement.skill.name }} · Level {{ requirement.required_level }}</strong>
+      <small>{{ requirement.required_quantity }} person{{ requirement.required_quantity|pluralize }} needed</small>
+    </div>
+  </div>
+
+  {% include "frontend/components/confirmation_state.html" with state_id="remove-assignment-coverage-confirmation" title="Remove this coverage link?" message=confirmation_message action_url=remove_url action_label="Remove coverage" cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

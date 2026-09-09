@@ -1,0 +1,30 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}Delete {{ target_name }} | Workforce Planning{% endblock %}
+{% block meta_description %}Review the project planning information that will be deleted with {{ target_name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Project maintenance" title="Delete project" description=target_name only %}
+
+  <div class="proficiency-confirmation-context surface-card">
+    <div>
+      <span>Project</span>
+      <strong>{{ project.name }}</strong>
+      <small>Project #{{ project.project_id|stringformat:"04d" }}</small>
+    </div>
+    <div>
+      <span>Schedule</span>
+      <strong>{{ project.start_date|workforce_date }} to {{ project.end_date|workforce_date }}</strong>
+      <small>{{ project.get_status_display }}</small>
+    </div>
+    <div>
+      <span>Planning priority</span>
+      <strong>{{ project.get_priority_display }} priority</strong>
+      <small>{{ project.get_criticality_display }} criticality</small>
+    </div>
+  </div>
+
+  {% include "frontend/components/cascade_impact.html" with impact=impact only %}
+  {% include "frontend/components/confirmation_state.html" with state_id="delete-project-confirmation" title="Delete this project?" message=confirmation_message action_url=delete_url action_label="Delete project" cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

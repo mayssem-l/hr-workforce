@@ -200,6 +200,54 @@ class ProjectSkillRequirement(models.Model):
             ),
         ]
 
+    def clean(self):
+        super().clean()
+
+        if not self.pk or self.required_quantity is None:
+            return
+
+        current_coverages = list(
+            self.assignment_skills.filter(
+                assignment__status__in=[
+                    Assignment.Status.PLANNED,
+                    Assignment.Status.ACTIVE,
+                ]
+            )
+            .select_related("assignment__employee")
+            .order_by(
+                "assignment__employee__last_name",
+                "assignment__employee__first_name",
+                "assignment_skill_id",
+            )
+        )
+        coverage_count = len(current_coverages)
+        if coverage_count <= self.required_quantity:
+            return
+
+        reduction_count = coverage_count - self.required_quantity
+        employee_label = "employee" if coverage_count == 1 else "employees"
+        removal_label = (
+            "one employee"
+            if reduction_count == 1
+            else f"{reduction_count} employees"
+        )
+        employee_names = ", ".join(
+            str(coverage.assignment.employee) for coverage in current_coverages
+        )
+        message = (
+            f"This requirement is currently covered by {coverage_count} "
+            f"{employee_label}. To reduce the required quantity to "
+            f"{self.required_quantity}, first remove {removal_label} from this "
+            "requirement's coverage."
+        )
+        if employee_names:
+            message = (
+                f"{message} Currently covering this requirement: "
+                f"{employee_names}."
+            )
+
+        raise ValidationError({"required_quantity": message})
+
     def __str__(self):
         return f"{self.project} requires {self.skill} (level {self.required_level})"
 

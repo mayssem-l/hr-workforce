@@ -1,0 +1,54 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Requirement Coverage | {{ profile.assignment.employee }} | {{ profile.assignment.project.name }}{% endblock %}
+{% block meta_description %}Review project requirement coverage for {{ profile.assignment.employee }} on {{ profile.assignment.project.name }}.{% endblock %}
+
+{% block content %}
+  {% if perms.core.add_assignmentskill and profile.available_count %}
+    {% url 'frontend:project_assignment_coverage_create' profile.assignment.project_id profile.assignment.assignment_id as add_coverage_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Assignment coverage" title="Requirement coverage" description=profile.assignment.project.name action_url=add_coverage_url action_label="Add coverage" only %}
+  {% else %}
+    {% include "frontend/components/page_header.html" with eyebrow="Assignment coverage" title="Requirement coverage" description=profile.assignment.project.name only %}
+  {% endif %}
+
+  <div class="proficiency-confirmation-context surface-card">
+    <div>
+      <span>Employee</span>
+      <strong>{{ profile.assignment.employee }}</strong>
+      <small>{{ profile.assignment.employee.position }} · {{ profile.assignment.employee.department }}</small>
+    </div>
+    <div>
+      <span>Assignment</span>
+      <strong>{{ profile.assignment.role_on_project }}</strong>
+      <small>{{ profile.assignment.get_status_display }} · {{ profile.assignment.allocation_percentage }}% allocated</small>
+    </div>
+    <div>
+      <span>Coverage</span>
+      <strong>{{ profile.covered_count }} of {{ profile.rows|length }} requirements linked</strong>
+      <small>{{ profile.available_count }} currently available to add</small>
+    </div>
+  </div>
+
+  <div class="planning-input-state planning-input-state--neutral" role="note">
+    <strong>How coverage works</strong>
+    <p>Coverage records which project requirements this assignment supports. Existing employee skill, proficiency, project, and staffing-limit rules determine what can be linked.</p>
+  </div>
+
+  <section class="profile-panel surface-card" aria-labelledby="coverage-requirements-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Project skill demand</p>
+        <h2 id="coverage-requirements-title">Requirement availability</h2>
+      </div>
+      <span>{{ profile.rows|length }} requirement{{ profile.rows|length|pluralize }}</span>
+    </div>
+    {% if profile.rows %}
+      {% include "frontend/components/table.html" with caption="Requirement coverage for this assignment" headers=coverage_headers rows=profile.rows row_template="frontend/projects/assignments/coverage/_coverage_row.html" perms=perms only %}
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>No project requirements defined</strong>
+        <p>Add skill requirements to the project before linking assignment coverage.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

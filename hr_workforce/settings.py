@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'frontend.apps.FrontendConfig',
 ]
 
 MIDDLEWARE = [
@@ -116,6 +117,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+# Authentication
+
+LOGIN_URL = 'frontend:login'
+LOGIN_REDIRECT_URL = 'frontend:landing'
+LOGOUT_REDIRECT_URL = 'frontend:login'
 
 
 # Email

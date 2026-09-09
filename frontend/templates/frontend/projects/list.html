@@ -1,0 +1,52 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Project Directory | Workforce Planning{% endblock %}
+{% block meta_description %}Search and filter the project directory for current planning demand.{% endblock %}
+
+{% block content %}
+  {% if perms.core.add_project %}
+    {% url 'frontend:project_create' as project_create_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Project planning" title="Project directory" description="Review planned demand by project, schedule, priority, criticality, and current status." action_url=project_create_url action_label="Add project" only %}
+  {% else %}
+    {% include "frontend/components/page_header.html" with eyebrow="Project planning" title="Project directory" description="Review planned demand by project, schedule, priority, criticality, and current status." only %}
+  {% endif %}
+
+  <section class="directory-filter-panel" aria-labelledby="project-filter-title">
+    <h2 class="visually-hidden" id="project-filter-title">Filter projects</h2>
+    <form method="get" action="{% url 'frontend:project_list' %}" role="search">
+      <div class="project-filter-grid">
+        {% include "frontend/components/form_field.html" with field=filter_form.query only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.status only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.priority only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.criticality only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.starts_on_or_after only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.ends_on_or_before only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.sort only %}
+        <div class="directory-filter-actions">
+          <button class="btn btn-primary" type="submit">Apply filters</button>
+          <a class="btn btn-outline-secondary" href="{% url 'frontend:project_list' %}">Clear</a>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <div class="directory-toolbar" role="status" aria-live="polite">
+    <div>
+      <strong>{{ page_obj.paginator.count }} project{{ page_obj.paginator.count|pluralize }}</strong>
+      {% if page_obj.paginator.count %}
+        <span>Showing {{ page_obj.start_index }}&ndash;{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
+      {% endif %}
+    </div>
+    <span class="directory-toolbar__note">Stored planning demand</span>
+  </div>
+
+  {% if page_obj.object_list %}
+    {% include "frontend/components/table.html" with caption="Project directory results" headers=project_headers rows=page_obj.object_list row_template="frontend/projects/_project_row.html" only %}
+    {% include "frontend/components/pagination.html" with page_obj=page_obj pagination_label="Project directory pages" only %}
+  {% elif has_active_filters %}
+    {% url 'frontend:project_list' as project_list_url %}
+    {% include "frontend/components/empty_state.html" with state_id="project-filter-empty" title="No projects match these filters" message="Try a different name, project status, priority, criticality, or date range." action_url=project_list_url action_label="Clear filters" only %}
+  {% else %}
+    {% include "frontend/components/empty_state.html" with state_id="project-directory-empty" title="No projects yet" message="Projects will appear here once planning demand has been added." only %}
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,60 @@
+<form method="post" novalidate data-loading-form>
+  {% csrf_token %}
+  {{ form.project }}
+
+  {% if form.non_field_errors %}
+    <div class="employee-form-alert" role="alert">
+      <strong>Skill requirement details could not be saved.</strong>
+      {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+    </div>
+  {% endif %}
+
+  {% if preflight.blockers %}
+    <div class="planning-input-state planning-input-state--warning" role="status">
+      <strong>Existing planning input needs attention</strong>
+      <ul>
+        {% for blocker in preflight.blockers %}<li>{{ blocker.message }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <section class="employee-form-section surface-card" aria-labelledby="requirement-fields-title">
+    <div class="employee-form-section__header">
+      <span aria-hidden="true">01</span>
+      <div>
+        <h2 id="requirement-fields-title">Skill demand</h2>
+        <p>Define the capability, proficiency, staffing need, and effort for this project.</p>
+      </div>
+    </div>
+
+    <div class="proficiency-context">
+      <div>
+        <span>Project</span>
+        <strong>{{ project.name }}</strong>
+      </div>
+      {% if requirement %}
+        <div>
+          <span>Current skill</span>
+          <strong>{{ requirement.skill.name }}</strong>
+          <small>{{ requirement.skill.category }}</small>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="employee-form-grid employee-form-grid--two">
+      {% include "frontend/components/form_field.html" with field=form.skill only %}
+      {% include "frontend/components/form_field.html" with field=form.required_level only %}
+      {% include "frontend/components/form_field.html" with field=form.required_quantity only %}
+      {% include "frontend/components/form_field.html" with field=form.estimated_effort_hours only %}
+      {% include "frontend/components/form_field.html" with field=form.priority only %}
+      {% include "frontend/components/form_field.html" with field=form.is_mandatory only %}
+    </div>
+  </section>
+
+  <div class="employee-form-actions">
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+    <button class="btn btn-primary" type="submit" data-loading-label="Saving requirement…">
+      {{ submit_label }}
+    </button>
+  </div>
+</form>

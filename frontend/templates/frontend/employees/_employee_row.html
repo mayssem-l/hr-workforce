@@ -1,0 +1,18 @@
+{% load frontend_format %}
+<tr>
+  <td>
+    <a class="employee-identity employee-identity__link" href="{% url 'frontend:employee_detail' row.employee_id %}" aria-label="View profile for {{ row.first_name }} {{ row.last_name }}">
+      <span class="employee-identity__avatar" aria-hidden="true">{{ row.first_name|first|upper }}{{ row.last_name|first|upper }}</span>
+      <span class="employee-identity__copy">
+        <strong>{{ row.first_name }} {{ row.last_name }}</strong>
+        <small>Employee #{{ row.employee_id|stringformat:"04d" }}</small>
+      </span>
+    </a>
+  </td>
+  <td>{{ row.department }}</td>
+  <td>{{ row.position }}</td>
+  <td class="data-table__number">{{ row.capacity_hours_week|decimal_hours }}</td>
+  <td class="data-table__number">{{ row.experience_years|floatformat:1 }} years</td>
+  <td>{{ row.hire_date|workforce_date }}</td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.status only %}</td>
+</tr>

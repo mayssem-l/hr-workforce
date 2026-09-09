@@ -1,0 +1,53 @@
+<form method="post" novalidate data-loading-form>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="employee-form-alert" role="alert">
+      <strong>Project details could not be saved.</strong>
+      {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="employee-form-layout">
+    <section class="employee-form-section surface-card" aria-labelledby="project-definition-fields-title">
+      <div class="employee-form-section__header">
+        <span aria-hidden="true">01</span>
+        <div>
+          <h2 id="project-definition-fields-title">Project definition</h2>
+          <p>Record the project name, delivery purpose, and current planning stage.</p>
+        </div>
+      </div>
+      <div class="employee-form-grid employee-form-grid--two">
+        {% include "frontend/components/form_field.html" with field=form.name only %}
+        {% include "frontend/components/form_field.html" with field=form.status only %}
+        <div class="employee-form-grid__full">
+          {% include "frontend/components/form_field.html" with field=form.description only %}
+        </div>
+      </div>
+    </section>
+
+    <section class="employee-form-section surface-card" aria-labelledby="project-planning-fields-title">
+      <div class="employee-form-section__header">
+        <span aria-hidden="true">02</span>
+        <div>
+          <h2 id="project-planning-fields-title">Schedule and planning</h2>
+          <p>Set the delivery window, overall effort estimate, priority, and business criticality.</p>
+        </div>
+      </div>
+      <div class="employee-form-grid employee-form-grid--two">
+        {% include "frontend/components/form_field.html" with field=form.start_date only %}
+        {% include "frontend/components/form_field.html" with field=form.end_date only %}
+        {% include "frontend/components/form_field.html" with field=form.estimated_hours only %}
+        {% include "frontend/components/form_field.html" with field=form.priority only %}
+        {% include "frontend/components/form_field.html" with field=form.criticality only %}
+      </div>
+    </section>
+  </div>
+
+  <div class="employee-form-actions">
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+    <button class="btn btn-primary" type="submit" data-loading-label="Saving project…">
+      {{ submit_label }}
+    </button>
+  </div>
+</form>

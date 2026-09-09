@@ -1,0 +1,9 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Add Assignment | {{ project.name }}{% endblock %}
+{% block meta_description %}Assign an employee to {{ project.name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Project workforce" title="Add assignment" description=project.name only %}
+  {% include "frontend/projects/assignments/_form.html" with form=form project=project cancel_url=cancel_url submit_label="Add assignment" csrf_token=csrf_token only %}
+{% endblock %}

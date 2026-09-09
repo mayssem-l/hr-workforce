@@ -1,0 +1,19 @@
+<tr>
+  <td>
+    <span class="profile-table-primary">{{ row.requirement.skill.name }}</span><br>
+    <span class="profile-table-secondary">{{ row.requirement.skill.category }} · Level {{ row.requirement.required_level }} required</span>
+  </td>
+  <td class="data-table__number">{{ row.requirement.required_quantity }}</td>
+  <td>{% if row.requirement.is_mandatory %}Mandatory{% else %}Optional{% endif %}</td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.status_tone label=row.status_label only %}</td>
+  <td>{{ row.message }}</td>
+  <td>
+    {% if row.coverage and perms.core.delete_assignmentskill %}
+      <div class="skill-profile-list__actions">
+        <a class="skill-profile-list__remove" href="{% url 'frontend:project_assignment_coverage_remove' row.project_id row.assignment_id row.coverage.assignment_skill_id %}">Remove</a>
+      </div>
+    {% else %}
+      <span class="profile-table-secondary">No action needed</span>
+    {% endif %}
+  </td>
+</tr>

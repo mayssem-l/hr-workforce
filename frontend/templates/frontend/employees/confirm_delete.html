@@ -1,0 +1,12 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Delete {{ target_name }} | Workforce Planning{% endblock %}
+{% block meta_description %}Review what will be deleted with {{ target_name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Workforce maintenance" title="Delete employee" description=target_name only %}
+  {% include "frontend/components/workforce_tabs.html" %}
+
+  {% include "frontend/components/cascade_impact.html" with impact=impact only %}
+  {% include "frontend/components/confirmation_state.html" with state_id="delete-employee-confirmation" title="Delete this employee?" message=confirmation_message action_url=delete_url action_label="Delete employee" cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

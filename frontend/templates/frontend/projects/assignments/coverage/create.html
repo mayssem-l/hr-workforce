@@ -1,0 +1,9 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Add Requirement Coverage | {{ assignment.employee }} | {{ project.name }}{% endblock %}
+{% block meta_description %}Link a project requirement to {{ assignment.employee }}'s assignment on {{ project.name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Assignment coverage" title="Add requirement coverage" description=project.name only %}
+  {% include "frontend/projects/assignments/coverage/_form.html" with assignment=assignment project=project form=form available_requirement_count=available_requirement_count cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

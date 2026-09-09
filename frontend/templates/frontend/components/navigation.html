@@ -1,0 +1,69 @@
+{% if not compact %}
+  {% include "frontend/components/brand.html" %}
+{% endif %}
+
+<div class="app-nav__section">
+  <p class="app-nav__label">Workspace</p>
+  <nav class="app-nav" aria-label="Primary navigation">
+    <a class="app-nav__item{% if request.resolver_match.url_name == 'landing' %} is-active{% endif %}"
+       href="{% url 'frontend:landing' %}"
+       {% if request.resolver_match.url_name == 'landing' %}aria-current="page"{% endif %}>
+      <span class="app-nav__index" aria-hidden="true">01</span>
+      <span class="app-nav__copy">
+        <strong>Dashboard</strong>
+        <small>Planning overview</small>
+      </span>
+    </a>
+    <a class="app-nav__item{% if request.resolver_match.url_name == 'employee_list' or request.resolver_match.url_name == 'employee_detail' or request.resolver_match.url_name == 'employee_create' or request.resolver_match.url_name == 'employee_update' or request.resolver_match.url_name == 'employee_delete' or request.resolver_match.url_name == 'employee_skill_create' or request.resolver_match.url_name == 'employee_skill_update' or request.resolver_match.url_name == 'employee_skill_remove' or request.resolver_match.url_name == 'skill_list' or request.resolver_match.url_name == 'skill_detail' or request.resolver_match.url_name == 'skill_create' or request.resolver_match.url_name == 'skill_update' or request.resolver_match.url_name == 'skill_delete' or request.resolver_match.url_name == 'leave_list' or request.resolver_match.url_name == 'leave_create' or request.resolver_match.url_name == 'leave_update' or request.resolver_match.url_name == 'leave_delete' or request.resolver_match.url_name == 'attendance_list' or request.resolver_match.url_name == 'attendance_create' or request.resolver_match.url_name == 'attendance_update' or request.resolver_match.url_name == 'attendance_delete' %} is-active{% endif %}"
+       href="{% url 'frontend:employee_list' %}"
+       {% if request.resolver_match.url_name == 'employee_list' or request.resolver_match.url_name == 'employee_detail' or request.resolver_match.url_name == 'employee_create' or request.resolver_match.url_name == 'employee_update' or request.resolver_match.url_name == 'employee_delete' or request.resolver_match.url_name == 'employee_skill_create' or request.resolver_match.url_name == 'employee_skill_update' or request.resolver_match.url_name == 'employee_skill_remove' or request.resolver_match.url_name == 'skill_list' or request.resolver_match.url_name == 'skill_detail' or request.resolver_match.url_name == 'skill_create' or request.resolver_match.url_name == 'skill_update' or request.resolver_match.url_name == 'skill_delete' or request.resolver_match.url_name == 'leave_list' or request.resolver_match.url_name == 'leave_create' or request.resolver_match.url_name == 'leave_update' or request.resolver_match.url_name == 'leave_delete' or request.resolver_match.url_name == 'attendance_list' or request.resolver_match.url_name == 'attendance_create' or request.resolver_match.url_name == 'attendance_update' or request.resolver_match.url_name == 'attendance_delete' %}aria-current="page"{% endif %}>
+      <span class="app-nav__index" aria-hidden="true">02</span>
+      <span class="app-nav__copy">
+        <strong>Workforce</strong>
+        <small>People and capacity</small>
+      </span>
+    </a>
+    <a class="app-nav__item{% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_requirement_create' or request.resolver_match.url_name == 'project_requirement_update' or request.resolver_match.url_name == 'project_requirement_remove' or request.resolver_match.url_name == 'project_assignment_create' or request.resolver_match.url_name == 'project_assignment_update' or request.resolver_match.url_name == 'project_assignment_delete' or request.resolver_match.url_name == 'project_assignment_coverage' or request.resolver_match.url_name == 'project_assignment_coverage_create' or request.resolver_match.url_name == 'project_assignment_coverage_remove' %} is-active{% endif %}"
+       href="{% url 'frontend:project_list' %}"
+       {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_requirement_create' or request.resolver_match.url_name == 'project_requirement_update' or request.resolver_match.url_name == 'project_requirement_remove' or request.resolver_match.url_name == 'project_assignment_create' or request.resolver_match.url_name == 'project_assignment_update' or request.resolver_match.url_name == 'project_assignment_delete' or request.resolver_match.url_name == 'project_assignment_coverage' or request.resolver_match.url_name == 'project_assignment_coverage_create' or request.resolver_match.url_name == 'project_assignment_coverage_remove' %}aria-current="page"{% endif %}>
+      <span class="app-nav__index" aria-hidden="true">03</span>
+      <span class="app-nav__copy">
+        <strong>Projects</strong>
+        <small>Demand and requirements</small>
+      </span>
+    </a>
+    <span class="app-nav__item is-disabled" aria-disabled="true">
+      <span class="app-nav__index" aria-hidden="true">04</span>
+      <span class="app-nav__copy">
+        <strong>Planning</strong>
+        <small>Assignments and scenarios</small>
+      </span>
+      <span class="app-nav__soon">Soon</span>
+    </span>
+    <span class="app-nav__item is-disabled" aria-disabled="true">
+      <span class="app-nav__index" aria-hidden="true">05</span>
+      <span class="app-nav__copy">
+        <strong>Recommendations</strong>
+        <small>Feasible team options</small>
+      </span>
+      <span class="app-nav__soon">Soon</span>
+    </span>
+  </nav>
+</div>
+
+<div class="app-nav__footer">
+  <div class="user-summary">
+    <span class="user-summary__avatar" aria-hidden="true">{{ user.get_username|first|upper }}</span>
+    <span class="user-summary__copy">
+      <strong>{{ user.get_username }}</strong>
+      <small>Signed in securely</small>
+    </span>
+  </div>
+  <form method="post" action="{% url 'frontend:logout' %}" data-loading-form>
+    {% csrf_token %}
+    <button class="app-nav__logout" type="submit">
+      <span>Sign out</span>
+      <span aria-hidden="true">↗</span>
+    </button>
+  </form>
+</div>

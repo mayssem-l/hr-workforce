@@ -1,0 +1,191 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}{{ profile.full_name }} | Workforce Planning{% endblock %}
+{% block meta_description %}Review {{ profile.full_name }}'s workforce profile, capacity, assignments, approved leave, and skills.{% endblock %}
+
+{% block content %}
+  {% if perms.core.change_employee and perms.core.delete_employee %}
+    {% url 'frontend:employee_update' profile.employee.employee_id as employee_update_url %}
+    {% url 'frontend:employee_delete' profile.employee.employee_id as employee_delete_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Employee profile" title=profile.full_name description=profile.position_summary action_url=employee_update_url action_label="Edit employee" secondary_action_url=employee_delete_url secondary_action_label="Delete employee" secondary_action_class="btn-outline-danger" only %}
+  {% elif perms.core.change_employee %}
+    {% url 'frontend:employee_update' profile.employee.employee_id as employee_update_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Employee profile" title=profile.full_name description=profile.position_summary action_url=employee_update_url action_label="Edit employee" only %}
+  {% elif perms.core.delete_employee %}
+    {% url 'frontend:employee_delete' profile.employee.employee_id as employee_delete_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Employee profile" title=profile.full_name description=profile.position_summary action_url=employee_delete_url action_label="Delete employee" action_class="btn-outline-danger" only %}
+  {% else %}
+    {% include "frontend/components/page_header.html" with eyebrow="Employee profile" title=profile.full_name description=profile.position_summary only %}
+  {% endif %}
+
+  <section class="employee-profile-card surface-card" aria-labelledby="employee-overview-title">
+    <div class="employee-profile-card__identity">
+      <span class="employee-profile-card__avatar" aria-hidden="true">{{ profile.employee.first_name|first|upper }}{{ profile.employee.last_name|first|upper }}</span>
+      <div>
+        <p class="profile-kicker">Employee #{{ profile.employee.employee_id|stringformat:"04d" }}</p>
+        <h2 id="employee-overview-title">Employment overview</h2>
+        <p>{{ profile.employee.position }} · {{ profile.employee.department }}</p>
+      </div>
+      <div class="employee-profile-card__status">
+        <span>Employment status</span>
+        {% include "frontend/components/status_badge.html" with status=profile.employee.status only %}
+      </div>
+    </div>
+
+    <dl class="employee-facts">
+      <div>
+        <dt>Department</dt>
+        <dd>{{ profile.employee.department }}</dd>
+      </div>
+      <div>
+        <dt>Position</dt>
+        <dd>{{ profile.employee.position }}</dd>
+      </div>
+      <div>
+        <dt>Hire date</dt>
+        <dd>{{ profile.employee.hire_date|workforce_date }}</dd>
+      </div>
+      <div>
+        <dt>Experience</dt>
+        <dd>{{ profile.employee.experience_years|floatformat:1 }} years</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="profile-section" aria-labelledby="capacity-title">
+    <div class="section-heading profile-section__heading">
+      <div>
+        <h2 id="capacity-title">Capacity and workload</h2>
+        <p>Service-calculated planning context as of {{ profile.as_of|workforce_date }}.</p>
+      </div>
+    </div>
+
+    <div class="capacity-metric-grid">
+      <article class="capacity-metric">
+        <span>Weekly capacity</span>
+        <strong>{{ profile.weekly_capacity_hours|decimal_hours }}</strong>
+        <small>Stored working capacity</small>
+      </article>
+      <article class="capacity-metric">
+        <span>Current workload</span>
+        <strong>{{ profile.current_workload_percentage|percentage }}</strong>
+        <small>Allocated on this date</small>
+      </article>
+      <article class="capacity-metric">
+        <span>Unallocated weekly hours</span>
+        <strong>{{ profile.available_weekly_hours|decimal_hours }}</strong>
+        <small>After current workload</small>
+      </article>
+      <article class="capacity-metric capacity-metric--accent">
+        <span>Available today</span>
+        <strong>{{ profile.available_today_hours|decimal_hours }}</strong>
+        <small>Effective weekday availability</small>
+      </article>
+    </div>
+
+    <p class="capacity-assumption">
+      Daily availability uses the current Monday-to-Friday capacity model. Employment status and dated approved leave are shown as separate planning signals.
+    </p>
+  </section>
+
+  <div class="profile-detail-grid">
+    <section class="profile-panel profile-panel--assignments surface-card" aria-labelledby="assignments-title">
+      <div class="profile-panel__header">
+        <div>
+          <p class="profile-kicker">Planning context</p>
+          <h2 id="assignments-title">Current and upcoming assignments</h2>
+        </div>
+        <span>{{ profile.assignments|length }} assignment{{ profile.assignments|length|pluralize }}</span>
+      </div>
+      {% if profile.assignments %}
+        {% include "frontend/components/table.html" with caption="Current and upcoming employee assignments" headers=assignment_headers rows=profile.assignments row_template="frontend/employees/_assignment_row.html" only %}
+      {% else %}
+        <div class="profile-empty" role="status">
+          <strong>No active or upcoming assignments</strong>
+          <p>This employee has no active or planned assignment ending on or after today.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="profile-panel surface-card" aria-labelledby="skills-title">
+      <div class="profile-panel__header">
+        <div>
+          <p class="profile-kicker">Capability profile</p>
+          <h2 id="skills-title">Skills and proficiency</h2>
+        </div>
+        <div class="skill-profile-toolbar">
+          <span>{{ profile.skills|length }} skill{{ profile.skills|length|pluralize }}</span>
+          {% if perms.core.add_employeeskill %}
+            <a class="btn btn-sm btn-primary" href="{% url 'frontend:employee_skill_create' profile.employee.employee_id %}">Add skill</a>
+          {% endif %}
+        </div>
+      </div>
+      {% if profile.skills %}
+        <ul class="skill-profile-list">
+          {% for employee_skill in profile.skills %}
+            <li>
+              <div class="skill-profile-list__heading">
+                <div>
+                  {% if perms.core.view_skill %}
+                    <strong><a class="profile-skill-link" href="{% url 'frontend:skill_detail' employee_skill.skill.skill_id %}">{{ employee_skill.skill.name }}</a></strong>
+                  {% else %}
+                    <strong>{{ employee_skill.skill.name }}</strong>
+                  {% endif %}
+                  <span>{{ employee_skill.skill.category }}</span>
+                </div>
+                <div class="skill-profile-list__controls">
+                  <span class="proficiency-level">Level {{ employee_skill.level }} of 5</span>
+                  {% if perms.core.change_employeeskill or perms.core.delete_employeeskill %}
+                    <div class="skill-profile-list__actions" aria-label="Manage {{ employee_skill.skill.name }} proficiency">
+                      {% if perms.core.change_employeeskill %}
+                        <a href="{% url 'frontend:employee_skill_update' profile.employee.employee_id employee_skill.employee_skill_id %}">Edit</a>
+                      {% endif %}
+                      {% if perms.core.delete_employeeskill %}
+                        <a class="skill-profile-list__remove" href="{% url 'frontend:employee_skill_remove' profile.employee.employee_id employee_skill.employee_skill_id %}">Remove</a>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <p>{{ employee_skill.years_experience|floatformat:1 }} years of experience</p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="profile-empty" role="status">
+          <strong>No skills recorded</strong>
+          <p>Skills and proficiency will appear here once they are added to this employee.</p>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+
+  <section class="profile-panel surface-card" aria-labelledby="leave-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Dated availability</p>
+        <h2 id="leave-title">Upcoming approved leave</h2>
+      </div>
+      <span>{{ profile.upcoming_leaves|length }} leave record{{ profile.upcoming_leaves|length|pluralize }}</span>
+    </div>
+    {% if profile.upcoming_leaves %}
+      <ul class="leave-profile-list">
+        {% for leave in profile.upcoming_leaves %}
+          <li>
+            <div>
+              <strong>{{ leave.get_type_display }} leave</strong>
+              <span>{{ leave.start_date|workforce_date }} to {{ leave.end_date|workforce_date }}</span>
+            </div>
+            {% include "frontend/components/status_badge.html" with status=leave.status only %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>No upcoming approved leave</strong>
+        <p>No approved dated leave ending on or after today is recorded for this employee.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

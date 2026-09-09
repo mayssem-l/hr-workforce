@@ -1,0 +1,5 @@
+{% load frontend_format %}
+<span class="status-badge {{ status|status_badge_class }}">
+  <span class="status-badge__dot" aria-hidden="true"></span>
+  {% if label %}{{ label }}{% else %}{{ status|status_label }}{% endif %}
+</span>

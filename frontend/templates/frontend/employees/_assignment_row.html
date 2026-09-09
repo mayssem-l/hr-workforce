@@ -1,0 +1,13 @@
+{% load frontend_format %}
+<tr>
+  <td>
+    <strong class="profile-table-primary">{{ row.project.name }}</strong>
+  </td>
+  <td>{{ row.role_on_project }}</td>
+  <td class="data-table__number">
+    {{ row.start_date|workforce_date }}<br>
+    <span class="profile-table-secondary">to {{ row.end_date|workforce_date }}</span>
+  </td>
+  <td class="data-table__number">{{ row.allocation_percentage|percentage }}</td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.status only %}</td>
+</tr>

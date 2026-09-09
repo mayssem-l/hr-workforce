@@ -1,0 +1,33 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}Delete {{ employee_name }} Attendance | Workforce Planning{% endblock %}
+{% block meta_description %}Review the attendance record that will be deleted for {{ employee_name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Attendance maintenance" title="Delete attendance" description=employee_name only %}
+
+  <div class="proficiency-confirmation-context surface-card">
+    <div>
+      <span>Employee</span>
+      <strong>{{ employee_name }}</strong>
+      <small>{{ attendance.employee.department }}</small>
+    </div>
+    <div>
+      <span>Date</span>
+      <strong>{{ attendance.date|workforce_date }}</strong>
+      <small>{{ attendance.get_status_display }}</small>
+    </div>
+    <div>
+      <span>Recorded times</span>
+      <strong>
+        {% if attendance.arrival_time %}{{ attendance.arrival_time|time:"g:i A" }}{% else %}No arrival time{% endif %}
+        to
+        {% if attendance.departure_time %}{{ attendance.departure_time|time:"g:i A" }}{% else %}no departure time{% endif %}
+      </strong>
+      <small>Descriptive history only</small>
+    </div>
+  </div>
+
+  {% include "frontend/components/confirmation_state.html" with state_id="delete-attendance-confirmation" title="Delete this attendance record?" message=confirmation_message action_url=delete_url action_label="Delete attendance" cancel_url=cancel_url csrf_token=csrf_token only %}
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Add Project | Workforce Planning{% endblock %}
+{% block meta_description %}Add a project to the workforce planning directory.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Project maintenance" title="Add project" description="Create the project profile managers will use to define demand and plan delivery." only %}
+  {% include "frontend/projects/_project_form.html" with form=form cancel_url=cancel_url submit_label="Add project" csrf_token=csrf_token only %}
+{% endblock %}

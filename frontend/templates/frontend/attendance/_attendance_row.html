@@ -1,0 +1,31 @@
+{% load frontend_format %}
+<tr>
+  <td>
+    <div class="skill-directory-identity">
+      <a href="{% url 'frontend:employee_detail' row.employee_id %}"><strong>{{ row.employee }}</strong></a>
+      <small>{{ row.employee.department }}</small>
+    </div>
+  </td>
+  <td>{{ row.date|workforce_date }}</td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.status only %}</td>
+  <td>
+    {% if row.arrival_time or row.departure_time %}
+      <span class="profile-table-primary">
+        {% if row.arrival_time %}Arrival {{ row.arrival_time|time:"g:i A" }}{% else %}Arrival not recorded{% endif %}
+      </span><br>
+      <span class="profile-table-secondary">
+        {% if row.departure_time %}Departure {{ row.departure_time|time:"g:i A" }}{% else %}Departure not recorded{% endif %}
+      </span>
+    {% else %}
+      <span class="profile-table-secondary">Times not recorded</span>
+    {% endif %}
+  </td>
+  {% if perms.core.change_attendance or perms.core.delete_attendance %}
+    <td>
+      <div class="skill-profile-list__actions" aria-label="Manage {{ row.employee }} attendance">
+        {% if perms.core.change_attendance %}<a href="{% url 'frontend:attendance_update' row.attendance_id %}">Edit</a>{% endif %}
+        {% if perms.core.delete_attendance %}<a class="skill-profile-list__remove" href="{% url 'frontend:attendance_delete' row.attendance_id %}">Delete</a>{% endif %}
+      </div>
+    </td>
+  {% endif %}
+</tr>

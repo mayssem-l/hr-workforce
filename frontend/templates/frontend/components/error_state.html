@@ -1,0 +1,8 @@
+<section class="state-card state-card--error" role="alert" aria-labelledby="{{ state_id|default:'error-state-title' }}">
+  <span class="state-card__icon" aria-hidden="true">&times;</span>
+  <div class="state-card__body">
+    <h2 id="{{ state_id|default:'error-state-title' }}">{{ title|default:"We could not load this view" }}</h2>
+    <p>{{ message|default:"Try again. If the problem continues, contact your administrator." }}</p>
+    {% if action_url %}<a class="btn btn-outline-danger" href="{{ action_url }}">{{ action_label|default:"Try again" }}</a>{% endif %}
+  </div>
+</section>

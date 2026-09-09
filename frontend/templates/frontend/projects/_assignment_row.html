@@ -1,0 +1,36 @@
+{% load frontend_format %}
+<tr>
+  <td>
+    <span class="profile-table-primary">{{ row.employee }}</span><br>
+    <span class="profile-table-secondary">{{ row.employee.position }} · {{ row.employee.department }}</span>
+  </td>
+  <td>{{ row.role_on_project }}</td>
+  <td>{{ row.start_date|workforce_date }}&ndash;{{ row.end_date|workforce_date }}</td>
+  <td class="data-table__number">{{ row.allocation_percentage|percentage }}</td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.status only %}</td>
+  <td>
+    {% if row.profile_coverage %}
+      <ul class="project-coverage-list">
+        {% for coverage in row.profile_coverage %}
+          <li>
+            {{ coverage.project_skill_requirement.skill.name }}
+            <span>Level {{ coverage.project_skill_requirement.required_level }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <span class="profile-table-secondary">No requirements linked</span>
+    {% endif %}
+    <div class="skill-profile-list__actions">
+      <a href="{% url 'frontend:project_assignment_coverage' row.project_id row.assignment_id %}">Review coverage</a>
+    </div>
+  </td>
+  {% if perms.core.change_assignment or perms.core.delete_assignment %}
+    <td>
+      <div class="skill-profile-list__actions" aria-label="Manage {{ row.employee }} assignment">
+        {% if perms.core.change_assignment %}<a href="{% url 'frontend:project_assignment_update' row.project_id row.assignment_id %}">Edit</a>{% endif %}
+        {% if perms.core.delete_assignment %}<a class="skill-profile-list__remove" href="{% url 'frontend:project_assignment_delete' row.project_id row.assignment_id %}">Delete</a>{% endif %}
+      </div>
+    </td>
+  {% endif %}
+</tr>

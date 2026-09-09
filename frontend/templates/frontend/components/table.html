@@ -1,0 +1,29 @@
+<div class="data-table-shell">
+  <div class="table-responsive">
+    <table class="table data-table align-middle">
+      {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+      <thead>
+        <tr>
+          {% for header in headers %}<th scope="col">{{ header }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          {% if row_template %}
+            {% include row_template with row=row perms=perms only %}
+          {% else %}
+            <tr>
+              {% for cell in row %}<td>{{ cell }}</td>{% endfor %}
+            </tr>
+          {% endif %}
+        {% empty %}
+          <tr>
+            <td colspan="{{ headers|length|default:1 }}" class="data-table__empty">
+              {{ empty_message|default:"No records to display." }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

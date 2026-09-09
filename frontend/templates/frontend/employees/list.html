@@ -1,0 +1,51 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Employee Directory | Workforce Planning{% endblock %}
+{% block meta_description %}Search and filter the workforce employee directory.{% endblock %}
+
+{% block content %}
+  {% if perms.core.add_employee %}
+    {% url 'frontend:employee_create' as employee_create_url %}
+    {% include "frontend/components/page_header.html" with eyebrow="Workforce" title="Employee directory" description="Find employees by name, department, or status and review their core workforce details." action_url=employee_create_url action_label="Add employee" only %}
+  {% else %}
+    {% include "frontend/components/page_header.html" with eyebrow="Workforce" title="Employee directory" description="Find employees by name, department, or status and review their core workforce details." only %}
+  {% endif %}
+
+  {% include "frontend/components/workforce_tabs.html" %}
+
+  <section class="directory-filter-panel" aria-labelledby="employee-filter-title">
+    <h2 class="visually-hidden" id="employee-filter-title">Filter employees</h2>
+    <form method="get" action="{% url 'frontend:employee_list' %}" role="search">
+      <div class="directory-filter-grid">
+        {% include "frontend/components/form_field.html" with field=filter_form.query only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.status only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.department only %}
+        {% include "frontend/components/form_field.html" with field=filter_form.sort only %}
+        <div class="directory-filter-actions">
+          <button class="btn btn-primary" type="submit">Apply filters</button>
+          <a class="btn btn-outline-secondary" href="{% url 'frontend:employee_list' %}">Clear</a>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <div class="directory-toolbar" role="status" aria-live="polite">
+    <div>
+      <strong>{{ page_obj.paginator.count }} employee{{ page_obj.paginator.count|pluralize }}</strong>
+      {% if page_obj.paginator.count %}
+        <span>Showing {{ page_obj.start_index }}&ndash;{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
+      {% endif %}
+    </div>
+    <span class="directory-toolbar__note">Stored workforce details</span>
+  </div>
+
+  {% if page_obj.object_list %}
+    {% include "frontend/components/table.html" with caption="Employee directory results" headers=employee_headers rows=page_obj.object_list row_template="frontend/employees/_employee_row.html" only %}
+    {% include "frontend/components/pagination.html" with page_obj=page_obj pagination_label="Employee directory pages" only %}
+  {% elif has_active_filters %}
+    {% url 'frontend:employee_list' as employee_list_url %}
+    {% include "frontend/components/empty_state.html" with state_id="employee-filter-empty" title="No employees match these filters" message="Try a different name, status, or department." action_url=employee_list_url action_label="Clear filters" only %}
+  {% else %}
+    {% include "frontend/components/empty_state.html" with state_id="employee-directory-empty" title="No employees yet" message="Employee records will appear here once they have been added." action_url=employee_create_url action_label="Add the first employee" only %}
+  {% endif %}
+{% endblock %}

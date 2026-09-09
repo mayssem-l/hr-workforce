@@ -1,0 +1,66 @@
+<form method="post" novalidate data-loading-form>
+  {% csrf_token %}
+  {{ form.project }}
+
+  {% if form.non_field_errors %}
+    <div class="employee-form-alert" role="alert">
+      <strong>Assignment details could not be saved.</strong>
+      {% for error in form.non_field_errors %}<span>{{ error }}</span>{% endfor %}
+    </div>
+  {% endif %}
+
+  {% if form.project.errors %}
+    <div class="employee-form-alert" id="{{ form.project.id_for_label }}_error" role="alert">
+      <strong>This assignment conflicts with the project context.</strong>
+      {% for error in form.project.errors %}<span>{{ error }}</span>{% endfor %}
+    </div>
+  {% endif %}
+
+  <section class="employee-form-section surface-card" aria-labelledby="assignment-fields-title">
+    <div class="employee-form-section__header">
+      <span aria-hidden="true">01</span>
+      <div>
+        <h2 id="assignment-fields-title">Assignment planning</h2>
+        <p>Choose the employee, delivery role, schedule, allocation, and current planning stage.</p>
+      </div>
+    </div>
+
+    <div class="proficiency-context">
+      <div>
+        <span>Project</span>
+        <strong>{{ project.name }}</strong>
+        <small>{{ project.start_date|date:"M j, Y" }} to {{ project.end_date|date:"M j, Y" }}</small>
+      </div>
+      {% if assignment %}
+        <div>
+          <span>Current employee</span>
+          <strong>{{ assignment.employee }}</strong>
+          <small>{{ assignment.employee.position }} · {{ assignment.employee.department }}</small>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="planning-input-state planning-input-state--neutral" role="note">
+      <strong>Employee selection guidance</strong>
+      <p>Skill-match notes help with selection. Qualification, overlapping work, total allocation, and approved leave are checked when you save.</p>
+    </div>
+
+    <div class="employee-form-grid employee-form-grid--two">
+      <div class="employee-form-grid__full">
+        {% include "frontend/components/form_field.html" with field=form.employee only %}
+      </div>
+      {% include "frontend/components/form_field.html" with field=form.role_on_project only %}
+      {% include "frontend/components/form_field.html" with field=form.status only %}
+      {% include "frontend/components/form_field.html" with field=form.start_date only %}
+      {% include "frontend/components/form_field.html" with field=form.end_date only %}
+      {% include "frontend/components/form_field.html" with field=form.allocation_percentage only %}
+    </div>
+  </section>
+
+  <div class="employee-form-actions">
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+    <button class="btn btn-primary" type="submit" data-loading-label="Saving assignment…">
+      {{ submit_label }}
+    </button>
+  </div>
+</form>

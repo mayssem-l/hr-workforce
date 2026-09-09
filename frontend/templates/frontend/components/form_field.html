@@ -1,0 +1,31 @@
+{% load frontend_format %}
+<div class="form-field{% if field.errors %} form-field--invalid{% endif %}">
+  {% if field.field.widget.input_type == "checkbox" %}
+    <div class="form-check">
+      {{ field|form_control }}
+      {{ field.label_tag }}
+      {% if field.field.required %}
+        <span class="required-indicator" aria-hidden="true">*</span>
+        <span class="visually-hidden">required</span>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="form-label-row">
+      {{ field.label_tag }}
+      {% if field.field.required %}
+        <span class="required-indicator" aria-hidden="true">*</span>
+        <span class="visually-hidden">required</span>
+      {% endif %}
+    </div>
+    {{ field|form_control }}
+  {% endif %}
+
+  {% if field.help_text %}
+    <div class="form-text" id="{{ field.id_for_label }}_helptext">{{ field.help_text }}</div>
+  {% endif %}
+  {% if field.errors %}
+    <div class="invalid-feedback d-block" id="{{ field.id_for_label }}_error">
+      {% for error in field.errors %}<span>{{ error }}</span>{% endfor %}
+    </div>
+  {% endif %}
+</div>

@@ -1,0 +1,9 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Edit {{ requirement.skill }} Requirement | {{ project.name }}{% endblock %}
+{% block meta_description %}Update the {{ requirement.skill }} requirement for {{ project.name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Project skill demand" title="Edit skill requirement" description=project.name only %}
+  {% include "frontend/projects/requirements/_form.html" with form=form project=project requirement=requirement preflight=preflight cancel_url=cancel_url submit_label="Save requirement" csrf_token=csrf_token only %}
+{% endblock %}

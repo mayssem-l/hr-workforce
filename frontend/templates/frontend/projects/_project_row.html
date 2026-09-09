@@ -1,0 +1,16 @@
+{% load frontend_format %}
+<tr>
+  <td>
+    <div class="skill-directory-identity">
+      <a href="{% url 'frontend:project_detail' row.project_id %}">
+        <strong>{{ row.name }}</strong>
+      </a>
+      <small>Project #{{ row.project_id|stringformat:"04d" }}</small>
+    </div>
+  </td>
+  <td>{{ row.start_date|workforce_date }}&ndash;{{ row.end_date|workforce_date }}</td>
+  <td class="data-table__number">{{ row.estimated_hours|decimal_hours }}</td>
+  <td>{{ row.get_priority_display }}</td>
+  <td>{{ row.get_criticality_display }}</td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.status only %}</td>
+</tr>
