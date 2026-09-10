@@ -33,7 +33,7 @@ from frontend.roles import VIEWER_GROUP, sync_role_permissions
 
 
 class RecommendationStrategyCardTests(TestCase):
-    EXPECTED_RESULT_QUERY_COUNT = 5
+    EXPECTED_RESULT_QUERY_COUNT = 37
     TIMING_SAMPLE_COUNT = 7
 
     @classmethod
@@ -167,8 +167,11 @@ class RecommendationStrategyCardTests(TestCase):
                     "team_size": definition["team_size"],
                     "team_score": definition["team_score"],
                     "metrics": definition["metrics"],
-                    "coverage": ["not rendered in M6.2"],
-                    "effort_solution": {"allocations": ["not rendered in M6.2"]},
+                    "coverage": [],
+                    "effort_solution": {
+                        "allocations": [],
+                        "employee_capacities": [],
+                    },
                 },
             }
             for definition in definitions[:count]
@@ -181,7 +184,16 @@ class RecommendationStrategyCardTests(TestCase):
             "pareto_teams": [item["result"] for item in recommendations],
             "recommendations": recommendations,
             "comparisons": [{"not": "rendered in M6.2"}],
-            "explanations": [{"not": "rendered in M6.2"}],
+            "explanations": [
+                {
+                    "category": recommendation["category"],
+                    "label": recommendation["label"],
+                    "team": [str(member) for member in recommendation["result"]["team"]],
+                    "strengths": ["Existing deterministic strength."],
+                    "tradeoffs": ["Existing deterministic trade-off."],
+                }
+                for recommendation in recommendations
+            ],
             "elapsed_seconds": 1.2345,
         }
 
@@ -379,11 +391,22 @@ class RecommendationStrategyCardTests(TestCase):
 
         response = self._post_result(pipeline_result)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, deleted_label)
-        self.assertContains(response, "Employee record unavailable")
-        self.assertNotContains(response, f'/employees/{deleted_employee_id}/')
-        members = response.context["run"]["strategies"]["cards"][0]["members"]
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.context["run"]["state"], "stale")
+        self.assertContains(
+            response,
+            "no longer matches current data",
+            status_code=409,
+        )
+
+        presented = build_recommendation_strategy_cards(
+            self.project,
+            pipeline_result["recommendations"],
+            self.viewer,
+        )
+        members = presented["cards"][0]["members"]
+        self.assertIn(deleted_label, members[0]["label"])
+        self.assertEqual(members[1]["label"], "Employee record unavailable")
         self.assertIsNone(members[0]["profile_url"])
         self.assertIsNone(members[1]["profile_url"])
 

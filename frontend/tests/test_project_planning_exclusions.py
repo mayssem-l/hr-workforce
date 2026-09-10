@@ -32,7 +32,7 @@ from frontend.selectors.projects import get_project_profile
 
 
 class ProjectPlanningExclusionTests(TestCase):
-    EXPECTED_PAGE_QUERY_COUNT = 20
+    EXPECTED_PAGE_QUERY_COUNT = 26
     EXPECTED_WORKFORCE_QUERY_COUNT = 2
     TIMING_SAMPLE_COUNT = 25
 

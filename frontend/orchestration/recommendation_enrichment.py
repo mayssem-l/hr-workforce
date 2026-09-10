@@ -12,6 +12,28 @@ MAX_MANAGER_SUMMARY_CHARACTERS = 400
 NUMBER_PATTERN = re.compile(r"(?<![\w])[-+]?\d+(?:\.\d+)?%?")
 
 
+def build_unavailable_manager_summaries(explanations):
+    """Return the existing generic per-strategy fallback shape."""
+
+    return {
+        "state": "unavailable",
+        "message": (
+            "Optional Gemini summaries are unavailable. The complete "
+            "deterministic evidence remains available below."
+        ),
+        "items": tuple(
+            {
+                "category": explanation["category"],
+                "label": explanation["label"],
+                "state": "unavailable",
+                "summary": None,
+                "service_explanation": explanation,
+            }
+            for explanation in explanations
+        ),
+    }
+
+
 def _validated_manager_summary(summary, explanation):
     if not isinstance(summary, str):
         return None

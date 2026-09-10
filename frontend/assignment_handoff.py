@@ -5,78 +5,83 @@ from django.core import signing
 from django.core.cache import cache
 
 
-RECOMMENDATION_TOKEN_MAX_AGE_SECONDS = 60 * 60
-RECOMMENDATION_TOKEN_SALT = "frontend.recommendation-generation"
-RECOMMENDATION_SUBMISSION_CACHE_PREFIX = "recommendation-submission"
+HANDOFF_TOKEN_MAX_AGE_SECONDS = 60 * 60
+HANDOFF_TOKEN_SALT = "frontend.assignment-handoff"
+HANDOFF_SUBMISSION_CACHE_PREFIX = "assignment-handoff"
 
 
-class InvalidRecommendationSubmissionToken(ValueError):
-    """Raised when a generation token is invalid for the current request."""
+class InvalidHandoffToken(ValueError):
+    """Raised when a confirmation token is invalid for the request."""
 
 
-class StaleRecommendationSubmissionToken(ValueError):
-    """Raised when current inputs no longer match a rendered generation action."""
+class StaleHandoffToken(ValueError):
+    """Raised when inputs changed after the review was prepared."""
 
 
-def issue_recommendation_submission_token(
+def issue_handoff_token(
     *,
     project_id,
     user_id,
+    category,
     input_signature=None,
 ):
     payload = {
         "project_id": project_id,
         "user_id": user_id,
+        "category": category,
         "nonce": secrets.token_urlsafe(18),
     }
     if input_signature is not None:
         payload["input_signature"] = input_signature
     return signing.dumps(
         payload,
-        salt=RECOMMENDATION_TOKEN_SALT,
+        salt=HANDOFF_TOKEN_SALT,
         compress=True,
     )
 
 
-def validate_recommendation_submission_token(
+def validate_handoff_token(
     token,
     *,
     project_id,
     user_id,
+    category,
     input_signature=None,
 ):
     try:
         payload = signing.loads(
             token,
-            salt=RECOMMENDATION_TOKEN_SALT,
-            max_age=RECOMMENDATION_TOKEN_MAX_AGE_SECONDS,
+            salt=HANDOFF_TOKEN_SALT,
+            max_age=HANDOFF_TOKEN_MAX_AGE_SECONDS,
         )
     except (signing.BadSignature, signing.SignatureExpired) as exc:
-        raise InvalidRecommendationSubmissionToken from exc
+        raise InvalidHandoffToken from exc
 
     if not isinstance(payload, dict):
-        raise InvalidRecommendationSubmissionToken
+        raise InvalidHandoffToken
     if payload.get("project_id") != project_id:
-        raise InvalidRecommendationSubmissionToken
+        raise InvalidHandoffToken
     if payload.get("user_id") != user_id:
-        raise InvalidRecommendationSubmissionToken
+        raise InvalidHandoffToken
+    if payload.get("category") != category:
+        raise InvalidHandoffToken
     if not isinstance(payload.get("nonce"), str) or not payload["nonce"]:
-        raise InvalidRecommendationSubmissionToken
+        raise InvalidHandoffToken
     rendered_signature = payload.get("input_signature")
     if (
         input_signature is not None
         and rendered_signature is not None
         and rendered_signature != input_signature
     ):
-        raise StaleRecommendationSubmissionToken
+        raise StaleHandoffToken
     return token
 
 
-def claim_recommendation_submission(token):
+def claim_handoff_submission(token):
     token_digest = hashlib.sha256(token.encode("utf-8")).hexdigest()
-    cache_key = f"{RECOMMENDATION_SUBMISSION_CACHE_PREFIX}:{token_digest}"
+    cache_key = f"{HANDOFF_SUBMISSION_CACHE_PREFIX}:{token_digest}"
     return cache.add(
         cache_key,
         True,
-        timeout=RECOMMENDATION_TOKEN_MAX_AGE_SECONDS,
+        timeout=HANDOFF_TOKEN_MAX_AGE_SECONDS,
     )

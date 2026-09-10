@@ -93,6 +93,7 @@ class _PlanningMarkupAudit(HTMLParser):
 class _PlanningBaselineMixin:
     TIMING_SAMPLE_COUNT = 7
     AUTHENTICATED_SHELL_QUERY_COUNT = 4
+    RECOMMENDATION_SNAPSHOT_QUERY_COUNT = 6
 
     def _service_workspace(self):
         project = get_project_profile(self.project.project_id)
@@ -109,9 +110,14 @@ class _PlanningBaselineMixin:
         return workspace
 
     def _measure_baseline(self, label, expected_service_queries, expected_page_queries):
-        self.assertEqual(
-            expected_page_queries - expected_service_queries,
-            self.AUTHENTICATED_SHELL_QUERY_COUNT,
+        snapshot_queries = (
+            expected_page_queries
+            - expected_service_queries
+            - self.AUTHENTICATED_SHELL_QUERY_COUNT
+        )
+        self.assertIn(
+            snapshot_queries,
+            (0, self.RECOMMENDATION_SNAPSHOT_QUERY_COUNT),
         )
         warm_service = self._service_workspace()
         self.assertEqual(warm_service["project"], self.project)
@@ -155,7 +161,8 @@ class _PlanningBaselineMixin:
             f"service_p95={service_p95:.3f} ms\n"
             f"  page_queries={expected_page_queries} "
             f"({self.AUTHENTICATED_SHELL_QUERY_COUNT} shell + "
-            f"{expected_service_queries} planning), "
+            f"{expected_service_queries} planning + "
+            f"{snapshot_queries} recommendation snapshot), "
             f"response_median={statistics.median(response_durations):.3f} ms, "
             f"response_p95={response_p95:.3f} ms, "
             f"response={max(response_sizes)} bytes"
@@ -164,7 +171,7 @@ class _PlanningBaselineMixin:
 
 class ProjectPlanningPopulatedHardeningTests(_PlanningBaselineMixin, TestCase):
     EXPECTED_SERVICE_QUERY_COUNT = 17
-    EXPECTED_PAGE_QUERY_COUNT = 21
+    EXPECTED_PAGE_QUERY_COUNT = 27
 
     @classmethod
     def setUpTestData(cls):
@@ -724,7 +731,7 @@ class ProjectPlanningIncompleteBaselineTests(_PlanningBaselineMixin, TestCase):
 
 class ProjectPlanningLargeBaselineTests(_PlanningBaselineMixin, TestCase):
     EXPECTED_SERVICE_QUERY_COUNT = 17
-    EXPECTED_PAGE_QUERY_COUNT = 21
+    EXPECTED_PAGE_QUERY_COUNT = 27
     EMPLOYEE_COUNT = 60
     REQUIREMENT_COUNT = 12
     ASSIGNMENT_COUNT = 24

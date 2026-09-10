@@ -1,0 +1,32 @@
+<section class="profile-panel surface-card" aria-labelledby="recommendation-recovery-title">
+  <div class="profile-panel__header">
+    <div>
+      <p class="profile-kicker">Next step</p>
+      <h2 id="recommendation-recovery-title">{{ recovery.title }}</h2>
+    </div>
+    <span>Current planning data</span>
+  </div>
+
+  <div class="planning-input-state planning-input-state--warning" role="status">
+    <p>{{ recovery.message }}</p>
+    {% if recovery.items %}
+      <ul class="planning-repair-list">
+        {% for item in recovery.items %}
+          <li>
+            <span>{{ item.message }}</span>
+            {% if item.actions %}
+              <span class="planning-repair-actions">
+                {% for action in item.actions %}<a href="{{ action.url }}">{{ action.label }}</a>{% endfor %}
+              </span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% if recovery.actions %}
+      <div class="planning-repair-actions">
+        {% for action in recovery.actions %}<a class="btn btn-sm btn-{% if action.kind == 'primary' %}primary{% else %}outline-secondary{% endif %}" href="{{ action.url }}">{{ action.label }}</a>{% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>

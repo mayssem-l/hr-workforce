@@ -1,6 +1,6 @@
 # Lessons Learned
 
-Last updated: 2026-09-09
+Last updated: 2026-09-10
 
 ## How to use this file
 
@@ -194,6 +194,18 @@ Review this file before starting a task and update it immediately after discover
 - **Observation:** The LLM receives only the selected category, label, team names, strengths, and trade-offs. It does not calculate or select teams, requires external credentials/network access, and can fail or return unsupported wording independently for any selected strategy.
 - **Consequence:** A batch-level provider failure can discard otherwise useful summaries, while unvalidated generated numbers or raw provider errors can make supplemental prose look authoritative or expose operational detail.
 - **Action:** Finish and retain the deterministic result first, make enrichment explicitly opt-in, bound each call with no automatic retry, isolate failures per strategy, and discard output unless it is short plain text whose numeric tokens already exist in the supplied evidence. Render only generic fallback states, log no provider exception detail, and keep deterministic evidence visible and authoritative in every path.
+
+### Test result states against snapshots, not against stored invalid rows
+
+- **Observation:** Blocked planning pages issue no generation form, database CHECK constraints reject stored invalid dates, and view-level snapshot/reference checks turn mocked deleted pipeline references into 409 stale before the presenter renders them.
+- **Consequence:** Scraping a token from a blocked planning GET returns no form, saving an invalid-date fixture fails at the database, and asserting a 200 readable page for a deleted-reference POST contradicts the required never-mix-snapshots behavior.
+- **Action:** Issue blocked-state POST tokens directly with the current snapshot signature, cover unstorable blockers through a mocked readiness assessment, expect stale at the view boundary for deleted references while keeping direct presenter calls for readable/unlinked robustness, and record page-only snapshot queries separately from service query baselines.
+
+### Keep staffing confirmations replay-safe when the save changes its own inputs
+
+- **Observation:** Confirmed assignments are themselves recommendation-snapshot inputs, so replaying a token after a successful save is simultaneously duplicate and stale, while per-row model validation cannot see sibling proposals competing for the same required quantity.
+- **Consequence:** Asserting only the duplicate message makes the replay test brittle, and validating each coverage link in isolation can let two proposals jointly exceed a requirement quantity.
+- **Action:** Validate the token before claiming it, assert replay safety as 409 plus a single save rather than one fixed message, prove true duplicate behavior with a no-save failure that leaves the snapshot unchanged, check existing plus all proposed coverage against each required quantity together, and wrap the compound assignment/coverage save in `transaction.atomic()`.
 
 ## Presentation and configuration
 

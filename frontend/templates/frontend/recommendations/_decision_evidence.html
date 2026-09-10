@@ -11,20 +11,20 @@
 
   <p class="capacity-assumption">Strengths, trade-offs, and changes below are the existing deterministic pipeline outputs. They are not generated or recalculated by this page.</p>
 
-  <div class="planning-input-state{% if evidence.enrichment.state == 'partial' or evidence.enrichment.state == 'unavailable' %} planning-input-state--warning{% endif %}" role="status">
-    <strong>
-      {% if evidence.enrichment.state == "available" %}
-        Optional Gemini summaries available
-      {% elif evidence.enrichment.state == "partial" %}
-        Some optional Gemini summaries unavailable
-      {% elif evidence.enrichment.state == "unavailable" %}
-        Optional Gemini summaries unavailable
-      {% else %}
-        Optional Gemini summaries are off
-      {% endif %}
-    </strong>
-    <p>{{ evidence.enrichment.message }}</p>
-  </div>
+  {% if evidence.enrichment.state != "available" %}
+    <div class="planning-input-state{% if evidence.enrichment.state == 'partial' or evidence.enrichment.state == 'unavailable' %} planning-input-state--warning{% endif %}" role="status">
+      <strong>
+        {% if evidence.enrichment.state == "partial" %}
+          Some optional Gemini summaries unavailable
+        {% elif evidence.enrichment.state == "unavailable" %}
+          Optional Gemini summaries unavailable
+        {% else %}
+          Optional Gemini summaries are off
+        {% endif %}
+      </strong>
+      <p>{{ evidence.enrichment.message }}</p>
+    </div>
+  {% endif %}
 
   <div class="recommendation-explanation-grid">
     {% for item in evidence.strategies.items %}
@@ -36,10 +36,9 @@
 
         {% if item.state == "available" %}
           {% if item.manager_summary.state == "available" %}
-            <aside class="recommendation-gemini-summary" aria-label="Supplemental Gemini summary">
-              <span>Optional Gemini summary</span>
+            <aside class="recommendation-gemini-summary" aria-label="Manager summary">
+              <span>Manager summary</span>
               <p>{{ item.manager_summary.summary }}</p>
-              <small>Supplemental wording only. The deterministic evidence below remains authoritative.</small>
             </aside>
           {% elif evidence.enrichment.state != "disabled" %}
             <aside class="recommendation-gemini-summary recommendation-gemini-summary--unavailable" aria-label="Gemini summary unavailable">

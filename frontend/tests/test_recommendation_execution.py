@@ -113,8 +113,8 @@ class RecommendationOrchestrationTests(SimpleTestCase):
 
 
 class RecommendationExecutionTests(TestCase):
-    EXPECTED_PLANNING_QUERY_COUNT = 21
-    EXPECTED_RESULT_QUERY_COUNT = 5
+    EXPECTED_PLANNING_QUERY_COUNT = 27
+    EXPECTED_RESULT_QUERY_COUNT = 38
     TIMING_SAMPLE_COUNT = 7
     REQUIRED_VIEW_CODENAMES = (
         "view_project",
@@ -235,32 +235,42 @@ class RecommendationExecutionTests(TestCase):
             ("balanced", "Best balanced alternative"),
             ("capacity", "Best capacity alternative"),
         )
+        recommendations = [
+            {
+                "category": strategy_definitions[index][0],
+                "label": strategy_definitions[index][1],
+                "reason": "Existing service-owned selection reason.",
+                "result": {
+                    "team": [self.employee],
+                    "team_size": 1,
+                    "team_score": 88.25,
+                    "metrics": {
+                        "team_size": 1,
+                        "total_available_hours": Decimal("32.00"),
+                        "total_allocated_hours": Decimal("8.00"),
+                        "remaining_capacity_hours": Decimal("24.00"),
+                        "max_utilization": 25.0,
+                        "utilization_spread": 0.0,
+                    },
+                },
+            }
+            for index in range(count)
+        ]
         return {
             "feasible_teams": ["feasible"] if count else [],
             "pareto_teams": ["pareto"] if count else [],
-            "recommendations": [
-                {
-                    "category": strategy_definitions[index][0],
-                    "label": strategy_definitions[index][1],
-                    "reason": "Existing service-owned selection reason.",
-                    "result": {
-                        "team": [self.employee],
-                        "team_size": 1,
-                        "team_score": 88.25,
-                        "metrics": {
-                            "team_size": 1,
-                            "total_available_hours": Decimal("32.00"),
-                            "total_allocated_hours": Decimal("8.00"),
-                            "remaining_capacity_hours": Decimal("24.00"),
-                            "max_utilization": 25.0,
-                            "utilization_spread": 0.0,
-                        },
-                    },
-                }
-                for index in range(count)
-            ],
+            "recommendations": recommendations,
             "comparisons": [],
-            "explanations": [],
+            "explanations": [
+                {
+                    "category": recommendation["category"],
+                    "label": recommendation["label"],
+                    "team": [str(self.employee)],
+                    "strengths": ["Existing deterministic strength."],
+                    "tradeoffs": ["Existing deterministic trade-off."],
+                }
+                for recommendation in recommendations
+            ],
             "elapsed_seconds": elapsed,
         }
 
@@ -507,10 +517,9 @@ class RecommendationExecutionTests(TestCase):
                 {"submission_token": self._submission_token()},
             )
         self.assertEqual(empty.status_code, 200)
-        self.assertEqual(empty.context["run"]["state"], "empty")
-        self.assertContains(empty, "No recommendation strategy was returned.")
-        self.assertContains(empty, "does not infer which planning condition")
-        self.assertNotContains(empty, "No feasible team exists")
+        self.assertEqual(empty.context["run"]["state"], "no_feasible_team")
+        self.assertContains(empty, "No feasible team is available")
+        self.assertContains(empty, "all mandatory coverage")
 
         with patch(
             "frontend.views.recommendations.run_recommendation_pipeline"
@@ -668,15 +677,25 @@ class RecommendationExecutionTests(TestCase):
     def test_frontend_sources_do_not_duplicate_pipeline_or_calculations(self):
         frontend_root = Path(__file__).resolve().parents[1]
         orchestrator_source = inspect.getsource(run_recommendation_pipeline).lower()
-        for call in (
-            "find_all_feasible_teams(",
-            "find_pareto_teams(",
-            "select_recommended_teams(",
-            "compare_recommendations(",
-            "build_recommendation_explanations(",
+        for name in (
+            "find_all_feasible_teams",
+            "find_pareto_teams",
+            "select_recommended_teams",
+            "compare_recommendations",
+            "build_recommendation_explanations",
         ):
-            with self.subTest(call=call):
-                self.assertEqual(orchestrator_source.count(call), 1)
+            with self.subTest(service=name):
+                self.assertEqual(orchestrator_source.count(name), 1)
+        self.assertEqual(orchestrator_source.count("_run_stage("), 5)
+        for stage in (
+            '"team_assessment"',
+            '"comparison_filter"',
+            '"recommendation_selection"',
+            '"strategy_comparison"',
+            '"deterministic_evidence"',
+        ):
+            with self.subTest(stage=stage):
+                self.assertIn(stage, orchestrator_source)
         self.assertNotIn("gemini", orchestrator_source)
         self.assertNotIn("generate_manager_summar", orchestrator_source)
 

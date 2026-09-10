@@ -21,7 +21,7 @@
       <p>{{ run.message }}</p>
     </div>
 
-    <dl class="skill-facts project-planning-facts mt-3">
+    {% if run.state != "project_changed" %}<dl class="skill-facts project-planning-facts mt-3">
       <div>
         <dt>Project period</dt>
         <dd>{{ project.start_date|workforce_date }} through {{ project.end_date|workforce_date }}</dd>
@@ -38,13 +38,17 @@
         <dt>Pipeline elapsed time</dt>
         <dd>{% if run.elapsed_seconds is None %}Not available{% else %}{{ run.elapsed_seconds|floatformat:3 }} seconds{% endif %}</dd>
       </div>
-    </dl>
+    </dl>{% endif %}
 
     <div class="planning-input-state mt-3" role="note">
       <strong>This run did not change staffing records.</strong>
       <p>Recommendation generation is advisory. No project assignment or requirement coverage was created, changed, or removed.</p>
     </div>
   </section>
+
+  {% if run.recovery %}
+    {% include "frontend/recommendations/_recovery.html" with recovery=run.recovery only %}
+  {% endif %}
 
   {% if run.strategies.cards %}
     <section class="profile-panel surface-card" aria-labelledby="recommendation-summary-title">
@@ -135,7 +139,8 @@
   {% endif %}
 
   <div class="directory-footer-actions">
-    <a class="btn btn-primary" href="{{ planning_url }}">Return to planning workspace</a>
-    <a class="btn btn-outline-secondary" href="{{ project_detail_url }}">Return to project profile</a>
+    {% if planning_url %}<a class="btn btn-primary" href="{{ planning_url }}">Return to planning workspace</a>{% endif %}
+    {% if project_detail_url %}<a class="btn btn-outline-secondary" href="{{ project_detail_url }}">Return to project profile</a>{% endif %}
+    {% if not planning_url and not project_detail_url %}<a class="btn btn-primary" href="{{ project_list_url }}">Return to projects</a>{% endif %}
   </div>
 {% endblock %}

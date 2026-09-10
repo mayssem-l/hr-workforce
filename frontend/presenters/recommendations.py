@@ -489,6 +489,9 @@ def build_recommendation_strategy_cards(project, recommendations, user):
     """Present selected strategies without changing their order or metrics."""
 
     navigation = _recommendation_navigation(project, user)
+    can_confirm = user.has_perm("core.add_assignment") and user.has_perm(
+        "core.add_assignmentskill"
+    )
     cards = []
     for recommendation in recommendations:
         result = recommendation["result"]
@@ -498,6 +501,17 @@ def build_recommendation_strategy_cards(project, recommendations, user):
                 "category": recommendation["category"],
                 "label": recommendation["label"],
                 "reason": recommendation["reason"],
+                "handoff_url": (
+                    reverse(
+                        "frontend:project_recommendation_confirm",
+                        args=[
+                            project.project_id,
+                            recommendation["category"],
+                        ],
+                    )
+                    if can_confirm
+                    else None
+                ),
                 "members": tuple(
                     _present_team_member(
                         employee,
@@ -731,6 +745,248 @@ def build_recommendation_generation_context(project, readiness, form):
     }
 
 
+def _empty_recommendation_evidence():
+    return {
+        "strategies": {"cards": (), "navigation": {}},
+        "decision_evidence": {
+            "enrichment": {
+                "state": "disabled",
+                "message": "Manager summaries are not available for this result.",
+            },
+            "strategies": {"state": "empty", "items": ()},
+            "comparisons": {"state": "empty", "items": ()},
+        },
+    }
+
+
+def _recovery_action(label, url, *, kind="secondary"):
+    return {"label": label, "url": url, "kind": kind}
+
+
+def _returned_recovery_url(route_name, planning_url, *, args=(), query=None):
+    url = reverse(route_name, args=args)
+    if query:
+        url = f"{url}?{urlencode(query)}"
+    return with_planning_return(url, planning_url)
+
+
+def _leave_evidence_recovery_url(project, planning_url):
+    return _returned_recovery_url(
+        "frontend:leave_list",
+        planning_url,
+        query={
+            "status": "approved",
+            "from_date": project.start_date.isoformat(),
+            "to_date": project.end_date.isoformat(),
+        },
+    )
+
+
+def _readiness_repair_actions(project, blocker, user, planning_url):
+    """Mirror the planning repair mapping without reinterpreting blockers."""
+
+    if user is None:
+        return ()
+    code = blocker["code"]
+    requirement = blocker.get("requirement")
+    actions = []
+    if code == "invalid_project_dates":
+        if user.has_perm("core.change_project"):
+            actions.append(
+                _recovery_action(
+                    "Edit project schedule",
+                    _returned_recovery_url(
+                        "frontend:project_update",
+                        planning_url,
+                        args=[project.project_id],
+                    ),
+                    kind="primary",
+                )
+            )
+    elif code == "mandatory_effort_must_be_positive" and requirement is not None:
+        if user.has_perm("core.change_projectskillrequirement"):
+            actions.append(
+                _recovery_action(
+                    "Enter requirement effort",
+                    _returned_recovery_url(
+                        "frontend:project_requirement_update",
+                        planning_url,
+                        args=[
+                            project.project_id,
+                            requirement.project_skill_requirement_id,
+                        ],
+                    ),
+                    kind="primary",
+                )
+            )
+    elif code == "no_mandatory_requirements":
+        if user.has_perm("core.add_projectskillrequirement"):
+            actions.append(
+                _recovery_action(
+                    "Add mandatory requirement",
+                    _returned_recovery_url(
+                        "frontend:project_requirement_create",
+                        planning_url,
+                        args=[project.project_id],
+                    ),
+                    kind="primary",
+                )
+            )
+    if code in {
+        "insufficient_eligible_headcount",
+        "no_eligible_employees",
+        "insufficient_qualified_capacity",
+    }:
+        if user.has_perm("core.view_leave"):
+            actions.append(
+                _recovery_action(
+                    "Review approved leave",
+                    _leave_evidence_recovery_url(project, planning_url),
+                )
+            )
+    return tuple(actions)
+
+
+def _planning_recovery(
+    project,
+    user=None,
+    *,
+    items=(),
+    section="planning-readiness-title",
+    include_leave=False,
+):
+    planning_url = reverse(
+        "frontend:project_planning",
+        args=[project.project_id],
+    )
+    section = section or "planning-readiness-title"
+    actions = [
+        _recovery_action(
+            "Review planning workspace",
+            f"{planning_url}#{section}",
+            kind="primary",
+        )
+    ]
+    if include_leave and user is not None and user.has_perm("core.view_leave"):
+        actions.append(
+            _recovery_action(
+                "Review approved leave",
+                _leave_evidence_recovery_url(project, planning_url),
+            )
+        )
+    return {
+        "title": "Review current planning information",
+        "message": (
+            "Open the current planning workspace, review the evidence, and "
+            "start a new recommendation request after any issue is resolved."
+        ),
+        "items": tuple(items),
+        "actions": tuple(actions),
+    }
+
+
+def _readiness_recovery_anchor(blocker):
+    code = blocker["code"]
+    if code == "no_eligible_employees":
+        code = "insufficient_eligible_headcount"
+    requirement = blocker.get("requirement")
+    if code == "mandatory_effort_must_be_positive" and requirement is not None:
+        return (
+            f"requirement-evidence-"
+            f"{requirement.project_skill_requirement_id}-title"
+        )
+    return {
+        "no_mandatory_requirements": "planning-requirements-title",
+        "insufficient_eligible_headcount": "planning-requirement-evidence-title",
+        "insufficient_qualified_capacity": "planning-requirement-evidence-title",
+    }.get(code, "planning-readiness-title")
+
+
+def build_recommendation_readiness_foundation(project, readiness, user=None):
+    """Present the existing planning-readiness blockers without reinterpreting them."""
+
+    blockers = tuple(readiness["blockers"])
+    primary_blocker = blockers[0] if blockers else {"code": "stale_planning_inputs"}
+    primary_code = primary_blocker["code"]
+    if (
+        primary_code == "insufficient_eligible_headcount"
+        and primary_blocker.get("eligible_count") == 0
+    ):
+        primary_code = "no_eligible_employees"
+    states = {
+        "invalid_project_dates": {
+            "label": "Project schedule needs review",
+            "title": "The project dates are not ready for team planning.",
+        },
+        "mandatory_effort_must_be_positive": {
+            "label": "Requirement effort needed",
+            "title": "Mandatory requirement effort must be completed.",
+        },
+        "no_mandatory_requirements": {
+            "label": "Mandatory requirements needed",
+            "title": "The project needs at least one mandatory requirement.",
+        },
+        "insufficient_eligible_headcount": {
+            "label": "Qualified headcount is insufficient",
+            "title": "The current workforce cannot meet a required quantity.",
+        },
+        "no_eligible_employees": {
+            "label": "No eligible employees",
+            "title": "No active employee currently qualifies for required work.",
+        },
+        "insufficient_qualified_capacity": {
+            "label": "Qualified capacity is insufficient",
+            "title": "The current qualified capacity cannot cover the work.",
+        },
+        "stale_planning_inputs": {
+            "label": "Planning information changed",
+            "title": "Refresh the planning workspace before trying again.",
+        },
+    }
+    selected = states.get(primary_code, states["stale_planning_inputs"])
+    planning_url = reverse(
+        "frontend:project_planning",
+        args=[project.project_id],
+    )
+    recovery_items = tuple(
+        {
+            "message": blocker["message"],
+            "actions": (
+                _recovery_action(
+                    "Review this planning evidence",
+                    f"{planning_url}#{_readiness_recovery_anchor(blocker)}",
+                    kind="primary",
+                ),
+                *_readiness_repair_actions(
+                    project, blocker, user, planning_url
+                ),
+            ),
+        }
+        for blocker in blockers
+    )
+    return {
+        "state": primary_code,
+        "result_variant": "planning_blocked",
+        "tone": "warning",
+        "recommendation_count": None,
+        "elapsed_seconds": None,
+        "pipeline_result": None,
+        "message": (
+            "Recommendation generation stopped before team search. Review the "
+            "current planning evidence and start a new request after the "
+            "blocking information is corrected."
+        ),
+        "recovery": _planning_recovery(
+            project,
+            user,
+            items=recovery_items,
+            section=_readiness_recovery_anchor(blockers[0]) if blockers else None,
+        ),
+        **_empty_recommendation_evidence(),
+        **selected,
+    }
+
+
 def build_recommendation_result_foundation(
     project,
     pipeline_result,
@@ -738,6 +994,7 @@ def build_recommendation_result_foundation(
     manager_summaries=None,
 ):
     recommendation_count = len(pipeline_result["recommendations"])
+    feasible_team_count = len(pipeline_result["feasible_teams"])
     if recommendation_count:
         state = "completed"
         label = "Run completed"
@@ -747,13 +1004,40 @@ def build_recommendation_result_foundation(
             f"strateg{'y' if recommendation_count == 1 else 'ies'}. Review "
             "the team-level evidence for each selected strategy below."
         )
-    else:
-        state = "empty"
-        label = "No strategy returned"
-        title = "No recommendation strategy was returned."
+        result_variant = {
+            1: "one_strategy",
+            2: "two_strategies",
+        }.get(recommendation_count, "three_strategies")
+        recovery = None
+    elif not feasible_team_count:
+        state = "no_feasible_team"
+        label = "No feasible team found"
+        title = "No feasible team is available for the current planning inputs."
         message = (
-            "The pipeline completed without a selected strategy. This initial "
-            "result does not infer which planning condition prevented one."
+            "The current team assessment completed, but no group could satisfy "
+            "all mandatory coverage, effort, and capacity requirements together."
+        )
+        result_variant = "no_feasible_team"
+        recovery = _planning_recovery(
+            project,
+            user,
+            section="planning-requirement-evidence-title",
+            include_leave=True,
+        )
+    else:
+        state = "no_recommendation"
+        label = "No comparison strategy selected"
+        title = "No recommendation strategy was selected from the feasible teams."
+        message = (
+            "Feasible teams were returned, but the current selection result did "
+            "not contain a strategy to compare. Return to the current planning "
+            "workspace before starting a new request."
+        )
+        result_variant = "no_recommendation"
+        recovery = _planning_recovery(
+            project,
+            user,
+            section="planning-candidates-title",
         )
 
     strategies = build_recommendation_strategy_cards(
@@ -769,6 +1053,7 @@ def build_recommendation_result_foundation(
     )
     return {
         "state": state,
+        "result_variant": result_variant,
         "tone": "success" if recommendation_count else "warning",
         "label": label,
         "title": title,
@@ -778,10 +1063,11 @@ def build_recommendation_result_foundation(
         "pipeline_result": pipeline_result,
         "strategies": strategies,
         "decision_evidence": decision_evidence,
+        "recovery": recovery,
     }
 
 
-def build_recommendation_error_foundation(state):
+def build_recommendation_error_foundation(state, *, project=None, user=None):
     states = {
         "invalid": {
             "label": "Request expired",
@@ -807,22 +1093,44 @@ def build_recommendation_error_foundation(state):
                 "changed. Return to the planning workspace and try again."
             ),
         },
+        "stale": {
+            "label": "Planning information changed",
+            "title": "This recommendation request no longer matches current data.",
+            "message": (
+                "The project or workforce information changed after this request "
+                "was prepared. No mixed or outdated recommendation evidence is "
+                "shown. Review the current planning workspace and start again."
+            ),
+        },
+        "project_changed": {
+            "label": "Project no longer available",
+            "title": "The project changed while recommendations were running.",
+            "message": (
+                "No outdated recommendation evidence is shown. Return to the "
+                "project list to review the current records."
+            ),
+        },
+        "incomplete": {
+            "label": "Result not completed",
+            "title": "The recommendation evidence could not be completed.",
+            "message": (
+                "No partial recommendation is shown. Review the current planning "
+                "workspace and start a new request."
+            ),
+        },
     }
     selected = states[state]
+    recovery = (
+        _planning_recovery(project, user) if project is not None else None
+    )
     return {
         "state": state,
+        "result_variant": "request_failure",
         "tone": "warning",
         "recommendation_count": None,
         "elapsed_seconds": None,
         "pipeline_result": None,
-        "strategies": {"cards": (), "navigation": {}},
-        "decision_evidence": {
-            "enrichment": {
-                "state": "disabled",
-                "message": "Optional Gemini summaries are off.",
-            },
-            "strategies": {"state": "empty", "items": ()},
-            "comparisons": {"state": "empty", "items": ()},
-        },
+        "recovery": recovery,
+        **_empty_recommendation_evidence(),
         **selected,
     }

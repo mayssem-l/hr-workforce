@@ -38,7 +38,7 @@ from frontend.selectors.projects import get_project_profile
 
 
 class ProjectPlanningRequirementEvidenceTests(TestCase):
-    EXPECTED_PAGE_QUERY_COUNT = 21
+    EXPECTED_PAGE_QUERY_COUNT = 27
     TIMING_SAMPLE_COUNT = 25
 
     @classmethod

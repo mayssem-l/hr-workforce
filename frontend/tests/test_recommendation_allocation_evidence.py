@@ -35,7 +35,7 @@ from frontend.roles import VIEWER_GROUP, sync_role_permissions
 
 
 class RecommendationAllocationEvidenceTests(TestCase):
-    EXPECTED_RESULT_QUERY_COUNT = 5
+    EXPECTED_RESULT_QUERY_COUNT = 37
     TIMING_SAMPLE_COUNT = 7
 
     @classmethod
@@ -235,7 +235,15 @@ class RecommendationAllocationEvidenceTests(TestCase):
             "pareto_teams": [team_result],
             "recommendations": [recommendation],
             "comparisons": [{"not": "rendered in M6.3"}],
-            "explanations": [{"not": "rendered in M6.3"}],
+            "explanations": [
+                {
+                    "category": recommendation["category"],
+                    "label": recommendation["label"],
+                    "team": [str(member) for member in team_result["team"]],
+                    "strengths": ["Existing deterministic strength."],
+                    "tradeoffs": ["Existing deterministic trade-off."],
+                }
+            ],
             "elapsed_seconds": 1.25,
         }
 
@@ -497,15 +505,20 @@ class RecommendationAllocationEvidenceTests(TestCase):
         ]
 
         response = self._post_result(self._pipeline_result(team_result))
-        evidence = response.context["run"]["strategies"]["cards"][0][
-            "allocation_evidence"
-        ]
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.context["run"]["state"], "stale")
         self.assertContains(
             response,
-            "Deleted evidence skill — requirement record unavailable",
+            "no longer matches current data",
+            status_code=409,
         )
-        self.assertNotContains(response, f"/employees/{employee_id}/")
+
+        presented = build_recommendation_strategy_cards(
+            self.project,
+            self._pipeline_result(team_result)["recommendations"],
+            self.viewer,
+        )
+        evidence = presented["cards"][0]["allocation_evidence"]
         self.assertIsNone(evidence["matrix"]["rows"][0]["profile_url"])
         self.assertIsNone(evidence["coverage"]["rows"][0]["requirements_url"])
 

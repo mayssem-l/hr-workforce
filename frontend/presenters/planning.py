@@ -221,6 +221,8 @@ def _capacity_blockers(issues):
                 {
                     "code": issue["code"],
                     "requirement": requirement,
+                    "eligible_count": issue["eligible_count"],
+                    "required_count": issue["required_count"],
                     "message": (
                         f"{requirement.skill} needs {issue['required_count']} "
                         f"qualified active employee"
@@ -796,8 +798,8 @@ def build_requirement_evidence_context(
     }
 
 
-def build_project_planning_workspace(project):
-    """Add current, read-only readiness evidence to the stored workspace."""
+def build_project_planning_readiness(project):
+    """Return the existing readiness assessment before candidate presentation."""
 
     stored_context = build_project_planning_foundation(project)
 
@@ -838,6 +840,22 @@ def build_project_planning_workspace(project):
                 assessed_capacity=True,
             )
 
+    return {
+        "stored_context": stored_context,
+        "readiness": readiness,
+        "requirement_assessment_context": requirement_assessment_context,
+    }
+
+
+def build_project_planning_workspace(project):
+    """Add current, read-only readiness evidence to the stored workspace."""
+
+    assessment = build_project_planning_readiness(project)
+    stored_context = assessment["stored_context"]
+    readiness = assessment["readiness"]
+    requirement_assessment_context = assessment[
+        "requirement_assessment_context"
+    ]
     estimates_match = (
         project.estimated_hours == stored_context["mandatory_effort_hours"]
     )

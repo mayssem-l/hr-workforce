@@ -38,7 +38,7 @@ from frontend.roles import VIEWER_GROUP, sync_role_permissions
 
 
 class RecommendationDecisionEvidenceTests(TestCase):
-    EXPECTED_RESULT_QUERY_COUNT = 5
+    EXPECTED_RESULT_QUERY_COUNT = 37
     TIMING_SAMPLE_COUNT = 7
 
     @classmethod

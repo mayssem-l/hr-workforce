@@ -31,6 +31,7 @@ from frontend.views.employees import (
 from frontend.views.landing import landing
 from frontend.views.planning import project_planning
 from frontend.views.recommendations import project_recommendation_generate
+from frontend.views.assignment_handoff import project_recommendation_confirm
 from frontend.views.leaves import (
     leave_create,
     leave_delete,
@@ -140,6 +141,11 @@ urlpatterns = [
         "projects/<int:project_id>/recommendations/generate/",
         project_recommendation_generate,
         name="project_recommendation_generate",
+    ),
+    path(
+        "projects/<int:project_id>/recommendations/confirm/<slug:category>/",
+        project_recommendation_confirm,
+        name="project_recommendation_confirm",
     ),
     path("projects/<int:project_id>/", project_detail, name="project_detail"),
     path("employees/", employee_list, name="employee_list"),

@@ -11,6 +11,12 @@
 
   <p class="recommendation-strategy-card__reason">{{ strategy.reason }}</p>
 
+  {% if strategy.handoff_url %}
+    <p class="recommendation-strategy-card__handoff">
+      <a class="btn btn-sm btn-outline-primary" href="{{ strategy.handoff_url }}">Review staffing handoff</a>
+    </p>
+  {% endif %}
+
   <dl class="recommendation-strategy-metrics">
     <div>
       <dt>Team score</dt>

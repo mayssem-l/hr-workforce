@@ -50,7 +50,7 @@ from frontend.selectors.projects import get_project_profile
 
 class Milestone5VerificationTests(TestCase):
     EXPECTED_SERVICE_QUERY_COUNT = 17
-    EXPECTED_PAGE_QUERY_COUNT = 21
+    EXPECTED_PAGE_QUERY_COUNT = 27
     AUTHENTICATED_SHELL_QUERY_COUNT = 4
     TIMING_SAMPLE_COUNT = 7
     REQUIRED_VIEW_CODENAMES = (
@@ -697,10 +697,12 @@ class Milestone5VerificationTests(TestCase):
         self.assertNotIn("planning", app_js.lower())
 
     def test_final_query_service_and_warm_response_baseline(self):
-        self.assertEqual(
-            self.EXPECTED_PAGE_QUERY_COUNT - self.EXPECTED_SERVICE_QUERY_COUNT,
-            self.AUTHENTICATED_SHELL_QUERY_COUNT,
+        snapshot_queries = (
+            self.EXPECTED_PAGE_QUERY_COUNT
+            - self.EXPECTED_SERVICE_QUERY_COUNT
+            - self.AUTHENTICATED_SHELL_QUERY_COUNT
         )
+        self.assertEqual(snapshot_queries, 6)
         warm_service = self._service_workspace()
         self.assertTrue(warm_service["readiness"]["is_ready"])
         warm_response = self.client.get(self.url)
@@ -747,7 +749,8 @@ class Milestone5VerificationTests(TestCase):
             f"service_p95={service_p95:.3f} ms\n"
             f"  page_queries={self.EXPECTED_PAGE_QUERY_COUNT} "
             f"({self.AUTHENTICATED_SHELL_QUERY_COUNT} shell + "
-            f"{self.EXPECTED_SERVICE_QUERY_COUNT} planning), "
+            f"{self.EXPECTED_SERVICE_QUERY_COUNT} planning + "
+            f"{snapshot_queries} recommendation snapshot), "
             f"response_median={statistics.median(response_durations):.3f} ms, "
             f"response_p95={response_p95:.3f} ms, "
             f"response={max(response_sizes)} bytes"

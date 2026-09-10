@@ -31,7 +31,7 @@ from frontend.selectors.projects import get_project_profile
 
 
 class ProjectPlanningCandidateTests(TestCase):
-    EXPECTED_PAGE_QUERY_COUNT = 20
+    EXPECTED_PAGE_QUERY_COUNT = 26
     EXPECTED_RANKING_QUERY_COUNT = 5
     TIMING_SAMPLE_COUNT = 25
 

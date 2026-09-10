@@ -25,6 +25,7 @@ from frontend.presenters.recommendations import (
 )
 from frontend.selectors.planning import get_candidate_exclusion_workforce
 from frontend.selectors.projects import get_project_profile
+from frontend.selectors.recommendations import get_recommendation_input_snapshot
 
 
 @read_models_permission_required(
@@ -55,9 +56,11 @@ def project_planning(request, project_id):
     add_planning_repair_navigation(workspace, request.user)
     recommendation_form = None
     if workspace["readiness"]["candidate_assessment_allowed"]:
+        input_snapshot = get_recommendation_input_snapshot(project.project_id)
         recommendation_form = RecommendationGenerationForm(
             project=project,
             user=request.user,
+            input_signature=input_snapshot["signature"],
         )
     recommendation_generation = build_recommendation_generation_context(
         project,

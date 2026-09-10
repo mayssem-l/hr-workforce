@@ -8,7 +8,7 @@ from google.genai import types
 # client = OpenAI()
 
 
-def generate_manager_summary(explanation, *, timeout_ms=2500):
+def generate_manager_summary(explanation, *, timeout_ms=10000):
     """
     Generate a short manager-friendly explanation
     from deterministic recommendation facts.
@@ -64,7 +64,7 @@ Mandatory rules:
     # )
 
     response = client.models.generate_content(
-        model="gemini-3.5-flash-lite",
+        model="gemini-3.1-flash-lite",
         contents=json.dumps(
             payload,
             ensure_ascii=False,
@@ -78,7 +78,7 @@ Mandatory rules:
     return response.text.strip()
 
 
-def generate_manager_summaries(explanations, *, timeout_ms=2500):
+def generate_manager_summaries(explanations, *, timeout_ms=10000):
     """
     Generate summaries for ALL recommendations.
     """

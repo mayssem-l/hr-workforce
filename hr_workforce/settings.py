@@ -126,7 +126,7 @@ GEMINI_MANAGER_SUMMARIES_ENABLED = (
     os.environ.get('GEMINI_MANAGER_SUMMARIES_ENABLED', '').strip().lower()
     in {'1', 'true', 'yes', 'on'}
 )
-GEMINI_MANAGER_SUMMARY_TIMEOUT_MS = 2500
+GEMINI_MANAGER_SUMMARY_TIMEOUT_MS = 10000
 
 
 # Authentication

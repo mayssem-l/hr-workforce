@@ -41,7 +41,7 @@ from frontend.roles import VIEWER_GROUP, sync_role_permissions
 
 
 class RecommendationGeminiEnrichmentTests(TestCase):
-    EXPECTED_RESULT_QUERY_COUNT = 5
+    EXPECTED_RESULT_QUERY_COUNT = 37
     TIMING_SAMPLE_COUNT = 7
 
     @classmethod
@@ -224,7 +224,7 @@ class RecommendationGeminiEnrichmentTests(TestCase):
 
     @override_settings(
         GEMINI_MANAGER_SUMMARIES_ENABLED=True,
-        GEMINI_MANAGER_SUMMARY_TIMEOUT_MS=2500,
+        GEMINI_MANAGER_SUMMARY_TIMEOUT_MS=10000,
     )
     def test_successful_summaries_render_without_changing_service_evidence(self):
         pipeline_result = self._pipeline_result()
@@ -251,15 +251,28 @@ class RecommendationGeminiEnrichmentTests(TestCase):
         self.assertEqual(
             provider.call_args_list,
             [
-                call(explanation, timeout_ms=2500)
+                call(explanation, timeout_ms=10000)
                 for explanation in pipeline_result["explanations"]
             ],
         )
-        self.assertContains(response, "Optional Gemini summaries available")
+        self.assertNotContains(response, "Optional Gemini summaries available")
+        self.assertNotContains(response, "Optional Gemini wording is available")
         self.assertContains(
             response,
-            'aria-label="Supplemental Gemini summary"',
+            'aria-label="Manager summary"',
             count=3,
+        )
+        self.assertContains(
+            response,
+            "<span>Manager summary</span>",
+            count=3,
+            html=True,
+        )
+        self.assertNotContains(response, "Optional Gemini summary</span>")
+        self.assertNotContains(
+            response,
+            "Supplemental wording only. The deterministic evidence below "
+            "remains authoritative.",
         )
         for summary in summaries:
             self.assertContains(response, summary)
@@ -399,18 +412,18 @@ class RecommendationGeminiEnrichmentTests(TestCase):
             "core.services.llm_explanations.genai.Client",
             return_value=client,
         ) as client_factory:
-            result = generate_manager_summary(explanation, timeout_ms=2500)
+            result = generate_manager_summary(explanation, timeout_ms=10000)
 
         self.assertEqual(
             result,
             "This compact option is useful for a focused team.",
         )
         http_options = client_factory.call_args.kwargs["http_options"]
-        self.assertEqual(http_options.timeout, 2500)
+        self.assertEqual(http_options.timeout, 10000)
         self.assertEqual(http_options.retry_options.attempts, 1)
         self.assertNotIn("api_key", client_factory.call_args.kwargs)
         generate_call = client.models.generate_content.call_args
-        self.assertEqual(generate_call.kwargs["model"], "gemini-3.5-flash-lite")
+        self.assertEqual(generate_call.kwargs["model"], "gemini-3.1-flash-lite")
         payload = json.loads(generate_call.kwargs["contents"])
         self.assertEqual(
             set(payload),
@@ -476,7 +489,7 @@ class RecommendationGeminiEnrichmentTests(TestCase):
 
     @override_settings(
         GEMINI_MANAGER_SUMMARIES_ENABLED=True,
-        GEMINI_MANAGER_SUMMARY_TIMEOUT_MS=2500,
+        GEMINI_MANAGER_SUMMARY_TIMEOUT_MS=10000,
     )
     def test_query_count_and_warm_mocked_provider_overhead_remain_fixed(self):
         pipeline_result = self._pipeline_result()
