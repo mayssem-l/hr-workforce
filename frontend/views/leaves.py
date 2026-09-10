@@ -8,10 +8,16 @@ from django.views.decorators.http import require_http_methods
 
 from core.models import Leave
 from frontend.forms.leaves import LeaveDirectoryFilterForm, LeaveForm
+from frontend.navigation import (
+    get_planning_return_url,
+    planning_return_query,
+    with_planning_return,
+)
 from frontend.permissions import (
     read_model_permission_required,
     write_model_permission_required,
 )
+from frontend.presenters.dashboard import build_operational_directory_navigation
 from frontend.selectors.leaves import (
     DEFAULT_LEAVE_SORT,
     LEAVE_PAGE_SIZE,
@@ -23,6 +29,7 @@ from frontend.selectors.leaves import (
 
 @read_model_permission_required(Leave)
 def leave_list(request):
+    planning_return_url = get_planning_return_url(request)
     employee_choices = get_leave_employee_choices()
     filter_form = LeaveDirectoryFilterForm(
         request.GET,
@@ -39,6 +46,14 @@ def leave_list(request):
     if filter_form.is_valid():
         filters.update(filter_form.cleaned_data)
 
+    navigation_context = None
+    if filters["from_date"] and filters["to_date"]:
+        navigation_context = build_operational_directory_navigation(
+            start_date=filters["from_date"],
+            end_date=filters["to_date"],
+            employee_id=filters["employee"],
+        )
+
     leaves = get_leave_directory(**filters)
     page_obj = Paginator(leaves, LEAVE_PAGE_SIZE).get_page(
         request.GET.get("page")
@@ -49,12 +64,17 @@ def leave_list(request):
     ):
         leave_headers = (*leave_headers, "Actions")
 
+    dashboard_url = (
+        navigation_context["dashboard_url"]
+        if navigation_context
+        else reverse("frontend:landing")
+    )
     return render(
         request,
         "frontend/leaves/list.html",
         {
             "breadcrumbs": [
-                {"label": "Dashboard", "url": reverse("frontend:landing")},
+                {"label": "Dashboard", "url": dashboard_url},
                 {"label": "Workforce", "url": reverse("frontend:employee_list")},
                 {"label": "Leave", "url": None},
             ],
@@ -70,7 +90,28 @@ def leave_list(request):
                 )
             ),
             "leave_headers": leave_headers,
+            "leave_create_url": (
+                with_planning_return(
+                    reverse("frontend:leave_create"),
+                    planning_return_url,
+                )
+                if request.user.has_perm("core.add_leave")
+                else None
+            ),
+            "leave_list_clear_url": with_planning_return(
+                reverse("frontend:leave_list"),
+                planning_return_url,
+            ),
+            "navigation_context": navigation_context,
             "page_obj": page_obj,
+            "dashboard_url": dashboard_url,
+            "profile_query_string": (
+                navigation_context["profile_query_string"]
+                if navigation_context
+                else ""
+            ),
+            "planning_return_query": planning_return_query(planning_return_url),
+            "planning_return_url": planning_return_url,
         },
     )
 
@@ -93,6 +134,8 @@ def _save_leave_form(request, form, *, success_message):
 
 @write_model_permission_required(Leave, "add")
 def leave_create(request):
+    planning_return_url = get_planning_return_url(request)
+    destination_url = planning_return_url or reverse("frontend:leave_list")
     form = LeaveForm(request.POST if request.method == "POST" else None)
 
     if request.method == "POST":
@@ -106,7 +149,7 @@ def leave_create(request):
                 ),
             )
             if leave is not None:
-                return redirect("frontend:leave_list")
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -124,7 +167,10 @@ def leave_create(request):
                 {"label": "Leave", "url": reverse("frontend:leave_list")},
                 {"label": "Add leave", "url": None},
             ],
-            "cancel_url": reverse("frontend:leave_list"),
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
+            ),
+            "cancel_url": destination_url,
             "form": form,
         },
     )
@@ -138,6 +184,8 @@ def leave_update(request, leave_id):
         raise Http404("Leave record not found.") from exc
 
     employee_name = str(leave.employee)
+    planning_return_url = get_planning_return_url(request)
+    destination_url = planning_return_url or reverse("frontend:leave_list")
     form = LeaveForm(
         request.POST if request.method == "POST" else None,
         instance=leave,
@@ -154,7 +202,7 @@ def leave_update(request, leave_id):
                 ),
             )
             if saved_leave is not None:
-                return redirect("frontend:leave_list")
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -171,7 +219,10 @@ def leave_update(request, leave_id):
                 {"label": "Leave", "url": reverse("frontend:leave_list")},
                 {"label": f"Edit {employee_name}", "url": None},
             ],
-            "cancel_url": reverse("frontend:leave_list"),
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
+            ),
+            "cancel_url": destination_url,
             "employee_name": employee_name,
             "form": form,
             "leave": leave,
@@ -182,6 +233,8 @@ def leave_update(request, leave_id):
 @write_model_permission_required(Leave, "delete")
 @require_http_methods(["GET", "POST"])
 def leave_delete(request, leave_id):
+    planning_return_url = get_planning_return_url(request)
+    destination_url = planning_return_url or reverse("frontend:leave_list")
     try:
         leave = get_leave(leave_id)
     except Leave.DoesNotExist as exc:
@@ -190,12 +243,13 @@ def leave_delete(request, leave_id):
                 request,
                 "This leave record no longer exists. No deletion was needed.",
             )
-            return redirect("frontend:leave_list")
+            return redirect(destination_url)
         raise Http404("Leave record not found.") from exc
 
     employee_name = str(leave.employee)
     leave_type = leave.get_type_display()
     delete_url = reverse("frontend:leave_delete", args=[leave.leave_id])
+    delete_url = with_planning_return(delete_url, planning_return_url)
 
     if request.method == "POST":
         try:
@@ -212,7 +266,7 @@ def leave_delete(request, leave_id):
                 request,
                 f"{leave_type} leave for {employee_name} was deleted.",
             )
-            return redirect("frontend:leave_list")
+            return redirect(destination_url)
 
     return render(
         request,
@@ -224,7 +278,7 @@ def leave_delete(request, leave_id):
                 {"label": "Leave", "url": reverse("frontend:leave_list")},
                 {"label": f"Delete {employee_name} leave", "url": None},
             ],
-            "cancel_url": reverse("frontend:leave_list"),
+            "cancel_url": destination_url,
             "confirmation_message": (
                 f"Delete this {leave_type.lower()} leave record for "
                 f"{employee_name}? The employee profile and employment status "

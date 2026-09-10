@@ -16,7 +16,7 @@ from frontend.roles import VIEWER_GROUP, sync_role_permissions
 
 
 class DashboardFilterTests(TestCase):
-    EXPECTED_QUERY_COUNT = 5
+    EXPECTED_QUERY_COUNT = 9
     TIMING_SAMPLE_COUNT = 25
     TODAY = date(2026, 9, 9)
 
@@ -256,7 +256,7 @@ class DashboardFilterTests(TestCase):
 
         self.assertEqual(response.status_code, 405)
 
-    def test_dashboard_query_count_matches_shell_plus_department_choices(self):
+    def test_dashboard_query_count_includes_fixed_kpi_snapshot_queries(self):
         with patch(
             "frontend.views.landing.timezone.localdate",
             return_value=self.TODAY,
@@ -295,7 +295,7 @@ class DashboardFilterTests(TestCase):
             "max_ms": max(durations_ms),
         }
         print(
-            "\nM4.1 dashboard baseline "
+            "\nM4.2 dashboard baseline "
             f"({self.TIMING_SAMPLE_COUNT} warm Django test-client GETs):\n"
             f"  queries={self.EXPECTED_QUERY_COUNT}, "
             f"median={result['median_ms']:.3f} ms, "

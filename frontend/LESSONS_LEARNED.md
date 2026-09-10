@@ -1,6 +1,6 @@
 # Lessons Learned
 
-Last updated: 2026-09-08
+Last updated: 2026-09-09
 
 ## How to use this file
 
@@ -132,6 +132,16 @@ Review this file before starting a task and update it immediately after discover
 - **Observation:** Active employees who meet at least one project requirement are candidates. The current final score is 55% skill fit, 20% minimum free capacity, 15% leave availability, and 10% experience.
 - **Action:** Present these components directly from the returned service data. If weights or eligibility rules change, update the backend and tests first, then update explanatory copy.
 
+### Reconcile negative explanations against the authoritative service result
+
+- **Observation:** A candidate service owns the positive result set, while its scalar eligibility gates can explain only some employees omitted from that set. Rebuilding the whole candidate decision in a presenter would create a shadow rule, and assigning a familiar reason to an unexplained mismatch would turn incomplete evidence into a false claim.
+- **Action:** Treat the exact employee IDs returned by the service as authoritative, compare the current workforce against that set, and reuse existing gate helpers only for employees who are absent. Apply gates in the service's deterministic order and render a clear unavailable state whenever current stored evidence cannot prove a specific reason.
+
+### Expose requirement evidence from the authoritative pre-solver check
+
+- **Observation:** Readiness blockers and requirement-level UI need the same qualified employee set, headcount comparison, qualified available capacity, and effort comparison. Reconstructing those values in a presenter can drift from fast feasibility, while rerunning scalar workload and leave services would duplicate work already captured in the optimization context.
+- **Action:** Expose one structured per-requirement evidence helper in the core optimization service, let the existing fast-feasibility check delegate to it, and let presenters consume its output with the already-prefetched employee and capacity context. This keeps optional requirement evidence available without starting a solver and keeps mandatory UI states identical to readiness decisions.
+
 ## Recommendation pipeline
 
 ### Recommendation generation is already slow enough to shape the interaction
@@ -139,6 +149,12 @@ Review this file before starting a task and update it immediately after discover
 - **Observation:** On the included 10-employee dataset, one project generated 88 feasible teams, 15 Pareto teams, and 3 recommendations in about 20.4 seconds. Team enumeration grows combinatorially.
 - **Consequence:** Running optimization on page load or every filter change would feel broken and consume unnecessary server capacity.
 - **Action:** Require an explicit action, show progress, prevent duplicate submissions, record elapsed time, and benchmark realistic data. Consider caching, candidate bounds, or background jobs only after measuring the target scale.
+
+### Pair browser submission guards with a server-owned one-time claim
+
+- **Observation:** Disabling a submit button and setting `aria-busy` makes the synchronous recommendation wait understandable, but browser refresh, history resubmission, parallel requests, or JavaScript failure can still replay the same expensive POST.
+- **Consequence:** Client-side protection alone can launch duplicate enumeration and solver work even when no domain record is written.
+- **Action:** Issue a short-lived signed nonce bound to the current user and routed object, validate it after normal authentication, permissions, CSRF, and object lookup, then claim its digest atomically in the configured server cache before starting the pipeline. Treat any replay as a safe conflict and require a newly rendered action for an intentional retry. Keep target-scale multi-process concurrency validation in the dedicated performance-hardening task because cache guarantees depend on the configured backend.
 
 ### Preserve the full deterministic pipeline order
 
@@ -155,12 +171,67 @@ Review this file before starting a task and update it immediately after discover
 - **Observation:** Feasible team results include coverage, per-requirement allocations, employee capacities, matching components, and team metrics such as remaining hours and utilization spread.
 - **Action:** Build a presenter over these returned values rather than launching more availability or solver calls while rendering the page.
 
+### Treat sparse solver rows as evidence, not as reconstructed totals
+
+- **Observation:** The OR-Tools allocation result returns only positive employee-to-requirement allocation rows, plus per-employee capacity totals. It does not currently return per-requirement allocated or remaining-effort totals.
+- **Consequence:** Treating a missing matrix pair as numeric zero or summing returned cells in presentation code would blur omitted evidence with an explicit value and duplicate optimization-derived aggregation outside the backend contract.
+- **Action:** Preserve the returned allocation and capacity ordering and values exactly, label missing pairs as no row returned, display an explicit zero only when the backend supplies one, and mark unavailable aggregates as unavailable. If a future interface needs a new total, add it to the authoritative backend result and contract tests first.
+
+### Keep deterministic user-facing language in its owning service
+
+- **Observation:** Deterministic recommendation explanations are complete service outputs consumed by both the result page and optional Gemini enrichment. Translating their returned sentences in a presenter or template would make the frontend reinterpret authoritative strengths and trade-offs.
+- **Consequence:** Multiple translation paths can drift from the service's branches, numbers, and comparison meaning, and a provider may receive different evidence from the manager-facing page.
+- **Action:** Keep the approved English wording in the deterministic explanation service, pass those strings through unchanged, and contract-test both deterministic repetition and the English-only boundary. Wording corrections must preserve the existing calculation branches, values, ordering, and output schema.
+
+### Do not infer member-set changes from metric-only comparisons
+
+- **Observation:** The current adjacent-comparison result returns the two strategy labels and five metric deltas, but it does not return added or removed team-member sets. Deterministic explanations separately return each strategy's complete ordered team-name list.
+- **Consequence:** Calculating added and removed names in a frontend presenter would create a new comparison output outside the authoritative service contract and make stale or duplicate identities harder to handle correctly.
+- **Action:** Show the existing earlier and later team lists beside the exact returned deltas so managers can inspect the change without a frontend set calculation. If explicit added/removed members are needed later, add them to the backend comparison contract and its tests first.
+
 ### Gemini is optional wording, not decision logic
 
-- **Observation:** The LLM receives only the selected category, label, team names, strengths, and trade-offs. It does not calculate or select teams and requires external credentials/network access.
-- **Action:** Render deterministic explanations first. Use a short timeout and graceful fallback for Gemini; never delay or discard a valid recommendation because summary generation failed.
+- **Observation:** The LLM receives only the selected category, label, team names, strengths, and trade-offs. It does not calculate or select teams, requires external credentials/network access, and can fail or return unsupported wording independently for any selected strategy.
+- **Consequence:** A batch-level provider failure can discard otherwise useful summaries, while unvalidated generated numbers or raw provider errors can make supplemental prose look authoritative or expose operational detail.
+- **Action:** Finish and retain the deterministic result first, make enrichment explicitly opt-in, bound each call with no automatic retry, isolate failures per strategy, and discard output unless it is short plain text whose numeric tokens already exist in the supplied evidence. Render only generic fallback states, log no provider exception detail, and keep deterministic evidence visible and authoritative in every path.
 
 ## Presentation and configuration
+
+### Separate stored planning context from staged service assessment
+
+- **Observation:** The established project profile presenter combines prefetched stored requirements, assignments, and coverage with a recommendation-preflight call. Reusing that complete presenter for an earlier read-only planning foundation would invoke a later assessment stage even though the selector already provides all required stored context in fixed queries.
+- **Consequence:** Progressive workspace slices can accidentally run out-of-scope or increasingly expensive services, blur query and timing baselines, and make later readiness or candidate behavior difficult to review independently.
+- **Action:** Shape prefetched stored planning context once, then layer preflight, matching, feasibility, and recommendation presenters only in the task that authorizes each stage. Keep focused mocks and source-boundary tests proving that earlier slices do not invoke later services.
+
+### Drive accessible evidence and visuals from one band sequence
+
+- **Observation:** A distribution table and its supplemental bars can drift when each representation rounds percentages, orders bands, or handles unclassified records independently.
+- **Consequence:** Visually plausible bars may disagree with the accessible evidence, and browser-side recalculation can create a second interpretation of service-owned workforce values.
+- **Action:** Define band boundaries and deterministic display serialization in one presenter, then render both the primary table and supplemental visual from that same ordered sequence. Test every boundary plus the count, share text, and visual width for exact agreement; keep the visual hidden from assistive technology when the table already provides the complete evidence.
+
+### Let scalar services consume prefetched records on aggregate pages
+
+- **Observation:** Existing workload, leave, and effective-availability services are intentionally scalar and query-backed, which is appropriate for one employee profile but would otherwise issue queries for every employee and working date on a dashboard.
+- **Consequence:** Reimplementing their formulas in a selector would create a second source of truth, while calling the unchanged query-backed path inside a period loop would make query volume grow with both headcount and range length.
+- **Action:** When an aggregate page needs the same rules at scale, let the core scalar service accept an optional prefetched record collection while preserving its default ORM path. Prefetch only records overlapping the validated scope, then add parity tests showing the prefetched and query-backed paths return the same values plus a zero-query presenter test.
+
+### Build selector prefetch scopes as a union of every service consumer
+
+- **Observation:** An employee profile reused one assignment query for an upcoming-assignment list, a reporting-period timeline, and current scalar workload values, but those consumers do not have identical status and date rules. Reusing only the display list would have dropped a non-cancelled completed assignment that the existing workload service still counts when it overlaps the calculation date.
+- **Consequence:** A narrow prefetch can remove queries while silently changing a service result, which is worse than the duplicate query it replaces.
+- **Action:** Build the selector query as the union of every required date window, retain separate in-memory collections for display and calculation consumers, and pass the broader collection back through the core service's optional-record path. Prove parity with the default query-backed service using an edge-status fixture before lowering the page query budget.
+
+### Expose service-owned contributing records with calculated values
+
+- **Observation:** A timeline needs to explain a calculated workload with the assignments that contributed to it. Filtering assignment evidence independently in a presenter would duplicate the core date, status, employee, and excluded-project rules even if the displayed percentage still came from the service.
+- **Consequence:** The numeric result and its explanatory records can drift as backend eligibility rules evolve, leaving a plausible but incorrect audit trail.
+- **Action:** Expose the core service's contributing-record selector alongside its scalar calculation, support the same optional prefetched collection on both paths, and build display context from that selector. Keep labels and layout in the presenter, but keep eligibility in the service.
+
+### Distinguish zero-denominator fallbacks from measured zero rates
+
+- **Observation:** Rate services safely return numeric zero when their denominator is zero, but a dashboard that renders that fallback as `0%` makes missing evidence look like a measured outcome. Attendance illustrates both cases: absenteeism has no denominator when there are no records, and late rate has no denominator when every record is absent.
+- **Consequence:** Managers can read an unavailable rate as proof of perfect attendance or punctuality even though no qualifying observations exist.
+- **Action:** Keep the service fallback unchanged, carry the service-owned denominator count into presentation context, and render `Not available` with the exact missing-denominator explanation. Render `0%` only when the denominator is positive and the measured numerator is zero.
 
 ### Keep directory pages on fixed-cost bulk queries
 
@@ -191,6 +262,12 @@ Review this file before starting a task and update it immediately after discover
 - **Mistake discovered:** A permission-aware project row was rendered through a shared table partial, but both template boundaries used `{% include ... only %}`. Passing the row alone meant the Actions header appeared while the nested Edit and Remove links silently disappeared because `perms` never reached the row template.
 - **Consequence:** Multi-level isolated includes can produce internally inconsistent interfaces even when the outer page has the correct context and permissions.
 - **Action:** Treat each isolated include as an explicit interface and forward every dependency through every layer. For permission-aware table rows, pass `perms` into the table partial and then into the row include, and assert the final rendered actions for each role.
+
+### Resolve return destinations as named workflows, not arbitrary URLs
+
+- **Observation:** A planning workspace can link into several existing edit and evidence flows, but a generic return parameter can become an open redirect, cross-project context switch, or stale dead end. Forms without an explicit action retain their query string, while filter forms and confirmation forms with explicit destinations need the return value forwarded deliberately.
+- **Consequence:** Host-only URL checks do not prove that a return target is the intended application workflow, and inconsistent forwarding can send a manager to a different project or lose their planning context after a valid save, filter, cancel, or confirmation.
+- **Action:** Resolve the supplied path to one allow-listed named route, reject scheme/host/query/fragment additions, bind project-scoped workflows to the same project ID, confirm the target still exists, and rebuild the canonical URL. Preserve only each destination's supported filters, pass the return context through GET filters and explicit form actions, and retain the established default redirect whenever validation fails.
 
 ### Verify navigation state across complete route families
 

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -117,6 +118,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+# Optional Gemini wording enrichment. Credentials remain provider-managed and
+# are never stored in Django settings.
+GEMINI_MANAGER_SUMMARIES_ENABLED = (
+    os.environ.get('GEMINI_MANAGER_SUMMARIES_ENABLED', '').strip().lower()
+    in {'1', 'true', 'yes', 'on'}
+)
+GEMINI_MANAGER_SUMMARY_TIMEOUT_MS = 2500
 
 
 # Authentication

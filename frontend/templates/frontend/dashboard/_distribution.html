@@ -1,0 +1,59 @@
+<article class="distribution-card surface-card" aria-labelledby="{{ distribution_id }}-title">
+  <div class="distribution-card__header">
+    <div>
+      <p class="profile-kicker">{{ eyebrow }}</p>
+      <h3 id="{{ distribution_id }}-title">{{ title }}</h3>
+      <p>{{ description }}</p>
+    </div>
+  </div>
+
+  {% if distribution.all_zero %}
+    <div class="distribution-card__notice" role="status">
+      <strong>{{ zero_title }}</strong>
+      <span>{{ zero_message }}</span>
+    </div>
+  {% endif %}
+
+  <div class="table-responsive distribution-table-wrap">
+    <table class="table distribution-table">
+      <caption>{{ caption }}</caption>
+      <thead>
+        <tr>
+          <th scope="col">Band</th>
+          <th scope="col">Definition</th>
+          <th class="text-end" scope="col">Employees</th>
+          <th class="text-end" scope="col">Share</th>
+          <th class="text-end" scope="col">Evidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for band in distribution.bands %}
+          <tr data-distribution-band="{{ band.key }}">
+            <th scope="row">{{ band.label }}</th>
+            <td>{{ band.range_label }}</td>
+            <td class="text-end">{{ band.count }}</td>
+            <td class="text-end">{{ band.share_serialized }}%</td>
+            <td class="text-end">
+              {% if band.evidence_url %}<a href="{{ band.evidence_url }}">View employees</a>{% else %}<span class="profile-table-secondary">No employees</span>{% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="distribution-visual" aria-hidden="true">
+    <span class="distribution-visual__label">Supplemental visual</span>
+    <div class="distribution-bars">
+      {% for band in distribution.bands %}
+        <div class="distribution-bar" data-distribution-band="{{ band.key }}" data-count="{{ band.count }}" data-share="{{ band.share_serialized }}">
+          <span class="distribution-bar__label">{{ band.label }}</span>
+          <span class="distribution-bar__track">
+            <span class="distribution-bar__fill distribution-bar__fill--{{ band.key }}" style="--distribution-share: {{ band.share_serialized }}%;"></span>
+          </span>
+          <span class="distribution-bar__count">{{ band.count }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</article>

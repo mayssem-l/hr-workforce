@@ -1,0 +1,42 @@
+{% load frontend_format %}
+<tr>
+  <th scope="row" class="data-table__number">
+    <strong class="profile-table-primary">{{ row.date|workforce_date }}</strong>
+  </th>
+  <td>
+    {{ row.date|date:"l" }}
+    <span class="timeline-state timeline-state--{{ row.state_key }}">{{ row.state_label }}</span>
+  </td>
+  <td class="data-table__number">{{ row.capacity_hours|decimal_hours }}</td>
+  <td class="data-table__number">{{ row.workload_percentage|percentage }}</td>
+  <td class="data-table__number">{{ row.allocated_hours|decimal_hours }}</td>
+  <td class="data-table__number"><strong>{{ row.available_hours|decimal_hours }}</strong></td>
+  <td>
+    {% if row.assignments %}
+      <ul class="timeline-context-list">
+        {% for assignment in row.assignments %}
+          <li>
+            <strong>{{ assignment.project.name }}</strong>
+            <span>{{ assignment.allocation_percentage|percentage }} · {{ assignment.get_status_display }} · {{ assignment.start_date|workforce_date }} to {{ assignment.end_date|workforce_date }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <span class="timeline-context-empty">No scheduled assignment</span>
+    {% endif %}
+  </td>
+  <td>
+    {% if row.approved_leaves %}
+      <ul class="timeline-context-list">
+        {% for leave in row.approved_leaves %}
+          <li>
+            <strong>{{ leave.get_type_display }} leave</strong>
+            <span>{{ leave.start_date|workforce_date }} to {{ leave.end_date|workforce_date }} · {{ leave.get_status_display }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <span class="timeline-context-empty">No approved leave</span>
+    {% endif %}
+  </td>
+</tr>

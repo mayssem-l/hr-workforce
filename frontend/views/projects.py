@@ -12,6 +12,7 @@ from core.models import (
     ProjectSkillRequirement,
 )
 from frontend.forms.projects import ProjectDirectoryFilterForm, ProjectForm
+from frontend.navigation import get_planning_return_url
 from frontend.permissions import (
     read_model_permission_required,
     read_models_permission_required,
@@ -194,6 +195,14 @@ def project_create(request):
 @write_model_permission_required(Project, "change")
 def project_update(request, project_id):
     project = get_object_or_404(Project, project_id=project_id)
+    planning_return_url = get_planning_return_url(
+        request,
+        project_id=project.project_id,
+    )
+    destination_url = planning_return_url or reverse(
+        "frontend:project_detail",
+        args=[project.project_id],
+    )
     project_name = project.name
     form = ProjectForm(request.POST or None, instance=project)
 
@@ -205,10 +214,7 @@ def project_update(request, project_id):
                 success_message=lambda saved: f"Project {saved} was updated.",
             )
             if saved_project is not None:
-                return redirect(
-                    "frontend:project_detail",
-                    saved_project.project_id,
-                )
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -234,10 +240,10 @@ def project_update(request, project_id):
                 },
                 {"label": "Edit", "url": None},
             ],
-            "cancel_url": reverse(
-                "frontend:project_detail",
-                args=[project.project_id],
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
             ),
+            "cancel_url": destination_url,
             "form": form,
             "project": project,
             "project_name": project_name,

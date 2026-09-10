@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods
 from core.models import Project, ProjectSkillRequirement
 from core.services.recommendation_preflight import get_recommendation_preflight
 from frontend.forms.requirements import ProjectSkillRequirementForm
+from frontend.navigation import get_planning_return_url
 from frontend.permissions import write_model_permission_required
 from frontend.selectors.requirements import (
     get_project_for_requirement,
@@ -61,6 +62,11 @@ def _save_requirement_form(request, form, *, success_message):
 @write_model_permission_required(ProjectSkillRequirement, "add")
 def project_requirement_create(request, project_id):
     project = _project_or_404(project_id)
+    planning_return_url = get_planning_return_url(
+        request,
+        project_id=project.project_id,
+    )
+    destination_url = planning_return_url or _project_detail_url(project)
     form = ProjectSkillRequirementForm(
         request.POST or None,
         project=project,
@@ -76,7 +82,7 @@ def project_requirement_create(request, project_id):
                 ),
             )
             if requirement is not None:
-                return redirect(_project_detail_url(project))
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -92,7 +98,10 @@ def project_requirement_create(request, project_id):
                 project,
                 "Add skill requirement",
             ),
-            "cancel_url": _project_detail_url(project),
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
+            ),
+            "cancel_url": destination_url,
             "form": form,
             "preflight": get_recommendation_preflight(project),
             "project": project,
@@ -104,6 +113,11 @@ def project_requirement_create(request, project_id):
 def project_requirement_update(request, project_id, requirement_id):
     requirement = _requirement_or_404(project_id, requirement_id)
     project = requirement.project
+    planning_return_url = get_planning_return_url(
+        request,
+        project_id=project.project_id,
+    )
+    destination_url = planning_return_url or _project_detail_url(project)
     form = ProjectSkillRequirementForm(
         request.POST or None,
         instance=requirement,
@@ -121,7 +135,7 @@ def project_requirement_update(request, project_id, requirement_id):
                 ),
             )
             if saved_requirement is not None:
-                return redirect(_project_detail_url(project))
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -136,7 +150,10 @@ def project_requirement_update(request, project_id, requirement_id):
                 project,
                 f"Edit {requirement.skill}",
             ),
-            "cancel_url": _project_detail_url(project),
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
+            ),
+            "cancel_url": destination_url,
             "form": form,
             "preflight": get_recommendation_preflight(project),
             "project": project,

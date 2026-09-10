@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from core.models import Assignment, Project
 from frontend.forms.assignments import AssignmentForm
+from frontend.navigation import get_planning_return_url
 from frontend.permissions import write_model_permission_required
 from frontend.selectors.assignments import (
     get_project_assignment,
@@ -59,6 +60,11 @@ def _save_assignment_form(request, form, *, success_message):
 @write_model_permission_required(Assignment, "add")
 def project_assignment_create(request, project_id):
     project = _project_or_404(project_id)
+    planning_return_url = get_planning_return_url(
+        request,
+        project_id=project.project_id,
+    )
+    destination_url = planning_return_url or _project_detail_url(project)
     form = AssignmentForm(request.POST or None, project=project)
 
     if request.method == "POST":
@@ -71,7 +77,7 @@ def project_assignment_create(request, project_id):
                 ),
             )
             if assignment is not None:
-                return redirect(_project_detail_url(project))
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -84,7 +90,10 @@ def project_assignment_create(request, project_id):
         "frontend/projects/assignments/create.html",
         {
             "breadcrumbs": _assignment_breadcrumbs(project, "Add assignment"),
-            "cancel_url": _project_detail_url(project),
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
+            ),
+            "cancel_url": destination_url,
             "form": form,
             "project": project,
         },
@@ -95,6 +104,11 @@ def project_assignment_create(request, project_id):
 def project_assignment_update(request, project_id, assignment_id):
     assignment = _assignment_or_404(project_id, assignment_id)
     project = assignment.project
+    planning_return_url = get_planning_return_url(
+        request,
+        project_id=project.project_id,
+    )
+    destination_url = planning_return_url or _project_detail_url(project)
     form = AssignmentForm(
         request.POST or None,
         instance=assignment,
@@ -112,7 +126,7 @@ def project_assignment_update(request, project_id, assignment_id):
                 ),
             )
             if saved_assignment is not None:
-                return redirect(_project_detail_url(project))
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -128,7 +142,10 @@ def project_assignment_update(request, project_id, assignment_id):
                 project,
                 f"Edit {assignment.employee}",
             ),
-            "cancel_url": _project_detail_url(project),
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
+            ),
+            "cancel_url": destination_url,
             "form": form,
             "project": project,
         },

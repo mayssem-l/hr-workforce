@@ -1,0 +1,6 @@
+{% load frontend_format %}
+<tr>
+  <th scope="row"><span class="profile-table-primary">{{ row.project.name }}</span></th>
+  <td>{{ row.project.start_date|workforce_date }} to {{ row.project.end_date|workforce_date }}</td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.project.status only %}</td>
+</tr>

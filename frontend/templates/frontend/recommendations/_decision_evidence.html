@@ -1,0 +1,153 @@
+{% load frontend_format %}
+
+<section class="profile-panel surface-card recommendation-decision-evidence" aria-labelledby="recommendation-decision-title">
+  <div class="profile-panel__header">
+    <div>
+      <p class="profile-kicker">Deterministic explanation</p>
+      <h2 id="recommendation-decision-title">Why these strategies differ</h2>
+    </div>
+    <span>Authoritative evidence</span>
+  </div>
+
+  <p class="capacity-assumption">Strengths, trade-offs, and changes below are the existing deterministic pipeline outputs. They are not generated or recalculated by this page.</p>
+
+  <div class="planning-input-state{% if evidence.enrichment.state == 'partial' or evidence.enrichment.state == 'unavailable' %} planning-input-state--warning{% endif %}" role="status">
+    <strong>
+      {% if evidence.enrichment.state == "available" %}
+        Optional Gemini summaries available
+      {% elif evidence.enrichment.state == "partial" %}
+        Some optional Gemini summaries unavailable
+      {% elif evidence.enrichment.state == "unavailable" %}
+        Optional Gemini summaries unavailable
+      {% else %}
+        Optional Gemini summaries are off
+      {% endif %}
+    </strong>
+    <p>{{ evidence.enrichment.message }}</p>
+  </div>
+
+  <div class="recommendation-explanation-grid">
+    {% for item in evidence.strategies.items %}
+      <article class="recommendation-explanation-card" aria-labelledby="recommendation-explanation-{{ forloop.counter }}-title">
+        <header>
+          <p class="profile-kicker">Strategy {{ forloop.counter }}</p>
+          <h3 id="recommendation-explanation-{{ forloop.counter }}-title">{{ item.label }}</h3>
+        </header>
+
+        {% if item.state == "available" %}
+          {% if item.manager_summary.state == "available" %}
+            <aside class="recommendation-gemini-summary" aria-label="Supplemental Gemini summary">
+              <span>Optional Gemini summary</span>
+              <p>{{ item.manager_summary.summary }}</p>
+              <small>Supplemental wording only. The deterministic evidence below remains authoritative.</small>
+            </aside>
+          {% elif evidence.enrichment.state != "disabled" %}
+            <aside class="recommendation-gemini-summary recommendation-gemini-summary--unavailable" aria-label="Gemini summary unavailable">
+              <span>Optional Gemini summary unavailable</span>
+              <p>Use the deterministic strengths and trade-offs below.</p>
+            </aside>
+          {% endif %}
+          <div class="recommendation-explanation-columns">
+            <section aria-labelledby="recommendation-explanation-{{ forloop.counter }}-strengths-title">
+              <h4 id="recommendation-explanation-{{ forloop.counter }}-strengths-title">Strengths</h4>
+              {% if item.strengths %}
+                <ul>
+                  {% for strength in item.strengths %}<li>{{ strength }}</li>{% endfor %}
+                </ul>
+              {% else %}
+                <p>No deterministic strength was returned for this strategy.</p>
+              {% endif %}
+            </section>
+            <section aria-labelledby="recommendation-explanation-{{ forloop.counter }}-tradeoffs-title">
+              <h4 id="recommendation-explanation-{{ forloop.counter }}-tradeoffs-title">Trade-offs</h4>
+              {% if item.tradeoffs %}
+                <ul>
+                  {% for tradeoff in item.tradeoffs %}<li>{{ tradeoff }}</li>{% endfor %}
+                </ul>
+              {% else %}
+                <p>No deterministic trade-off was returned for this strategy.</p>
+              {% endif %}
+            </section>
+          </div>
+        {% else %}
+          <div class="planning-input-state planning-input-state--warning" role="status">
+            <strong>Deterministic explanation unavailable</strong>
+            <p>No strengths or trade-offs are inferred when the pipeline does not return readable explanation evidence.</p>
+          </div>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+
+  <section class="recommendation-comparisons" aria-labelledby="recommendation-comparisons-title">
+    <div class="recommendation-comparisons__heading">
+      <h3 id="recommendation-comparisons-title">Adjacent strategy comparisons</h3>
+      <p>Each change is the later strategy minus the strategy immediately before it, exactly as returned by the comparison service.</p>
+    </div>
+
+    {% if evidence.comparisons.state == "available" %}
+      <div class="recommendation-comparison-list">
+        {% for comparison in evidence.comparisons.items %}
+          <article class="recommendation-comparison-card" aria-labelledby="recommendation-comparison-{{ forloop.counter }}-title">
+            <header>
+              <p class="profile-kicker">Adjacent comparison {{ forloop.counter }}</p>
+              <h4 id="recommendation-comparison-{{ forloop.counter }}-title">{{ comparison.from_label }} to {{ comparison.to_label }}</h4>
+            </header>
+
+            <div class="recommendation-comparison-teams">
+              <section aria-labelledby="recommendation-comparison-{{ forloop.counter }}-from-team-title">
+                <h5 id="recommendation-comparison-{{ forloop.counter }}-from-team-title">Earlier strategy team</h5>
+                {% if comparison.from_team %}
+                  <ol>{% for member in comparison.from_team %}<li>{{ member }}</li>{% endfor %}</ol>
+                {% else %}
+                  <p>Team names were not returned with the deterministic explanation.</p>
+                {% endif %}
+              </section>
+              <section aria-labelledby="recommendation-comparison-{{ forloop.counter }}-to-team-title">
+                <h5 id="recommendation-comparison-{{ forloop.counter }}-to-team-title">Later strategy team</h5>
+                {% if comparison.to_team %}
+                  <ol>{% for member in comparison.to_team %}<li>{{ member }}</li>{% endfor %}</ol>
+                {% else %}
+                  <p>Team names were not returned with the deterministic explanation.</p>
+                {% endif %}
+              </section>
+            </div>
+
+            <dl class="recommendation-comparison-metrics">
+              <div>
+                <dt>Team size change (people)</dt>
+                <dd>{{ comparison.team_size_change }}</dd>
+              </div>
+              <div>
+                <dt>Team score change</dt>
+                <dd>{{ comparison.team_score_change|floatformat:2 }} points</dd>
+              </div>
+              <div>
+                <dt>Remaining capacity change</dt>
+                <dd>{{ comparison.remaining_capacity_change|decimal_hours }}</dd>
+              </div>
+              <div>
+                <dt>Maximum utilization change</dt>
+                <dd>{{ comparison.max_utilization_change|floatformat:2 }} percentage points</dd>
+              </div>
+              <div>
+                <dt>Utilization spread change</dt>
+                <dd>{{ comparison.utilization_spread_change|floatformat:2 }} percentage points</dd>
+              </div>
+            </dl>
+          </article>
+        {% endfor %}
+      </div>
+    {% elif evidence.comparisons.state == "empty" %}
+      <div class="planning-input-state" role="status">
+        <strong>No adjacent comparison returned</strong>
+        <p>The service selected no additional strategy to compare with the preceding option.</p>
+      </div>
+    {% else %}
+      <div class="planning-input-state planning-input-state--warning" role="status">
+        <strong>Adjacent comparison unavailable</strong>
+        <p>No comparison values are inferred when the pipeline does not return readable comparison evidence.</p>
+      </div>
+    {% endif %}
+  </section>
+</section>

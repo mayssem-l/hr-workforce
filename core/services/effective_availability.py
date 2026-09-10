@@ -5,11 +5,27 @@ from core.models import Employee, Leave
 from core.services.workload import calculate_current_workload
 
 
-def is_on_approved_leave(employee, on_date):
+def calculate_daily_capacity_hours(employee, on_date):
+    """Return stored weekday capacity before workload or leave adjustments."""
+
+    if on_date.weekday() >= 5:
+        return Decimal("0.00")
+    return employee.capacity_hours_week / Decimal("5")
+
+
+def is_on_approved_leave(employee, on_date, leave_records=None):
     """
     Retourne True si l'employé est en congé approuvé
     à cette date.
     """
+
+    if leave_records is not None:
+        return any(
+            leave.employee_id == employee.employee_id
+            and leave.status == Leave.Status.APPROVED
+            and leave.start_date <= on_date <= leave.end_date
+            for leave in leave_records
+        )
 
     return Leave.objects.filter(
         employee=employee,
@@ -23,10 +39,13 @@ def calculate_daily_available_hours(
     employee,
     on_date,
     exclude_project=None,
+    assignment_records=None,
+    leave_records=None,
 ):
     """
     Calcule le nombre d'heures réellement disponibles
-    pour un employé sur une journée donnée.
+    pour un employé sur une journée donnée. Les listes préchargées
+    conservent les mêmes règles sans requêtes répétées.
     """
 
     # Week-end
@@ -38,20 +57,22 @@ def calculate_daily_available_hours(
         return Decimal("0.00")
 
     # Congé approuvé
-    if is_on_approved_leave(employee, on_date):
+    if is_on_approved_leave(
+        employee,
+        on_date,
+        leave_records=leave_records,
+    ):
         return Decimal("0.00")
 
     # Capacité quotidienne théorique.
     # Exemple : 40 h / semaine -> 8 h / jour.
-    daily_capacity = (
-        employee.capacity_hours_week
-        / Decimal("5")
-    )
+    daily_capacity = calculate_daily_capacity_hours(employee, on_date)
 
     workload = calculate_current_workload(
         employee,
         on_date,
         exclude_project=exclude_project,
+        assignment_records=assignment_records,
     )
 
     workload = Decimal(str(workload))
@@ -75,6 +96,8 @@ def calculate_daily_available_hours(
 def calculate_available_hours_for_project(
     employee,
     project,
+    assignment_records=None,
+    leave_records=None,
 ):
     """
     Calcule toutes les heures que l'employé peut
@@ -93,6 +116,8 @@ def calculate_available_hours_for_project(
                 employee,
                 current_date,
                 exclude_project=project,
+                assignment_records=assignment_records,
+                leave_records=leave_records,
             )
         )
 

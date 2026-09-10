@@ -2,7 +2,7 @@
 <tr>
   <td>
     <div class="skill-directory-identity">
-      <a href="{% url 'frontend:employee_detail' row.employee_id %}"><strong>{{ row.employee }}</strong></a>
+      <a href="{% url 'frontend:employee_detail' row.employee_id %}{% if profile_query_string %}?{{ profile_query_string }}{% endif %}"><strong>{{ row.employee }}</strong></a>
       <small>{{ row.employee.department }}</small>
     </div>
   </td>

@@ -56,7 +56,7 @@
   </section>
 
   <div class="employee-form-actions">
-    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">{{ cancel_label|default:"Cancel" }}</a>
     {% if available_requirement_count %}
       <button class="btn btn-primary" type="submit" data-loading-label="Adding coverage…">Add coverage</button>
     {% endif %}

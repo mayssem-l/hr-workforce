@@ -5,5 +5,5 @@
 
 {% block content %}
   {% include "frontend/components/page_header.html" with eyebrow="Project skill demand" title="Add skill requirement" description=project.name only %}
-  {% include "frontend/projects/requirements/_form.html" with form=form project=project preflight=preflight cancel_url=cancel_url submit_label="Add requirement" csrf_token=csrf_token only %}
+  {% include "frontend/projects/requirements/_form.html" with form=form project=project preflight=preflight cancel_url=cancel_url cancel_label=cancel_label submit_label="Add requirement" csrf_token=csrf_token only %}
 {% endblock %}

@@ -6,5 +6,5 @@
 {% block content %}
   {% include "frontend/components/page_header.html" with eyebrow="Employee skill profile" title="Edit proficiency" description=employee_name only %}
   {% include "frontend/components/workforce_tabs.html" %}
-  {% include "frontend/employees/proficiencies/_form.html" with form=form employee_name=employee_name employee_skill=employee_skill cancel_url=cancel_url submit_label="Save proficiency" csrf_token=csrf_token only %}
+  {% include "frontend/employees/proficiencies/_form.html" with form=form employee_name=employee_name employee_skill=employee_skill cancel_url=cancel_url cancel_label=cancel_label submit_label="Save proficiency" csrf_token=csrf_token only %}
 {% endblock %}

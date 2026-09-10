@@ -16,6 +16,7 @@ from frontend.permissions import (
     read_model_permission_required,
     write_model_permission_required,
 )
+from frontend.presenters.dashboard import build_operational_directory_navigation
 from frontend.selectors.attendance import (
     ATTENDANCE_PAGE_SIZE,
     DEFAULT_ATTENDANCE_SORT,
@@ -46,6 +47,14 @@ def attendance_list(request):
     if filter_form.is_valid():
         filters.update(filter_form.cleaned_data)
 
+    navigation_context = None
+    if filters["from_date"] and filters["to_date"]:
+        navigation_context = build_operational_directory_navigation(
+            start_date=filters["from_date"],
+            end_date=filters["to_date"],
+            employee_id=filters["employee"],
+        )
+
     records = get_attendance_directory(**filters)
     page_obj = Paginator(records, ATTENDANCE_PAGE_SIZE).get_page(
         request.GET.get("page")
@@ -56,13 +65,18 @@ def attendance_list(request):
     ):
         attendance_headers = (*attendance_headers, "Actions")
 
+    dashboard_url = (
+        navigation_context["dashboard_url"]
+        if navigation_context
+        else reverse("frontend:landing")
+    )
     return render(
         request,
         "frontend/attendance/list.html",
         {
             "attendance_headers": attendance_headers,
             "breadcrumbs": [
-                {"label": "Dashboard", "url": reverse("frontend:landing")},
+                {"label": "Dashboard", "url": dashboard_url},
                 {"label": "Workforce", "url": reverse("frontend:employee_list")},
                 {"label": "Attendance", "url": None},
             ],
@@ -71,7 +85,14 @@ def attendance_list(request):
                 filters[key]
                 for key in ("employee", "status", "from_date", "to_date")
             ),
+            "navigation_context": navigation_context,
             "page_obj": page_obj,
+            "dashboard_url": dashboard_url,
+            "profile_query_string": (
+                navigation_context["profile_query_string"]
+                if navigation_context
+                else ""
+            ),
         },
     )
 

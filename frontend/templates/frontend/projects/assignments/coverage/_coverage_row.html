@@ -10,7 +10,7 @@
   <td>
     {% if row.coverage and perms.core.delete_assignmentskill %}
       <div class="skill-profile-list__actions">
-        <a class="skill-profile-list__remove" href="{% url 'frontend:project_assignment_coverage_remove' row.project_id row.assignment_id row.coverage.assignment_skill_id %}">Remove</a>
+        <a class="skill-profile-list__remove" href="{% url 'frontend:project_assignment_coverage_remove' row.project_id row.assignment_id row.coverage.assignment_skill_id %}{% if planning_return_query %}?{{ planning_return_query }}{% endif %}">Remove</a>
       </div>
     {% else %}
       <span class="profile-table-secondary">No action needed</span>

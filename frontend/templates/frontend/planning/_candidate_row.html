@@ -1,0 +1,14 @@
+{% load frontend_format %}
+<tr id="candidate-{{ row.employee.employee_id }}">
+  <td class="data-table__number"><strong>#{{ row.rank }}</strong></td>
+  <th scope="row">
+    <a class="profile-table-primary" href="{{ row.profile_url }}">{{ row.employee }}</a>
+    <span class="profile-table-secondary">{{ row.employee.position }} · {{ row.employee.department }}</span>
+  </th>
+  <td class="data-table__number">{{ row.skill_score|floatformat:"2" }} / 100</td>
+  <td class="data-table__number">{{ row.workload_score|percentage }}</td>
+  <td class="data-table__number">{{ row.leave_score|percentage }}</td>
+  <td class="data-table__number">{{ row.experience_score|floatformat:"2" }} / 100</td>
+  <td class="data-table__number"><strong>{{ row.final_score|floatformat:"2" }} / 100</strong></td>
+  <td><a href="{{ row.requirements_url }}">Review project requirements</a></td>
+</tr>

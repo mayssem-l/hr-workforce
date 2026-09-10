@@ -7,6 +7,11 @@ from django.views.decorators.http import require_http_methods
 
 from core.models import Assignment, AssignmentSkill, Project, ProjectSkillRequirement
 from frontend.forms.coverage import AssignmentSkillCoverageForm
+from frontend.navigation import (
+    get_planning_return_url,
+    planning_return_query,
+    with_planning_return,
+)
 from frontend.permissions import (
     read_models_permission_required,
     write_model_permission_required,
@@ -83,6 +88,10 @@ def project_assignment_coverage(request, project_id, assignment_id):
         coverage_profile=True,
     )
     profile = build_assignment_coverage_profile(assignment)
+    planning_return_url = get_planning_return_url(
+        request,
+        project_id=assignment.project_id,
+    )
     return render(
         request,
         "frontend/projects/assignments/coverage/detail.html",
@@ -100,7 +109,16 @@ def project_assignment_coverage(request, project_id, assignment_id):
                 "Planning note",
                 "Actions",
             ),
+            "add_coverage_url": with_planning_return(
+                reverse(
+                    "frontend:project_assignment_coverage_create",
+                    args=[assignment.project_id, assignment.assignment_id],
+                ),
+                planning_return_url,
+            ),
             "profile": profile,
+            "planning_return_query": planning_return_query(planning_return_url),
+            "planning_return_url": planning_return_url,
         },
     )
 
@@ -109,6 +127,11 @@ def project_assignment_coverage(request, project_id, assignment_id):
 @require_http_methods(["GET", "POST"])
 def project_assignment_coverage_create(request, project_id, assignment_id):
     assignment = _assignment_or_404(project_id, assignment_id)
+    planning_return_url = get_planning_return_url(
+        request,
+        project_id=assignment.project_id,
+    )
+    destination_url = planning_return_url or _coverage_detail_url(assignment)
     form = AssignmentSkillCoverageForm(
         request.POST or None,
         assignment=assignment,
@@ -131,7 +154,7 @@ def project_assignment_coverage_create(request, project_id, assignment_id):
                     f"{coverage.project_skill_requirement.skill} coverage was "
                     f"added for {coverage.assignment.employee}.",
                 )
-                return redirect(_coverage_detail_url(assignment))
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -147,7 +170,10 @@ def project_assignment_coverage_create(request, project_id, assignment_id):
                 "project_skill_requirement"
             ].queryset.count(),
             "breadcrumbs": _coverage_breadcrumbs(assignment, "Add coverage"),
-            "cancel_url": _coverage_detail_url(assignment),
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
+            ),
+            "cancel_url": destination_url,
             "form": form,
             "project": assignment.project,
         },
@@ -166,10 +192,16 @@ def project_assignment_coverage_remove(
     assignment = coverage.assignment
     requirement = coverage.project_skill_requirement
     detail_url = _coverage_detail_url(assignment)
+    planning_return_url = get_planning_return_url(
+        request,
+        project_id=assignment.project_id,
+    )
+    destination_url = planning_return_url or detail_url
     remove_url = reverse(
         "frontend:project_assignment_coverage_remove",
         args=[project_id, assignment_id, coverage_id],
     )
+    remove_url = with_planning_return(remove_url, planning_return_url)
 
     if request.method == "POST":
         skill_name = requirement.skill.name
@@ -188,7 +220,7 @@ def project_assignment_coverage_remove(
                 request,
                 f"{skill_name} coverage was removed for {employee_name}.",
             )
-            return redirect(detail_url)
+            return redirect(destination_url)
 
     return render(
         request,
@@ -199,7 +231,7 @@ def project_assignment_coverage_remove(
                 assignment,
                 f"Remove {requirement.skill}",
             ),
-            "cancel_url": detail_url,
+            "cancel_url": destination_url,
             "confirmation_message": (
                 f"Remove {requirement.skill} coverage from "
                 f"{assignment.employee}'s assignment? The assignment, project "

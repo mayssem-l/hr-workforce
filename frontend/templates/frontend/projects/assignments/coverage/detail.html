@@ -5,10 +5,19 @@
 
 {% block content %}
   {% if perms.core.add_assignmentskill and profile.available_count %}
-    {% url 'frontend:project_assignment_coverage_create' profile.assignment.project_id profile.assignment.assignment_id as add_coverage_url %}
     {% include "frontend/components/page_header.html" with eyebrow="Assignment coverage" title="Requirement coverage" description=profile.assignment.project.name action_url=add_coverage_url action_label="Add coverage" only %}
   {% else %}
     {% include "frontend/components/page_header.html" with eyebrow="Assignment coverage" title="Requirement coverage" description=profile.assignment.project.name only %}
+  {% endif %}
+
+  {% if planning_return_url %}
+    <div class="dashboard-summary__notice" role="status">
+      <div>
+        <strong>Project planning context preserved.</strong>
+        <span>Review or update this assignment's coverage, then return to the same planning workspace.</span>
+      </div>
+      <a class="btn btn-sm btn-outline-secondary" href="{{ planning_return_url }}">Return to planning workspace</a>
+    </div>
   {% endif %}
 
   <div class="proficiency-confirmation-context surface-card">
@@ -43,7 +52,7 @@
       <span>{{ profile.rows|length }} requirement{{ profile.rows|length|pluralize }}</span>
     </div>
     {% if profile.rows %}
-      {% include "frontend/components/table.html" with caption="Requirement coverage for this assignment" headers=coverage_headers rows=profile.rows row_template="frontend/projects/assignments/coverage/_coverage_row.html" perms=perms only %}
+      {% include "frontend/components/table.html" with caption="Requirement coverage for this assignment" headers=coverage_headers rows=profile.rows row_template="frontend/projects/assignments/coverage/_coverage_row.html" perms=perms planning_return_query=planning_return_query only %}
     {% else %}
       <div class="profile-empty" role="status">
         <strong>No project requirements defined</strong>
@@ -51,4 +60,9 @@
       </div>
     {% endif %}
   </section>
+  {% if planning_return_url %}
+    <div class="directory-footer-actions">
+      <a class="btn btn-outline-secondary" href="{{ planning_return_url }}">Return to planning workspace</a>
+    </div>
+  {% endif %}
 {% endblock %}

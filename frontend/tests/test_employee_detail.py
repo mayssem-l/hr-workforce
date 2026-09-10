@@ -18,7 +18,7 @@ from frontend.selectors.employees import get_employee_profile
 
 class EmployeeDetailTests(TestCase):
     AS_OF = date(2026, 9, 8)
-    EXPECTED_QUERY_COUNT = 12
+    EXPECTED_QUERY_COUNT = 10
     SELECTOR_QUERY_COUNT = 4
     TIMING_SAMPLE_COUNT = 25
 
@@ -291,11 +291,25 @@ class EmployeeDetailTests(TestCase):
         self.assertContains(response, "37.0%")
         self.assertContains(response, "25.20 h")
         self.assertContains(response, "5.04 h")
-        for service in (current_workload, available_weekly, available_today):
-            service.assert_called_once()
-            called_employee, called_date = service.call_args.args
-            self.assertEqual(called_employee, self.employee)
-            self.assertEqual(called_date, self.AS_OF)
+        profile_employee = response.context["profile"]["employee"]
+        available_weekly.assert_called_once_with(
+            self.employee,
+            self.AS_OF,
+            assignment_records=profile_employee.profile_calculation_assignments,
+        )
+        available_today.assert_any_call(
+            self.employee,
+            self.AS_OF,
+            assignment_records=profile_employee.profile_calculation_assignments,
+            leave_records=profile_employee.profile_calculation_leaves,
+        )
+        self.assertEqual(available_today.call_count, 31)
+        current_workload.assert_any_call(
+            self.employee,
+            self.AS_OF,
+            assignment_records=profile_employee.profile_calculation_assignments,
+        )
+        self.assertEqual(current_workload.call_count, 31)
 
     def test_selector_loads_profile_collections_in_four_queries(self):
         with self.assertNumQueries(self.SELECTOR_QUERY_COUNT):
@@ -347,7 +361,7 @@ class EmployeeDetailTests(TestCase):
             method="inclusive",
         )[18]
         print(
-            "\nM2.2 employee-profile baseline "
+            "\nM4.5 employee-profile baseline "
             f"({self.TIMING_SAMPLE_COUNT} warm Django test-client GETs, "
             "2 relevant assignments, "
             "1 upcoming approved leave, 2 skills):\n"

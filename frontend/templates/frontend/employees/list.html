@@ -16,6 +16,11 @@
   <section class="directory-filter-panel" aria-labelledby="employee-filter-title">
     <h2 class="visually-hidden" id="employee-filter-title">Filter employees</h2>
     <form method="get" action="{% url 'frontend:employee_list' %}" role="search">
+      {% if navigation_context %}
+        <input type="hidden" name="start_date" value="{{ navigation_context.start_date|date:'Y-m-d' }}">
+        <input type="hidden" name="end_date" value="{{ navigation_context.end_date|date:'Y-m-d' }}">
+        <input type="hidden" name="project_status" value="{{ navigation_context.project_status }}">
+      {% endif %}
       <div class="directory-filter-grid">
         {% include "frontend/components/form_field.html" with field=filter_form.query only %}
         {% include "frontend/components/form_field.html" with field=filter_form.status only %}
@@ -36,11 +41,24 @@
         <span>Showing {{ page_obj.start_index }}&ndash;{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
       {% endif %}
     </div>
-    <span class="directory-toolbar__note">Stored workforce details</span>
+    {% if navigation_context %}
+      <a href="{{ dashboard_url }}">Return to dashboard</a>
+    {% else %}
+      <span class="directory-toolbar__note">Stored workforce details</span>
+    {% endif %}
   </div>
 
+  {% if navigation_context %}
+    <div class="dashboard-summary__notice" role="status">
+      <div>
+        <strong>Dashboard reporting context preserved.</strong>
+        <span>{{ navigation_context.start_date_label }} to {{ navigation_context.end_date_label }} is retained for employee profile links. Dates do not filter stored employee directory rows.</span>
+      </div>
+    </div>
+  {% endif %}
+
   {% if page_obj.object_list %}
-    {% include "frontend/components/table.html" with caption="Employee directory results" headers=employee_headers rows=page_obj.object_list row_template="frontend/employees/_employee_row.html" only %}
+    {% include "frontend/components/table.html" with caption="Employee directory results" headers=employee_headers rows=page_obj.object_list row_template="frontend/employees/_employee_row.html" profile_query_string=profile_query_string only %}
     {% include "frontend/components/pagination.html" with page_obj=page_obj pagination_label="Employee directory pages" only %}
   {% elif has_active_filters %}
     {% url 'frontend:employee_list' as employee_list_url %}

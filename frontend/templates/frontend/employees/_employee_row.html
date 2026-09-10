@@ -1,7 +1,7 @@
 {% load frontend_format %}
 <tr>
   <td>
-    <a class="employee-identity employee-identity__link" href="{% url 'frontend:employee_detail' row.employee_id %}" aria-label="View profile for {{ row.first_name }} {{ row.last_name }}">
+    <a class="employee-identity employee-identity__link" href="{% url 'frontend:employee_detail' row.employee_id %}{% if profile_query_string %}?{{ profile_query_string }}{% endif %}" aria-label="View profile for {{ row.first_name }} {{ row.last_name }}">
       <span class="employee-identity__avatar" aria-hidden="true">{{ row.first_name|first|upper }}{{ row.last_name|first|upper }}</span>
       <span class="employee-identity__copy">
         <strong>{{ row.first_name }} {{ row.last_name }}</strong>

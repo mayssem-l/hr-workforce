@@ -2,7 +2,8 @@ from datetime import date
 
 from django.db.models import Q
 
-from core.models import Assignment, Employee, EmployeeSkill
+from core.models import Assignment, Employee, EmployeeSkill, Leave
+from core.services.attendance import get_attendance_records
 from core.services.availability import get_approved_leaves
 
 
@@ -83,14 +84,37 @@ def get_employee_departments():
     )
 
 
-def get_employee_profile(employee_id, *, on_date):
-    """Load one employee and profile collections in four fixed queries."""
+def get_employee_profile(
+    employee_id,
+    *,
+    on_date,
+    timeline_start_date=None,
+    timeline_end_date=None,
+    include_attendance=False,
+):
+    """Load one employee and its permitted profile insight collections."""
     employee = Employee.objects.only(*EMPLOYEE_DIRECTORY_FIELDS).get(
         employee_id=employee_id
     )
 
-    employee.profile_upcoming_leaves = list(
-        get_approved_leaves(employee, on_date, date.max)
+    has_timeline_period = (
+        timeline_start_date is not None
+        and timeline_end_date is not None
+        and timeline_start_date <= timeline_end_date
+    )
+
+    leave_scope = Q(
+        status=Leave.Status.APPROVED,
+        end_date__gte=on_date,
+    )
+    if has_timeline_period:
+        leave_scope |= Q(
+            start_date__lte=timeline_end_date,
+            end_date__gte=timeline_start_date,
+        )
+    loaded_leaves = list(
+        Leave.objects.filter(employee=employee)
+        .filter(leave_scope)
         .only(
             "leave_id",
             "employee_id",
@@ -101,12 +125,36 @@ def get_employee_profile(employee_id, *, on_date):
         )
         .order_by("start_date", "end_date", "leave_id")
     )
-    employee.profile_assignments = list(
-        Assignment.objects.filter(
-            employee=employee,
-            status__in=(Assignment.Status.ACTIVE, Assignment.Status.PLANNED),
-            end_date__gte=on_date,
+    employee.profile_calculation_leaves = loaded_leaves
+    employee.profile_upcoming_leaves = get_approved_leaves(
+        employee,
+        on_date,
+        date.max,
+        leave_records=loaded_leaves,
+    )
+    employee.profile_timeline_leaves = [
+        leave
+        for leave in loaded_leaves
+        if has_timeline_period
+        and leave.start_date <= timeline_end_date
+        and leave.end_date >= timeline_start_date
+    ]
+
+    assignment_scope = Q(
+        status__in=(Assignment.Status.ACTIVE, Assignment.Status.PLANNED),
+        end_date__gte=on_date,
+    ) | Q(
+        start_date__lte=on_date,
+        end_date__gte=on_date,
+    )
+    if has_timeline_period:
+        assignment_scope |= Q(
+            start_date__lte=timeline_end_date,
+            end_date__gte=timeline_start_date,
         )
+    loaded_assignments = list(
+        Assignment.objects.filter(employee=employee)
+        .filter(assignment_scope)
         .select_related("project")
         .only(
             "assignment_id",
@@ -122,6 +170,20 @@ def get_employee_profile(employee_id, *, on_date):
         )
         .order_by("start_date", "end_date", "project__name", "assignment_id")
     )
+    employee.profile_calculation_assignments = loaded_assignments
+    employee.profile_assignments = [
+        assignment
+        for assignment in loaded_assignments
+        if assignment.status in (Assignment.Status.ACTIVE, Assignment.Status.PLANNED)
+        and assignment.end_date >= on_date
+    ]
+    employee.profile_timeline_assignments = [
+        assignment
+        for assignment in loaded_assignments
+        if has_timeline_period
+        and assignment.start_date <= timeline_end_date
+        and assignment.end_date >= timeline_start_date
+    ]
     employee.profile_skills = list(
         EmployeeSkill.objects.filter(employee=employee)
         .select_related("skill")
@@ -137,6 +199,24 @@ def get_employee_profile(employee_id, *, on_date):
         )
         .order_by("skill__category", "skill__name", "employee_skill_id")
     )
+    employee.profile_attendance_records = []
+    if has_timeline_period and include_attendance:
+        employee.profile_attendance_records = list(
+            get_attendance_records(
+                employee,
+                timeline_start_date,
+                timeline_end_date,
+            )
+            .only(
+                "attendance_id",
+                "employee_id",
+                "date",
+                "status",
+                "arrival_time",
+                "departure_time",
+            )
+            .order_by("date", "attendance_id")
+        )
     return employee
 
 

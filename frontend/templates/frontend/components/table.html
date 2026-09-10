@@ -10,7 +10,7 @@
       <tbody>
         {% for row in rows %}
           {% if row_template %}
-            {% include row_template with row=row perms=perms only %}
+            {% include row_template with row=row perms=perms profile_query_string=profile_query_string planning_return_query=planning_return_query only %}
           {% else %}
             <tr>
               {% for cell in row %}<td>{{ cell }}</td>{% endfor %}

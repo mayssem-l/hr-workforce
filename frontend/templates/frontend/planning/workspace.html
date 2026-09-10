@@ -1,0 +1,336 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}{{ workspace.project.name }} planning workspace | Workforce Planning{% endblock %}
+{% block meta_description %}Review planning readiness, stored demand, requirements, assignments, and coverage for {{ workspace.project.name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Project planning" title=workspace.project.name description="Review the project's current planning readiness, stored demand, and staffing context in one place." only %}
+
+  <section class="workspace-intro" aria-labelledby="planning-workspace-intro-title">
+    <div class="workspace-intro__copy">
+      <p class="page-eyebrow">Current planning context</p>
+      <h2 id="planning-workspace-intro-title">One view of readiness, demand, and current assignments.</h2>
+      <p>This workspace checks whether current project inputs, qualified headcount, and effective capacity are ready, then shows the existing matching service's ranked eligible employees and explains who is absent from that result. It does not enumerate teams, run optimization, or generate recommendations.</p>
+    </div>
+    <div class="workspace-intro__signal">
+      <small>Project schedule</small>
+      <strong>{{ workspace.project.start_date|workforce_date }} &ndash; {{ workspace.project.end_date|workforce_date }}</strong>
+      <span class="signal-line">{{ workspace.project.get_status_display }}</span>
+      <a class="link-light mt-3" href="{{ project_detail_url }}">Return to project profile</a>
+    </div>
+  </section>
+
+  <div class="dashboard-summary__notice" role="status">
+    <div>
+      <strong>Repair links keep this workspace as your return point.</strong>
+      <span>Each action opens an existing validated workflow. Only actions allowed by your permissions are shown; the planning workspace itself remains read-only.</span>
+    </div>
+    {% if workspace.repair.is_read_only %}<span>Read-only access</span>{% endif %}
+  </div>
+
+  <section class="profile-panel surface-card" aria-labelledby="planning-readiness-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Read-only preflight</p>
+        <h2 id="planning-readiness-title">Planning readiness</h2>
+      </div>
+      <span>{{ workspace.readiness.label }}</span>
+    </div>
+
+    <div class="planning-input-state planning-input-state--{{ workspace.readiness.tone }}" role="status">
+      <strong>{{ workspace.readiness.title }}</strong>
+      <p>{{ workspace.readiness.message }}</p>
+      {% if workspace.readiness.blockers %}
+        <ul class="planning-repair-list">
+          {% for blocker in workspace.readiness.blockers %}
+            <li data-blocker-code="{{ blocker.code }}">
+              <span>{{ blocker.message }}</span>
+              {% if blocker.repair_actions %}
+                <span class="planning-repair-actions">
+                  {% for action in blocker.repair_actions %}<a href="{{ action.url }}">{{ action.label }}</a>{% endfor %}
+                </span>
+              {% else %}
+                <small>Read-only: ask a colleague with the matching maintenance permission to correct this record.</small>
+              {% endif %}
+              {% if blocker.repair_note %}<small>{{ blocker.repair_note }}</small>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    <div class="planning-input-state mt-3" role="note">
+      <strong>This is a readiness check, not a feasibility result.</strong>
+      <p>No team combinations, solver, recommendation selection, or generated explanation has run. A project that passes these checks can still have no feasible team.</p>
+      <p>Effective capacity follows the current Monday-to-Friday model and does not include a holiday calendar. Current assignments and approved dated leave reduce capacity. Attendance remains descriptive only and does not affect staffing readiness.</p>
+    </div>
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="recommendation-generation-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Explicit recommendation run</p>
+        <h2 id="recommendation-generation-title">Team recommendation generation</h2>
+      </div>
+      <span>{% if recommendation_generation.state == "available" %}Ready to start{% else %}Planning inputs blocked{% endif %}</span>
+    </div>
+
+    <div class="planning-input-state{% if recommendation_generation.state == 'blocked' %} planning-input-state--warning{% endif %}" role="status">
+      <strong>{{ recommendation_generation.title }}</strong>
+      <p>{{ recommendation_generation.message }}</p>
+    </div>
+
+    {% if recommendation_generation.form %}
+      <form method="post" action="{{ recommendation_generation.action_url }}" class="mt-3" data-loading-form data-recommendation-generation-form aria-describedby="recommendation-generation-guidance recommendation-generation-progress">
+        {% csrf_token %}
+        {{ recommendation_generation.form.submission_token }}
+        <p id="recommendation-generation-guidance" class="capacity-assumption">This explicit run may take several seconds. It uses the current feasibility, optimization, Pareto, selection, comparison, and deterministic explanation services. It does not request optional generated summaries or change staffing records.</p>
+        <button class="btn btn-primary" type="submit" data-loading-label="Generating recommendations…">Generate recommendations</button>
+        <p id="recommendation-generation-progress" class="form-text" role="status" aria-live="polite" data-loading-status hidden>Recommendation generation started. Keep this page open while the current pipeline runs.</p>
+      </form>
+    {% else %}
+      <p class="capacity-assumption mt-3">Review the readiness evidence and permitted repair links above. No recommendation pipeline will run from this page while planning inputs are blocked.</p>
+    {% endif %}
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="planning-candidates-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Candidate evidence</p>
+        <h2 id="planning-candidates-title">Eligible candidates</h2>
+      </div>
+      <span>
+        {% if workspace.candidates.state == "ranked" %}
+          {{ workspace.candidates.count }} candidate{{ workspace.candidates.count|pluralize }}
+        {% else %}
+          {{ workspace.candidates.title }}
+        {% endif %}
+      </span>
+    </div>
+
+    {% if workspace.candidates.state == "ranked" %}
+      <p>{{ workspace.candidates.message }}</p>
+      <p class="capacity-assumption">
+        Score period: {{ workspace.candidates.period_start|workforce_date }} through {{ workspace.candidates.period_end|workforce_date }}, inclusive. Workload and approved dated leave are assessed by the current matching rules; attendance is not a score component.
+      </p>
+      {% include "frontend/components/table.html" with caption="Eligible employees in current matching rank order with score components" headers=candidate_headers rows=workspace.candidates.rows row_template="frontend/planning/_candidate_row.html" only %}
+
+      <section class="candidate-score-guide" aria-labelledby="candidate-score-guide-title">
+        <div class="candidate-score-guide__header">
+          <p class="profile-kicker">Reading guide</p>
+          <h3 id="candidate-score-guide-title">How to read the candidate scores</h3>
+          <p>Each heading matches a column in the candidate table above.</p>
+        </div>
+        <dl class="candidate-score-guide__grid">
+          {% for definition in workspace.candidates.component_definitions %}
+            <div class="candidate-score-guide__card{% if forloop.last %} candidate-score-guide__card--overall{% endif %}">
+              <dt>{{ definition.label }}</dt>
+              <dd class="candidate-score-guide__unit">{{ definition.unit }}</dd>
+              <dd class="candidate-score-guide__description">{{ definition.description }}</dd>
+            </div>
+          {% endfor %}
+        </dl>
+      </section>
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>{{ workspace.candidates.title }}</strong>
+        <p>{{ workspace.candidates.message }}</p>
+        {% if workspace.candidates.repair_actions %}<div class="planning-repair-actions">{% for action in workspace.candidates.repair_actions %}<a href="{{ action.url }}">{{ action.label }}</a>{% endfor %}</div>{% endif %}
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="planning-candidate-exclusions-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Workforce comparison</p>
+        <h2 id="planning-candidate-exclusions-title">Why employees are not ranked</h2>
+      </div>
+      <span>
+        {% if workspace.candidate_exclusions.state == "explained" %}
+          {{ workspace.candidate_exclusions.count }} employee{{ workspace.candidate_exclusions.count|pluralize }} not ranked
+        {% else %}
+          {{ workspace.candidate_exclusions.title }}
+        {% endif %}
+      </span>
+    </div>
+
+    {% if workspace.candidate_exclusions.state == "explained" %}
+      <p>{{ workspace.candidate_exclusions.message }}</p>
+      <div class="planning-input-state" role="note">
+        <strong>Scores do not create extra exclusion rules.</strong>
+        <p>Workload and approved dated leave shape candidate scores but do not remove an otherwise eligible active employee. An employee shown here does not by itself make the project infeasible.</p>
+      </div>
+      {% include "frontend/components/table.html" with caption="Current employees absent from the matching service candidate result" headers=candidate_exclusion_headers rows=workspace.candidate_exclusions.rows row_template="frontend/planning/_candidate_exclusion_row.html" only %}
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>{{ workspace.candidate_exclusions.title }}</strong>
+        <p>{{ workspace.candidate_exclusions.message }}</p>
+        {% if workspace.candidate_exclusions.repair_actions %}<div class="planning-repair-actions">{% for action in workspace.candidate_exclusions.repair_actions %}<a href="{{ action.url }}">{{ action.label }}</a>{% endfor %}</div>{% endif %}
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="employee-profile-card surface-card" aria-labelledby="planning-project-overview-title">
+    <div class="employee-profile-card__identity">
+      <span class="employee-profile-card__avatar" aria-hidden="true">PR</span>
+      <div>
+        <p class="profile-kicker">Project #{{ workspace.project.project_id|stringformat:"04d" }}</p>
+        <h2 id="planning-project-overview-title">Project overview</h2>
+        <p>{{ workspace.project.description }}</p>
+      </div>
+      <div class="employee-profile-card__status">
+        <span>Project status</span>
+        {% include "frontend/components/status_badge.html" with status=workspace.project.status only %}
+      </div>
+    </div>
+
+    <dl class="employee-facts">
+      <div>
+        <dt>Start date</dt>
+        <dd>{{ workspace.project.start_date|workforce_date }}</dd>
+      </div>
+      <div>
+        <dt>End date</dt>
+        <dd>{{ workspace.project.end_date|workforce_date }}</dd>
+      </div>
+      <div>
+        <dt>Priority</dt>
+        <dd>{{ workspace.project.get_priority_display }}</dd>
+      </div>
+      <div>
+        <dt>Criticality</dt>
+        <dd>{{ workspace.project.get_criticality_display }}</dd>
+      </div>
+    </dl>
+    {% if workspace.repair.project_edit_url %}
+      <div class="directory-footer-actions">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ workspace.repair.project_edit_url }}">Edit project details</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="planning-totals-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Stored demand</p>
+        <h2 id="planning-totals-title">Planning totals</h2>
+      </div>
+      <span>Read-only project context</span>
+    </div>
+
+    <dl class="skill-facts project-planning-facts">
+      <div>
+        <dt>Project estimate</dt>
+        <dd>{{ workspace.project.estimated_hours|decimal_hours }}</dd>
+      </div>
+      <div>
+        <dt>Mandatory skill effort</dt>
+        <dd>{{ workspace.mandatory_effort_hours|decimal_hours }}</dd>
+      </div>
+      <div>
+        <dt>Skill requirements</dt>
+        <dd>{{ workspace.requirement_count }}</dd>
+      </div>
+      <div>
+        <dt>Current assignment records</dt>
+        <dd>{{ workspace.assignment_count }}</dd>
+      </div>
+      <div>
+        <dt>Assignment coverage links</dt>
+        <dd>{{ workspace.coverage_count }}</dd>
+      </div>
+    </dl>
+
+    <div class="planning-input-state" role="note">
+      <strong>Estimates remain separate.</strong>
+      <p>The project estimate is stored on the project. Mandatory skill effort totals the entered effort on mandatory requirements; neither value replaces the other.</p>
+      <p>{{ workspace.estimate_message }}</p>
+      {% if workspace.mandatory_effort_unset_count %}
+        <p>{{ workspace.mandatory_effort_unset_count }} mandatory requirement{{ workspace.mandatory_effort_unset_count|pluralize }} {{ workspace.mandatory_effort_unset_count|pluralize:"has,have" }} no estimated effort entered and remain{{ workspace.mandatory_effort_unset_count|pluralize:"s," }} visible below.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="planning-requirements-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Skill demand</p>
+        <h2 id="planning-requirements-title">Stored skill requirements</h2>
+      </div>
+      <span>{{ workspace.requirement_count }} requirement{{ workspace.requirement_count|pluralize }}</span>
+    </div>
+    {% if workspace.requirements %}
+      {% include "frontend/components/table.html" with caption="Stored project skill requirements" headers=requirement_headers rows=workspace.requirements row_template="frontend/planning/_requirement_row.html" only %}
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>No skill requirements defined</strong>
+        <p>This project does not yet contain stored skill demand or proficiency levels.</p>
+        {% if workspace.repair.requirement_create_url %}<a class="btn btn-sm btn-primary" href="{{ workspace.repair.requirement_create_url }}">Add skill requirement</a>{% else %}<p>Read-only: ask a colleague with requirement-maintenance permission to add the project's skill demand.</p>{% endif %}
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="planning-requirement-evidence-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Requirement evidence</p>
+        <h2 id="planning-requirement-evidence-title">Qualification, capacity, and current coverage</h2>
+      </div>
+      <span>
+        {% if workspace.requirement_evidence.state == "empty" %}
+          {{ workspace.requirement_evidence.title }}
+        {% else %}
+          {{ workspace.requirement_evidence.count }} requirement{{ workspace.requirement_evidence.count|pluralize }} reviewed
+        {% endif %}
+      </span>
+    </div>
+
+    {% if workspace.requirement_evidence.state == "empty" %}
+      <div class="profile-empty" role="status">
+        <strong>{{ workspace.requirement_evidence.title }}</strong>
+        <p>{{ workspace.requirement_evidence.message }}</p>
+        {% if workspace.requirement_evidence.repair_actions %}<div class="planning-repair-actions">{% for action in workspace.requirement_evidence.repair_actions %}<a class="btn btn-sm btn-primary" href="{{ action.url }}">{{ action.label }}</a>{% endfor %}</div>{% else %}<p>Read-only: ask a colleague with requirement-maintenance permission to add stored skill demand.</p>{% endif %}
+      </div>
+    {% else %}
+      <p><strong>{{ workspace.requirement_evidence.title }}.</strong> {{ workspace.requirement_evidence.message }}</p>
+      <p class="capacity-assumption">
+        Capacity period: {{ workspace.requirement_evidence.period_start|workforce_date }} through {{ workspace.requirement_evidence.period_end|workforce_date }}, inclusive. Available hours follow the current Monday-to-Friday service rules, exclude this project's own assignments, and include overlapping workload and approved dated leave.
+      </p>
+      <div class="planning-input-state" role="note">
+        <strong>This evidence is not a feasible-team result.</strong>
+        <p>Qualified employees and combined capacity are requirement-level evidence only. Current assignment coverage records describe today's stored links; neither view allocates effort or proves that one team can satisfy the whole project.</p>
+      </div>
+      <div class="requirement-evidence-list">
+        {% for row in workspace.requirement_evidence.rows %}
+          {% include "frontend/planning/_requirement_evidence.html" with row=row qualified_employee_headers=qualified_employee_headers requirement_coverage_headers=requirement_coverage_headers only %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="planning-assignments-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Current staffing records</p>
+        <h2 id="planning-assignments-title">Stored project assignments</h2>
+      </div>
+      <span>{{ workspace.assignment_count }} assignment{{ workspace.assignment_count|pluralize }}</span>
+    </div>
+    {% if workspace.assignments %}
+      {% include "frontend/components/table.html" with caption="Stored project assignments and requirement coverage" headers=assignment_headers rows=workspace.assignments row_template="frontend/planning/_assignment_row.html" only %}
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>No employees assigned</strong>
+        <p>No assignment record currently connects an employee to this project.</p>
+        {% if workspace.repair.assignment_create_url %}<a class="btn btn-sm btn-primary" href="{{ workspace.repair.assignment_create_url }}">Add project assignment</a>{% else %}<p>Read-only: ask a colleague with assignment-maintenance permission to add staffing records.</p>{% endif %}
+      </div>
+    {% endif %}
+  </section>
+
+  <div class="directory-footer-actions">
+    <a class="btn btn-outline-secondary" href="{{ project_detail_url }}">Return to project profile</a>
+    <a class="btn btn-outline-secondary" href="{{ project_list_url }}">View project directory</a>
+  </div>
+{% endblock %}

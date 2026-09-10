@@ -8,7 +8,7 @@ from google.genai import types
 # client = OpenAI()
 
 
-def generate_manager_summary(explanation):
+def generate_manager_summary(explanation, *, timeout_ms=2500):
     """
     Generate a short manager-friendly explanation
     from deterministic recommendation facts.
@@ -16,8 +16,13 @@ def generate_manager_summary(explanation):
     The LLM does not calculate, rank, or select teams.
     """
     # client = OpenAI()
-    client = genai.Client()
-    
+    client = genai.Client(
+        http_options=types.HttpOptions(
+            timeout=timeout_ms,
+            retry_options=types.HttpRetryOptions(attempts=1),
+        )
+    )
+
     payload = {
         "category": explanation["category"],
         "label": explanation["label"],
@@ -70,9 +75,10 @@ Mandatory rules:
         ),
     )
 
-    # 
     return response.text.strip()
-def generate_manager_summaries(explanations):
+
+
+def generate_manager_summaries(explanations, *, timeout_ms=2500):
     """
     Generate summaries for ALL recommendations.
     """
@@ -84,7 +90,10 @@ def generate_manager_summaries(explanations):
         enriched_explanation = explanation.copy()
 
         enriched_explanation["manager_summary"] = (
-            generate_manager_summary(explanation)
+            generate_manager_summary(
+                explanation,
+                timeout_ms=timeout_ms,
+            )
         )
 
         results.append(enriched_explanation)

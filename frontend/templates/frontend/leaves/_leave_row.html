@@ -2,7 +2,7 @@
 <tr>
   <td>
     <div class="skill-directory-identity">
-      <a href="{% url 'frontend:employee_detail' row.employee_id %}"><strong>{{ row.employee }}</strong></a>
+      <a href="{% url 'frontend:employee_detail' row.employee_id %}{% if profile_query_string %}?{{ profile_query_string }}{% endif %}"><strong>{{ row.employee }}</strong></a>
       <small>{{ row.employee.department }}</small>
     </div>
   </td>
@@ -12,8 +12,8 @@
   {% if perms.core.change_leave or perms.core.delete_leave %}
     <td>
       <div class="skill-profile-list__actions" aria-label="Manage {{ row.employee }} leave">
-        {% if perms.core.change_leave %}<a href="{% url 'frontend:leave_update' row.leave_id %}">Edit</a>{% endif %}
-        {% if perms.core.delete_leave %}<a class="skill-profile-list__remove" href="{% url 'frontend:leave_delete' row.leave_id %}">Delete</a>{% endif %}
+        {% if perms.core.change_leave %}<a href="{% url 'frontend:leave_update' row.leave_id %}{% if planning_return_query %}?{{ planning_return_query }}{% endif %}">Edit</a>{% endif %}
+        {% if perms.core.delete_leave %}<a class="skill-profile-list__remove" href="{% url 'frontend:leave_delete' row.leave_id %}{% if planning_return_query %}?{{ planning_return_query }}{% endif %}">Delete</a>{% endif %}
       </div>
     </td>
   {% endif %}

@@ -1,4 +1,5 @@
 {% extends "frontend/base.html" %}
+{% load frontend_format %}
 
 {% block title %}Workforce Overview | Workforce Planning{% endblock %}
 {% block meta_description %}Set the reporting period and workforce filters for the management dashboard.{% endblock %}
@@ -59,33 +60,185 @@
       </div>
     </section>
 
-    <section aria-labelledby="reporting-scope-title">
+    <section class="dashboard-summary" aria-labelledby="workforce-summary-title">
       <div class="section-heading">
         <div>
-          <h2 id="reporting-scope-title">Reporting scope</h2>
-          <p>The shared context is ready for workforce, capacity, and project insight.</p>
+          <p class="page-eyebrow">Six planning signals</p>
+          <h2 id="workforce-summary-title">Workforce summary</h2>
+          <p>Values cover {{ filter_context.start_date_label }} through {{ filter_context.end_date_label }}, with both dates included.</p>
         </div>
       </div>
-      <div class="module-grid module-grid--three">
-        <article class="module-card">
-          <span class="module-card__number">01 / WORKFORCE</span>
-          <h3>Employee context</h3>
-          <p>{{ filter_context.department_label }} and {{ filter_context.employee_status_label|lower }} are selected for workforce reporting.</p>
-          <span class="module-card__state">Filter context ready</span>
+
+      {% if not kpi_summary.has_employees %}
+        <div class="dashboard-summary__notice" role="status">
+          <strong>No employees match the workforce filters.</strong>
+          <span>Employee-based signals are zero; the project signal still reflects the selected period and project status.</span>
+        </div>
+      {% elif not kpi_summary.working_day_count %}
+        <div class="dashboard-summary__notice" role="status">
+          <strong>This period contains no Monday-to-Friday working days.</strong>
+          <span>Available hours, scheduled hours, and over-capacity risk are zero. Dated approved leave and project overlap still use every selected calendar date.</span>
+        </div>
+      {% endif %}
+
+      <div class="dashboard-kpi-grid">
+        <article class="dashboard-kpi-card" aria-labelledby="headcount-kpi-title">
+          <span class="dashboard-kpi-card__index">01 / WORKFORCE</span>
+          <h3 id="headcount-kpi-title">Headcount</h3>
+          <p class="dashboard-kpi-card__value">{{ kpi_summary.headcount.total }} <small>employee{{ kpi_summary.headcount.total|pluralize }}</small></p>
+          <dl class="dashboard-kpi-card__breakdown" aria-label="Headcount by employment status">
+            {% for status in evidence_context.headcount.statuses %}
+              <div>
+                <dt>{% include "frontend/components/status_badge.html" with status=status.value label=status.label only %}</dt>
+                <dd>{% if status.evidence_url %}<a href="{{ status.evidence_url }}">{{ status.count }}</a>{% else %}{{ status.count }}{% endif %}</dd>
+              </div>
+            {% endfor %}
+          </dl>
+          <p class="dashboard-kpi-card__definition">Employees matching the department and employment-status filters. Status is stored employment context, not dated leave.</p>
+          <a class="dashboard-kpi-card__evidence" href="{{ evidence_context.headcount.evidence_url }}">View filtered employees</a>
         </article>
-        <article class="module-card">
-          <span class="module-card__number">02 / PROJECTS</span>
-          <h3>Project context</h3>
-          <p>{{ filter_context.project_status_label }} will define the project scope for later dashboard evidence.</p>
-          <span class="module-card__state">Filter context ready</span>
+
+        <article class="dashboard-kpi-card dashboard-kpi-card--accent" aria-labelledby="available-kpi-title">
+          <span class="dashboard-kpi-card__index">02 / CAPACITY</span>
+          <h3 id="available-kpi-title">Effective available capacity</h3>
+          <p class="dashboard-kpi-card__value">{{ kpi_summary.available_hours|decimal_hours }}</p>
+          <span class="dashboard-kpi-card__unit">Across {{ kpi_summary.working_day_count }} working day{{ kpi_summary.working_day_count|pluralize }}</span>
+          <p class="dashboard-kpi-card__definition">Hours remaining after scheduled allocation, inactive employment status, and approved dated leave. The current service uses Monday to Friday and no holiday calendar.</p>
+          <a class="dashboard-kpi-card__evidence" href="{{ evidence_context.available_capacity_url }}">View employee evidence</a>
         </article>
-        <article class="module-card">
-          <span class="module-card__number">03 / PERIOD</span>
-          <h3>Weekday planning period</h3>
-          <p>The selected inclusive dates use the existing Monday-to-Friday planning assumptions, without a holiday calendar.</p>
-          <span class="module-card__state">Date context ready</span>
+
+        <article class="dashboard-kpi-card" aria-labelledby="allocated-kpi-title">
+          <span class="dashboard-kpi-card__index">03 / WORKLOAD</span>
+          <h3 id="allocated-kpi-title">Scheduled allocation</h3>
+          <p class="dashboard-kpi-card__value">{{ kpi_summary.allocated_hours|decimal_hours }}</p>
+          <span class="dashboard-kpi-card__unit">Across {{ kpi_summary.working_day_count }} working day{{ kpi_summary.working_day_count|pluralize }}</span>
+          <p class="dashboard-kpi-card__definition">Assignment percentages converted to scheduled hours from each employee's weekly capacity. Cancelled assignments are excluded; leave does not remove scheduled work.</p>
+          <a class="dashboard-kpi-card__evidence" href="{{ evidence_context.allocated_capacity_url }}">View employee evidence</a>
+        </article>
+
+        <article class="dashboard-kpi-card" aria-labelledby="leave-kpi-title">
+          <span class="dashboard-kpi-card__index">04 / DATED LEAVE</span>
+          <h3 id="leave-kpi-title">Employees with approved leave</h3>
+          <p class="dashboard-kpi-card__value">{{ kpi_summary.approved_leave_employee_count }} <small>employee{{ kpi_summary.approved_leave_employee_count|pluralize }}</small></p>
+          <span class="dashboard-kpi-card__unit">Distinct employees in the inclusive period</span>
+          <p class="dashboard-kpi-card__definition">Employees with at least one approved leave record touching a selected date, including weekend-only leave. This is separate from employment status.</p>
+          <a class="dashboard-kpi-card__evidence" href="{{ evidence_context.approved_leave_url }}">View distinct employee evidence</a>
+        </article>
+
+        <article class="dashboard-kpi-card" aria-labelledby="projects-kpi-title">
+          <span class="dashboard-kpi-card__index">05 / PROJECTS</span>
+          <h3 id="projects-kpi-title">Projects active in period</h3>
+          <p class="dashboard-kpi-card__value">{{ kpi_summary.active_project_count }} <small>project{{ kpi_summary.active_project_count|pluralize }}</small></p>
+          <span class="dashboard-kpi-card__unit">{{ filter_context.project_status_label }}</span>
+          <p class="dashboard-kpi-card__definition">Projects whose stored start and end dates overlap the inclusive reporting period. The project-status filter narrows this date-based count.</p>
+          <a class="dashboard-kpi-card__evidence" href="{{ evidence_context.project_url }}">View overlapping projects</a>
+        </article>
+
+        <article class="dashboard-kpi-card{% if kpi_summary.over_capacity_employee_count %} dashboard-kpi-card--risk{% endif %}" aria-labelledby="risk-kpi-title">
+          <span class="dashboard-kpi-card__index">06 / RISK</span>
+          <h3 id="risk-kpi-title">Over-capacity risk</h3>
+          <p class="dashboard-kpi-card__value">{{ kpi_summary.over_capacity_employee_count }} <small>employee{{ kpi_summary.over_capacity_employee_count|pluralize }}</small></p>
+          <span class="dashboard-kpi-card__unit">Above 100% scheduled allocation</span>
+          <p class="dashboard-kpi-card__definition">Distinct employees whose non-cancelled assignments exceed 100% on at least one selected Monday-to-Friday working day.</p>
+          <a class="dashboard-kpi-card__evidence" href="{{ evidence_context.over_capacity_url }}">View risk dates</a>
         </article>
       </div>
+    </section>
+
+    <section class="dashboard-distributions" aria-labelledby="distribution-summary-title">
+      <div class="section-heading">
+        <div>
+          <p class="page-eyebrow">Filtered workforce shape</p>
+          <h2 id="distribution-summary-title">Capacity and utilization distributions</h2>
+          <p>Employee counts use the same service-backed period values as the summary above. Tables are the primary evidence; bars provide a supplemental visual.</p>
+        </div>
+      </div>
+
+      {% if distribution_context.state == "no_employees" %}
+        <div class="dashboard-summary__notice" role="status">
+          <strong>No distribution is available.</strong>
+          <span>No employees match the current department and employment-status filters.</span>
+        </div>
+      {% elif distribution_context.state == "no_working_days" %}
+        <div class="dashboard-summary__notice" role="status">
+          <strong>No working-day distribution is available.</strong>
+          <span>The selected period contains no Monday-to-Friday dates, so capacity and utilization are not presented as zero.</span>
+        </div>
+      {% else %}
+        {% if distribution_context.unclassified_employee_count %}
+          <div class="dashboard-summary__notice" role="status">
+            <strong>{{ distribution_context.unclassified_employee_count }} employee{{ distribution_context.unclassified_employee_count|pluralize }} not classified.</strong>
+            <span>These employees have no positive stored weekly capacity, so the dashboard does not present missing capacity context as 0%.</span>
+          </div>
+        {% endif %}
+        <div class="distribution-grid">
+          {% include "frontend/dashboard/_distribution.html" with distribution=distribution_context.availability distribution_id="availability-distribution" eyebrow="Effective availability" title="Available capacity distribution" description="Each employee's effective available hours as a share of stored weekday capacity for this period." caption="Effective available capacity bands for the filtered workforce" zero_title="All classified employees have no effective available hours." zero_message="Inactive status, approved dated leave, or scheduled allocation leaves zero effective capacity in this reporting period." only %}
+          {% include "frontend/dashboard/_distribution.html" with distribution=distribution_context.utilization distribution_id="utilization-distribution" eyebrow="Scheduled workload" title="Utilization distribution" description="Each employee's scheduled assignment hours as a share of stored weekday capacity for this period." caption="Scheduled utilization bands for the filtered workforce" zero_title="No scheduled assignment hours in this period." zero_message="All classified employees are in the unallocated band for the selected Monday-to-Friday dates." only %}
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="dashboard-evidence" aria-labelledby="dashboard-evidence-title">
+      <div class="section-heading">
+        <div>
+          <p class="page-eyebrow">Aggregate evidence</p>
+          <h2 id="dashboard-evidence-title">Records behind this dashboard</h2>
+          <p>These tables use the same validated filters and service-backed measures as the summary and distributions above.</p>
+        </div>
+      </div>
+
+      <article class="dashboard-evidence-card surface-card" id="employee-capacity-evidence" aria-labelledby="employee-capacity-evidence-title">
+        <div class="dashboard-evidence-card__header">
+          <div>
+            <p class="profile-kicker">Capacity, workload, and risk</p>
+            <h3 id="employee-capacity-evidence-title">Filtered employee evidence</h3>
+            <p>Employee rows explain effective available capacity, scheduled allocation, both distributions, and dates above 100% workload.</p>
+          </div>
+          <div class="dashboard-evidence-totals">
+            <span>Available <strong>{{ kpi_summary.available_hours|decimal_hours }}</strong></span>
+            <span>Scheduled <strong>{{ kpi_summary.allocated_hours|decimal_hours }}</strong></span>
+          </div>
+        </div>
+        {% if evidence_context.employee_rows %}
+          {% include "frontend/components/table.html" with caption="Employee capacity, workload, distribution, and over-capacity evidence" headers=employee_evidence_headers rows=evidence_context.employee_rows row_template="frontend/dashboard/_employee_evidence_row.html" only %}
+        {% else %}
+          <div class="profile-empty" role="status"><strong>No employee evidence matches these filters</strong><p>The direct employee-directory link above opens the same zero-result department and employment-status context.</p></div>
+        {% endif %}
+      </article>
+
+      <article class="dashboard-evidence-card surface-card" id="approved-leave-evidence" aria-labelledby="approved-leave-evidence-title">
+        <div class="dashboard-evidence-card__header">
+          <div>
+            <p class="profile-kicker">Dated approved leave</p>
+            <h3 id="approved-leave-evidence-title">Distinct employees with approved leave</h3>
+            <p>This on-page table preserves workforce filters that the leave directory does not support and keeps multiple leave records from inflating the employee count.</p>
+          </div>
+          <strong>{{ kpi_summary.approved_leave_employee_count }} employee{{ kpi_summary.approved_leave_employee_count|pluralize }}</strong>
+        </div>
+        {% if evidence_context.leave_rows and perms.core.view_leave %}
+          {% include "frontend/components/table.html" with caption="Distinct filtered employees with approved leave overlapping the reporting period" headers=leave_evidence_headers rows=evidence_context.leave_rows row_template="frontend/dashboard/_leave_evidence_row.html" only %}
+        {% elif evidence_context.leave_rows %}
+          <div class="profile-empty" role="status"><strong>Leave evidence is restricted</strong><p>You need leave viewing access to review the dated records behind this aggregate.</p></div>
+        {% else %}
+          <div class="profile-empty" role="status"><strong>No approved-leave employee evidence</strong><p>No filtered employee has approved dated leave overlapping this inclusive reporting period.</p></div>
+        {% endif %}
+      </article>
+
+      <article class="dashboard-evidence-card surface-card" id="project-period-evidence" aria-labelledby="project-period-evidence-title">
+        <div class="dashboard-evidence-card__header">
+          <div>
+            <p class="profile-kicker">Project overlap</p>
+            <h3 id="project-period-evidence-title">Projects active in period</h3>
+            <p>This on-page table uses overlap dates exactly; the project directory's start-after and end-before filters describe a different question.</p>
+          </div>
+          <strong>{{ kpi_summary.active_project_count }} project{{ kpi_summary.active_project_count|pluralize }}</strong>
+        </div>
+        {% if evidence_context.project_rows %}
+          {% include "frontend/components/table.html" with caption="Projects overlapping the inclusive reporting period" headers=project_evidence_headers rows=evidence_context.project_rows row_template="frontend/dashboard/_project_evidence_row.html" only %}
+        {% else %}
+          <div class="profile-empty" role="status"><strong>No project evidence matches this period</strong><p>No project with the selected project status overlaps either reporting boundary.</p></div>
+        {% endif %}
+      </article>
     </section>
   {% else %}
     {% url 'frontend:landing' as dashboard_url %}

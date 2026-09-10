@@ -2,21 +2,29 @@
 {% load frontend_format %}
 
 {% block title %}{{ profile.full_name }} | Workforce Planning{% endblock %}
-{% block meta_description %}Review {{ profile.full_name }}'s workforce profile, capacity, assignments, approved leave, and skills.{% endblock %}
+{% block meta_description %}Review {{ profile.full_name }}'s workforce profile, capacity, attendance history, assignments, approved leave, and skills.{% endblock %}
 
 {% block content %}
   {% if perms.core.change_employee and perms.core.delete_employee %}
-    {% url 'frontend:employee_update' profile.employee.employee_id as employee_update_url %}
     {% url 'frontend:employee_delete' profile.employee.employee_id as employee_delete_url %}
     {% include "frontend/components/page_header.html" with eyebrow="Employee profile" title=profile.full_name description=profile.position_summary action_url=employee_update_url action_label="Edit employee" secondary_action_url=employee_delete_url secondary_action_label="Delete employee" secondary_action_class="btn-outline-danger" only %}
   {% elif perms.core.change_employee %}
-    {% url 'frontend:employee_update' profile.employee.employee_id as employee_update_url %}
     {% include "frontend/components/page_header.html" with eyebrow="Employee profile" title=profile.full_name description=profile.position_summary action_url=employee_update_url action_label="Edit employee" only %}
   {% elif perms.core.delete_employee %}
     {% url 'frontend:employee_delete' profile.employee.employee_id as employee_delete_url %}
     {% include "frontend/components/page_header.html" with eyebrow="Employee profile" title=profile.full_name description=profile.position_summary action_url=employee_delete_url action_label="Delete employee" action_class="btn-outline-danger" only %}
   {% else %}
     {% include "frontend/components/page_header.html" with eyebrow="Employee profile" title=profile.full_name description=profile.position_summary only %}
+  {% endif %}
+
+  {% if planning_return_url %}
+    <div class="dashboard-summary__notice" role="status">
+      <div>
+        <strong>Project planning context preserved.</strong>
+        <span>This profile uses the project's supported date period. Return to the workspace when you finish reviewing or updating evidence.</span>
+      </div>
+      <a class="btn btn-sm btn-outline-secondary" href="{{ planning_return_url }}">Return to planning workspace</a>
+    </div>
   {% endif %}
 
   <section class="employee-profile-card surface-card" aria-labelledby="employee-overview-title">
@@ -89,6 +97,220 @@
     </p>
   </section>
 
+  <section class="profile-section employee-timeline-section" aria-labelledby="timeline-title">
+    <div class="section-heading profile-section__heading">
+      <div>
+        <p class="profile-kicker">Reporting evidence</p>
+        <h2 id="timeline-title">Workload and effective availability timeline</h2>
+        <p>Review daily capacity, scheduled work, and approved leave across one inclusive reporting period.</p>
+      </div>
+      <div class="employee-timeline-navigation">
+        <a class="btn btn-outline-secondary" href="{{ workforce_url }}">Return to filtered workforce</a>
+        <a class="btn btn-outline-secondary" href="{{ dashboard_url }}">Return to dashboard</a>
+      </div>
+    </div>
+
+    <form class="dashboard-filter-grid employee-timeline-filter surface-card" method="get" aria-label="Employee timeline reporting period">
+      {% if planning_return_url %}<input type="hidden" name="return_to" value="{{ planning_return_url }}">{% endif %}
+      {% if period_context %}
+        <input type="hidden" name="department" value="{{ period_context.department }}">
+        <input type="hidden" name="employee_status" value="{{ period_context.employee_status }}">
+        <input type="hidden" name="project_status" value="{{ period_context.project_status }}">
+      {% endif %}
+      {% if period_form.non_field_errors %}
+        <div class="form-error-summary" role="alert">
+          {% for error in period_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      {% endif %}
+      {% include "frontend/components/form_field.html" with field=period_form.start_date only %}
+      {% include "frontend/components/form_field.html" with field=period_form.end_date only %}
+      <div class="directory-filter-actions">
+        <button class="btn btn-primary" type="submit">Apply period</button>
+        <a class="btn btn-outline-secondary" href="{% url 'frontend:employee_detail' profile.employee.employee_id %}">Current month</a>
+      </div>
+    </form>
+
+    {% if period_context and timeline %}
+      <div class="employee-timeline-summary surface-card" aria-live="polite">
+        <div>
+          <span>Selected reporting period</span>
+          <strong>{{ period_context.start_date_label }} to {{ period_context.end_date_label }}</strong>
+        </div>
+        <div>
+          <span>Working days</span>
+          <strong>{{ timeline.working_day_count }}</strong>
+        </div>
+      </div>
+
+      {% if not timeline.working_day_count %}
+        <div class="dashboard-summary__notice" role="status">
+          <div>
+            <strong>This period contains weekends only.</strong>
+            <span>Daily records remain visible, with zero weekday capacity and effective availability.</span>
+          </div>
+        </div>
+      {% endif %}
+      {% if timeline.has_unconfigured_capacity %}
+        <div class="dashboard-summary__notice" role="status">
+          <div>
+            <strong>Stored weekly capacity is not available.</strong>
+            <span>The timeline keeps assignment and approved-leave evidence visible, but hour values remain zero.</span>
+          </div>
+        </div>
+      {% endif %}
+      {% if not timeline.has_assignments %}
+        <div class="dashboard-summary__notice" role="status">
+          <div>
+            <strong>No assignments overlap this reporting period.</strong>
+            <span>Capacity and approved-leave evidence are still shown for every date.</span>
+          </div>
+        </div>
+      {% endif %}
+      {% if not timeline.has_approved_leave %}
+        <div class="dashboard-summary__notice" role="status">
+          <div>
+            <strong>No approved leave overlaps this reporting period.</strong>
+            <span>Pending, rejected, and cancelled leave do not reduce effective availability.</span>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="employee-timeline-strip" aria-hidden="true">
+        <ol>
+          {% for row in timeline.rows %}
+            <li class="employee-timeline-day employee-timeline-day--{{ row.state_key }}">
+              <span>{{ row.date|date:"M j" }}</span>
+              <strong>{{ row.workload_percentage|percentage }} scheduled</strong>
+              <small>{{ row.available_hours|decimal_hours }} available</small>
+            </li>
+          {% endfor %}
+        </ol>
+      </div>
+
+      {% include "frontend/components/table.html" with caption="Daily workload and effective availability evidence for the selected reporting period" headers=timeline_headers rows=timeline.rows row_template="frontend/employees/_timeline_row.html" only %}
+
+      <p class="capacity-assumption">
+        Daily capacity follows the Monday-to-Friday model. Assignment percentages and dates determine scheduled workload; only dated approved leave reduces effective availability. Employment status remains a separate signal.
+      </p>
+    {% else %}
+      <div class="profile-empty" role="alert">
+        <strong>The reporting period needs attention</strong>
+        <p>Correct the highlighted dates to load daily workload and availability evidence. The employee profile above remains unchanged.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  {% if perms.core.view_attendance %}
+    <section class="profile-section employee-attendance-section" aria-labelledby="attendance-insight-title">
+      <div class="section-heading profile-section__heading">
+        <div>
+          <p class="profile-kicker">Descriptive operations</p>
+          <h2 id="attendance-insight-title">Attendance summary and recorded trend</h2>
+          <p>Recorded operational history for the selected reporting period. Attendance does not affect staffing recommendations.</p>
+        </div>
+      </div>
+
+      {% if attendance_insight and period_context %}
+        <div class="attendance-metric-grid">
+          <article class="capacity-metric">
+            <span>Attendance records</span>
+            <strong>{{ attendance_insight.summary.total_days }}</strong>
+            <small>{{ period_context.start_date_label }} to {{ period_context.end_date_label }}</small>
+            {% if attendance_insight.has_records %}<a href="{{ attendance_list_url }}?{{ attendance_insight.total_query_string }}">View all records</a>{% endif %}
+          </article>
+          <article class="capacity-metric">
+            <span>Absenteeism rate</span>
+            {% if attendance_insight.absenteeism_has_denominator %}
+              <strong>{{ attendance_insight.absenteeism_rate|percentage }}</strong>
+              <small>{{ attendance_insight.summary.absent_days }} absent record{{ attendance_insight.summary.absent_days|pluralize }} out of {{ attendance_insight.summary.total_days }} total</small>
+              {% if attendance_insight.absenteeism_query_string %}<a href="{{ attendance_list_url }}?{{ attendance_insight.absenteeism_query_string }}">View absent records</a>{% endif %}
+            {% else %}
+              <strong>Not available</strong>
+              <small>No attendance records in the denominator</small>
+            {% endif %}
+          </article>
+          <article class="capacity-metric capacity-metric--accent">
+            <span>Late rate</span>
+            {% if attendance_insight.late_has_denominator %}
+              <strong>{{ attendance_insight.late_rate|percentage }}</strong>
+              <small>{{ attendance_insight.summary.late_days }} late record{{ attendance_insight.summary.late_days|pluralize }} out of {{ attendance_insight.summary.non_absent_days }} non-absent</small>
+              {% if attendance_insight.late_query_string %}<a href="{{ attendance_list_url }}?{{ attendance_insight.late_query_string }}">View late records</a>{% endif %}
+            {% else %}
+              <strong>Not available</strong>
+              <small>No non-absent attendance records in the denominator</small>
+            {% endif %}
+          </article>
+        </div>
+
+        {% if attendance_insight.has_records %}
+          <div class="dashboard-summary__notice attendance-record-notice" role="status">
+            <div>
+              <strong>Attendance coverage is record-based.</strong>
+              <span>Dates without records are not treated as present, absent, late, remote, or half-day observations.</span>
+            </div>
+          </div>
+
+          <article class="distribution-card surface-card attendance-distribution" aria-labelledby="attendance-status-title">
+            <div class="distribution-card__header">
+              <div>
+                <p class="profile-kicker">Recorded status mix</p>
+                <h3 id="attendance-status-title">Attendance status summary</h3>
+                <p>Counts and shares use attendance records—not working days—as the denominator.</p>
+              </div>
+            </div>
+
+            {% include "frontend/components/table.html" with caption="Attendance status counts and record shares for the selected reporting period" headers=attendance_status_headers rows=attendance_insight.status_rows row_template="frontend/employees/_attendance_status_row.html" only %}
+
+            <div class="distribution-visual" aria-hidden="true">
+              <span class="distribution-visual__label">Supplemental visual</span>
+              <div class="distribution-bars">
+                {% for status_row in attendance_insight.status_rows %}
+                  <div class="distribution-bar" data-attendance-status="{{ status_row.status }}" data-count="{{ status_row.count }}" data-share="{{ status_row.share_serialized }}">
+                    <span class="distribution-bar__label">{{ status_row.label }}</span>
+                    <span class="distribution-bar__track">
+                      <span class="distribution-bar__fill attendance-bar__fill--{{ status_row.status }}" style="--distribution-share: {{ status_row.share_serialized }}%;"></span>
+                    </span>
+                    <span class="distribution-bar__count">{{ status_row.count }}</span>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </article>
+
+          <div class="section-heading attendance-trend-heading">
+            <div>
+              <h3>Recorded attendance timeline</h3>
+              <p>Chronological evidence includes recorded dates only; it does not fill gaps or infer employee status.</p>
+            </div>
+          </div>
+
+          <div class="attendance-timeline-strip" aria-hidden="true">
+            <ol>
+              {% for record in attendance_insight.records %}
+                <li class="attendance-timeline-record attendance-timeline-record--{{ record.status }}">
+                  <span>{{ record.date|date:"M j" }}</span>
+                  <strong>{{ record.get_status_display }}</strong>
+                </li>
+              {% endfor %}
+            </ol>
+          </div>
+
+          {% include "frontend/components/table.html" with caption="Chronological recorded attendance evidence for the selected reporting period" headers=attendance_headers rows=attendance_insight.records row_template="frontend/employees/_attendance_record_row.html" only %}
+        {% else %}
+          <div class="profile-empty" role="status">
+            <strong>No attendance records overlap this reporting period</strong>
+            <p>Rates and trends are not inferred when the employee has no recorded attendance history in the selected dates.</p>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="profile-empty" role="status">
+          <strong>Choose a valid reporting period</strong>
+          <p>Attendance summaries use the same reporting dates as the workload and availability timeline above.</p>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+
   <div class="profile-detail-grid">
     <section class="profile-panel profile-panel--assignments surface-card" aria-labelledby="assignments-title">
       <div class="profile-panel__header">
@@ -117,7 +339,7 @@
         <div class="skill-profile-toolbar">
           <span>{{ profile.skills|length }} skill{{ profile.skills|length|pluralize }}</span>
           {% if perms.core.add_employeeskill %}
-            <a class="btn btn-sm btn-primary" href="{% url 'frontend:employee_skill_create' profile.employee.employee_id %}">Add skill</a>
+            <a class="btn btn-sm btn-primary" href="{% url 'frontend:employee_skill_create' profile.employee.employee_id %}{% if planning_return_query %}?{{ planning_return_query }}{% endif %}">Add skill</a>
           {% endif %}
         </div>
       </div>
@@ -139,7 +361,7 @@
                   {% if perms.core.change_employeeskill or perms.core.delete_employeeskill %}
                     <div class="skill-profile-list__actions" aria-label="Manage {{ employee_skill.skill.name }} proficiency">
                       {% if perms.core.change_employeeskill %}
-                        <a href="{% url 'frontend:employee_skill_update' profile.employee.employee_id employee_skill.employee_skill_id %}">Edit</a>
+                        <a href="{% url 'frontend:employee_skill_update' profile.employee.employee_id employee_skill.employee_skill_id %}{% if planning_return_query %}?{{ planning_return_query }}{% endif %}">Edit</a>
                       {% endif %}
                       {% if perms.core.delete_employeeskill %}
                         <a class="skill-profile-list__remove" href="{% url 'frontend:employee_skill_remove' profile.employee.employee_id employee_skill.employee_skill_id %}">Remove</a>

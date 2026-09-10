@@ -9,6 +9,7 @@ from frontend.forms.proficiencies import (
     EmployeeSkillCreateForm,
     EmployeeSkillUpdateForm,
 )
+from frontend.navigation import get_planning_return_url
 from frontend.permissions import write_model_permission_required
 from frontend.selectors.employees import (
     get_employee_for_proficiency,
@@ -65,6 +66,11 @@ def _save_proficiency_form(request, form, *, success_message):
 @write_model_permission_required(EmployeeSkill, "add")
 def employee_skill_create(request, employee_id):
     employee = _employee_or_404(employee_id)
+    planning_return_url = get_planning_return_url(request)
+    destination_url = planning_return_url or reverse(
+        "frontend:employee_detail",
+        args=[employee.employee_id],
+    )
     form = EmployeeSkillCreateForm(
         request.POST or None,
         employee=employee,
@@ -80,10 +86,7 @@ def employee_skill_create(request, employee_id):
                 ),
             )
             if employee_skill is not None:
-                return redirect(
-                    "frontend:employee_detail",
-                    employee.employee_id,
-                )
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -95,10 +98,10 @@ def employee_skill_create(request, employee_id):
         "frontend/employees/proficiencies/create.html",
         {
             "breadcrumbs": _proficiency_breadcrumbs(employee, "Add skill"),
-            "cancel_url": reverse(
-                "frontend:employee_detail",
-                args=[employee.employee_id],
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
             ),
+            "cancel_url": destination_url,
             "employee": employee,
             "employee_name": str(employee),
             "form": form,
@@ -110,6 +113,11 @@ def employee_skill_create(request, employee_id):
 def employee_skill_update(request, employee_id, employee_skill_id):
     employee_skill = _employee_skill_or_404(employee_id, employee_skill_id)
     employee = employee_skill.employee
+    planning_return_url = get_planning_return_url(request)
+    destination_url = planning_return_url or reverse(
+        "frontend:employee_detail",
+        args=[employee.employee_id],
+    )
     form = EmployeeSkillUpdateForm(
         request.POST or None,
         instance=employee_skill,
@@ -125,10 +133,7 @@ def employee_skill_update(request, employee_id, employee_skill_id):
                 ),
             )
             if saved_employee_skill is not None:
-                return redirect(
-                    "frontend:employee_detail",
-                    employee.employee_id,
-                )
+                return redirect(destination_url)
         else:
             messages.error(
                 request,
@@ -143,10 +148,10 @@ def employee_skill_update(request, employee_id, employee_skill_id):
                 employee,
                 f"Edit {employee_skill.skill}",
             ),
-            "cancel_url": reverse(
-                "frontend:employee_detail",
-                args=[employee.employee_id],
+            "cancel_label": (
+                "Return to planning workspace" if planning_return_url else "Cancel"
             ),
+            "cancel_url": destination_url,
             "employee": employee,
             "employee_name": str(employee),
             "employee_skill": employee_skill,

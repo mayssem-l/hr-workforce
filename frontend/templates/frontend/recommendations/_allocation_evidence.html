@@ -1,0 +1,196 @@
+{% load frontend_format %}
+
+<section class="recommendation-allocation-evidence" aria-labelledby="recommendation-strategy-{{ strategy_index }}-allocation-title">
+  <div class="recommendation-allocation-evidence__heading">
+    <div>
+      <p class="profile-kicker">Existing optimization evidence</p>
+      <h4 id="recommendation-strategy-{{ strategy_index }}-allocation-title">Allocation and requirement coverage</h4>
+    </div>
+    <span>Advisory result</span>
+  </div>
+
+  <div class="planning-input-state{% if evidence.solver.state == 'feasible' %} planning-input-state--success{% else %} planning-input-state--warning{% endif %}" role="status">
+    <strong>
+      {% if evidence.solver.state == "feasible" %}
+        Mandatory effort allocation is feasible
+      {% elif evidence.solver.state == "not_feasible" %}
+        Mandatory effort allocation is not feasible
+      {% else %}
+        Solver outcome unavailable
+      {% endif %}
+    </strong>
+    <p>{{ evidence.solver.reason }}</p>
+  </div>
+
+  <section class="recommendation-evidence-section" aria-labelledby="recommendation-strategy-{{ strategy_index }}-matrix-title">
+    <div class="recommendation-evidence-section__heading">
+      <div>
+        <h5 id="recommendation-strategy-{{ strategy_index }}-matrix-title">Employee-by-required-skill allocation matrix</h5>
+        <p>{{ evidence.matrix.message }}</p>
+      </div>
+    </div>
+
+    {% if evidence.matrix.state == "available" %}
+      <div class="data-table-shell recommendation-allocation-table">
+        <table class="data-table">
+          <caption>Exact employee-to-mandatory-requirement hours returned by OR-Tools for {{ strategy.label }}.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Team member</th>
+              {% for column in evidence.matrix.columns %}
+                <th scope="col">
+                  <span class="recommendation-allocation-heading">{{ column.label }}</span>
+                  <small>
+                    Level {% if column.required_level is None %}not available{% else %}{{ column.required_level }}{% endif %}
+                    · Required effort {{ column.required_effort_hours|decimal_hours }}
+                  </small>
+                </th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in evidence.matrix.rows %}
+              <tr>
+                <th scope="row">
+                  {% if row.profile_url %}<a href="{{ row.profile_url }}">{{ row.label }}</a>{% else %}{{ row.label }}{% endif %}
+                </th>
+                {% for cell in row.cells %}
+                  <td class="data-table__number">
+                    {% if cell.has_returned_allocation %}
+                      {{ cell.hours|decimal_hours }}
+                    {% else %}
+                      <span aria-label="No allocation row returned">—</span>
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="planning-input-state planning-input-state--warning" role="status">
+        <strong>{% if evidence.matrix.state == "empty" %}No allocation rows returned{% else %}Allocation matrix unavailable{% endif %}</strong>
+        <p>No employee-by-requirement hours are inferred when the solver result does not provide them.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="recommendation-evidence-section" aria-labelledby="recommendation-strategy-{{ strategy_index }}-capacity-title">
+    <div class="recommendation-evidence-section__heading">
+      <div>
+        <h5 id="recommendation-strategy-{{ strategy_index }}-capacity-title">Employee capacity usage</h5>
+        <p>{{ evidence.capacity.message }}</p>
+      </div>
+    </div>
+
+    {% if evidence.capacity.state == "available" %}
+      <div class="data-table-shell recommendation-capacity-table">
+        <table class="data-table">
+          <caption>Exact per-employee capacity and utilization returned by OR-Tools for {{ strategy.label }}.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Team member</th>
+              <th scope="col">Available capacity</th>
+              <th scope="col">Allocated effort</th>
+              <th scope="col">Utilization</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in evidence.capacity.rows %}
+              <tr>
+                <th scope="row">
+                  {% if row.profile_url %}<a href="{{ row.profile_url }}">{{ row.label }}</a>{% else %}{{ row.label }}{% endif %}
+                </th>
+                <td>{{ row.available_hours|decimal_hours }}</td>
+                <td>{{ row.allocated_hours|decimal_hours }}</td>
+                <td>{{ row.utilization_rate|percentage }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="planning-input-state planning-input-state--warning" role="status">
+        <strong>{% if evidence.capacity.state == "empty" %}No capacity rows returned{% else %}Capacity usage unavailable{% endif %}</strong>
+        <p>No employee capacity or utilization value is calculated by this page.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="recommendation-evidence-section" aria-labelledby="recommendation-strategy-{{ strategy_index }}-coverage-title">
+    <div class="recommendation-evidence-section__heading">
+      <div>
+        <h5 id="recommendation-strategy-{{ strategy_index }}-coverage-title">Requirement coverage</h5>
+        <p>{{ evidence.coverage.message }}</p>
+      </div>
+    </div>
+
+    {% if evidence.coverage.state == "available" %}
+      <div class="data-table-shell recommendation-coverage-table">
+        <table class="data-table">
+          <caption>Requirement qualification and headcount coverage returned by the backend for {{ strategy.label }}.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Stored requirement</th>
+              <th scope="col">Type</th>
+              <th scope="col">Required effort</th>
+              <th scope="col">People coverage</th>
+              <th scope="col">Qualified team members</th>
+              <th scope="col">Coverage outcome</th>
+              <th scope="col">Allocated effort evidence</th>
+              <th scope="col">Remaining effort</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in evidence.coverage.rows %}
+              <tr>
+                <th scope="row">
+                  <span class="recommendation-allocation-heading">{{ row.label }}</span>
+                  <small>Required level {% if row.required_level is None %}not available{% else %}{{ row.required_level }}{% endif %}</small>
+                  {% if row.requirements_url %}<a href="{{ row.requirements_url }}">Review stored requirements</a>{% endif %}
+                </th>
+                <td>{{ row.requirement_type_label }}</td>
+                <td>{{ row.required_effort_hours|decimal_hours }}</td>
+                <td>{{ row.covered_quantity }} of {{ row.required_quantity }} required</td>
+                <td>
+                  {% if row.qualified_members %}
+                    <ul class="recommendation-qualified-members">
+                      {% for member in row.qualified_members %}
+                        <li>{% if member.profile_url %}<a href="{{ member.profile_url }}">{{ member.label }}</a>{% else %}{{ member.label }}{% endif %}</li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    None returned
+                  {% endif %}
+                </td>
+                <td>
+                  <strong>{{ row.outcome_label }}</strong>
+                  <small>{{ row.outcome_message }}</small>
+                </td>
+                <td>
+                  {% if row.has_matrix_column %}
+                    <a href="#recommendation-strategy-{{ strategy_index }}-matrix-title">Exact hours in allocation matrix</a>
+                  {% elif row.is_mandatory %}
+                    No mandatory allocation column returned
+                  {% else %}
+                    Optional requirement not included in mandatory effort allocation
+                  {% endif %}
+                </td>
+                <td>
+                  <strong>Not returned separately</strong>
+                  <small>The interface does not infer this total.</small>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="planning-input-state planning-input-state--warning" role="status">
+        <strong>{% if evidence.coverage.state == "empty" %}No coverage rows returned{% else %}Requirement coverage unavailable{% endif %}</strong>
+        <p>No requirement coverage or qualification outcome is reconstructed by this page.</p>
+      </div>
+    {% endif %}
+  </section>
+</section>

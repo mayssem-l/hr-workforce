@@ -25,14 +25,30 @@ def get_working_days(start_date, end_date):
     return working_days
 
 
-def get_approved_leaves(employee, start_date, end_date):
+def get_approved_leaves(
+    employee,
+    start_date,
+    end_date,
+    leave_records=None,
+):
     """
     Retourne les congés approuvés de l'employé
-    qui chevauchent la période demandée.
+    qui chevauchent la période demandée. leave_records permet
+    d'appliquer les mêmes règles à des données préchargées.
     """
 
     if start_date > end_date:
         raise ValueError("start_date must not be after end_date.")
+
+    if leave_records is not None:
+        return [
+            leave
+            for leave in leave_records
+            if leave.employee_id == employee.employee_id
+            and leave.status == Leave.Status.APPROVED
+            and leave.start_date <= end_date
+            and leave.end_date >= start_date
+        ]
 
     return Leave.objects.filter(
         employee=employee,
@@ -42,20 +58,34 @@ def get_approved_leaves(employee, start_date, end_date):
     )
 
 
-def has_approved_leave(employee, start_date, end_date):
+def has_approved_leave(
+    employee,
+    start_date,
+    end_date,
+    leave_records=None,
+):
     """
     Indique si l'employé possède au moins un congé approuvé
     qui chevauche la période.
     """
 
-    return get_approved_leaves(
+    approved_leaves = get_approved_leaves(
         employee,
         start_date,
         end_date,
-    ).exists()
+        leave_records=leave_records,
+    )
+    if leave_records is not None:
+        return bool(approved_leaves)
+    return approved_leaves.exists()
 
 
-def get_leave_working_days(employee, start_date, end_date):
+def get_leave_working_days(
+    employee,
+    start_date,
+    end_date,
+    leave_records=None,
+):
     """
     Retourne l'ensemble des jours ouvrables pendant lesquels
     l'employé est en congé approuvé.
@@ -68,6 +98,7 @@ def get_leave_working_days(employee, start_date, end_date):
         employee,
         start_date,
         end_date,
+        leave_records=leave_records,
     )
 
     leave_days = set()
@@ -96,7 +127,12 @@ def get_leave_working_days(employee, start_date, end_date):
     return sorted(leave_days)
 
 
-def calculate_leave_days(employee, start_date, end_date):
+def calculate_leave_days(
+    employee,
+    start_date,
+    end_date,
+    leave_records=None,
+):
     """
     Nombre de jours ouvrables de congé approuvé
     pendant la période.
@@ -107,11 +143,17 @@ def calculate_leave_days(employee, start_date, end_date):
             employee,
             start_date,
             end_date,
+            leave_records=leave_records,
         )
     )
 
 
-def calculate_leave_availability_rate(employee, start_date, end_date):
+def calculate_leave_availability_rate(
+    employee,
+    start_date,
+    end_date,
+    leave_records=None,
+):
     """
     Pourcentage de jours ouvrables pendant lesquels l'employé
     est disponible du point de vue des congés uniquement.
@@ -137,6 +179,7 @@ def calculate_leave_availability_rate(employee, start_date, end_date):
         employee,
         start_date,
         end_date,
+        leave_records=leave_records,
     )
 
     available_days = total_working_days - leave_days
@@ -147,7 +190,12 @@ def calculate_leave_availability_rate(employee, start_date, end_date):
     )
 
 
-def is_fully_available_from_leave(employee, start_date, end_date):
+def is_fully_available_from_leave(
+    employee,
+    start_date,
+    end_date,
+    leave_records=None,
+):
     """
     True si l'employé n'a aucun jour ouvrable
     de congé approuvé pendant la période.
@@ -157,4 +205,5 @@ def is_fully_available_from_leave(employee, start_date, end_date):
         employee,
         start_date,
         end_date,
+        leave_records=leave_records,
     ) == 0

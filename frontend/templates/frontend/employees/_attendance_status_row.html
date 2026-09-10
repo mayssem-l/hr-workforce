@@ -1,0 +1,13 @@
+<tr data-attendance-status="{{ row.status }}">
+  <th scope="row">{{ row.label }}</th>
+  <td>{{ row.definition }}</td>
+  <td class="text-end">{{ row.count }}</td>
+  <td class="text-end">{{ row.share_serialized }}%</td>
+  <td class="text-end">
+    {% if row.evidence_query_string %}
+      <a href="{% url 'frontend:attendance_list' %}?{{ row.evidence_query_string }}">View records</a>
+    {% else %}
+      <span class="profile-table-secondary">No records</span>
+    {% endif %}
+  </td>
+</tr>

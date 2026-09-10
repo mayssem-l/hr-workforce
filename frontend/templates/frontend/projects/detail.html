@@ -59,7 +59,12 @@
         <p class="profile-kicker">Demand definition</p>
         <h2 id="planning-inputs-title">Planning inputs</h2>
       </div>
-      <span>{{ profile.mandatory_requirement_count }} mandatory requirement{{ profile.mandatory_requirement_count|pluralize }}</span>
+      <div class="skill-profile-toolbar">
+        <span>{{ profile.mandatory_requirement_count }} mandatory requirement{{ profile.mandatory_requirement_count|pluralize }}</span>
+        {% if perms.core.view_employee and perms.core.view_skill %}
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'frontend:project_planning' profile.project.project_id %}">Open planning workspace</a>
+        {% endif %}
+      </div>
     </div>
 
     <dl class="skill-facts project-planning-facts">

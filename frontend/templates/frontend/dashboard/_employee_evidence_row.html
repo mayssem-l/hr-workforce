@@ -1,0 +1,36 @@
+{% load frontend_format %}
+<tr id="employee-evidence-{{ row.employee.employee_id }}">
+  <th scope="row">
+    <a class="profile-table-primary" href="{{ row.profile_url }}">{{ row.employee }}</a>
+    <span class="profile-table-secondary">{{ row.employee.department }} · {{ row.employee.get_status_display }}</span>
+  </th>
+  <td class="data-table__number">{{ row.capacity_hours|decimal_hours }}</td>
+  <td class="data-table__number">
+    <strong>{{ row.available_hours|decimal_hours }}</strong>
+    {% if row.availability_percentage is not None %}
+      <span class="profile-table-secondary">{{ row.availability_percentage|percentage }} · {{ row.availability_band_label }}</span>
+    {% else %}
+      <span class="profile-table-secondary">Not classified</span>
+    {% endif %}
+  </td>
+  <td class="data-table__number">
+    <strong>{{ row.allocated_hours|decimal_hours }}</strong>
+    {% if row.utilization_percentage is not None %}
+      <span class="profile-table-secondary">{{ row.utilization_percentage|percentage }} · {{ row.utilization_band_label }}</span>
+    {% else %}
+      <span class="profile-table-secondary">Not classified</span>
+    {% endif %}
+  </td>
+  <td>
+    {% if row.over_capacity_dates %}
+      <ul class="timeline-context-list">
+        {% for risk_day in row.over_capacity_dates %}
+          <li><strong>{{ risk_day.date|workforce_date }}</strong><span>{{ risk_day.workload_percentage|percentage }} scheduled</span></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <span class="profile-table-secondary">No day above 100%</span>
+    {% endif %}
+  </td>
+  <td><a href="{{ row.profile_url }}">View period timeline</a></td>
+</tr>

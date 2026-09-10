@@ -1,0 +1,97 @@
+{% load frontend_format %}
+<article class="requirement-evidence-card" aria-labelledby="{{ row.anchor_id }}-title">
+  <div class="requirement-evidence-card__header">
+    <div>
+      <p class="profile-kicker">{% if row.requirement.is_mandatory %}Mandatory requirement{% else %}Optional requirement{% endif %}</p>
+      <h3 id="{{ row.anchor_id }}-title">{{ row.requirement.skill.name }}</h3>
+      <p>{{ row.requirement.skill.category }} · Level {{ row.requirement.required_level }} of 5 · {{ row.requirement.get_priority_display }} priority</p>
+    </div>
+    <span>{{ row.coverage_state.label }}</span>
+  </div>
+
+  <div class="planning-repair-actions" aria-label="Next steps for {{ row.requirement.skill.name }}">
+    {% for action in row.repair_actions %}
+      <a class="btn btn-sm {% if action.kind == 'primary' %}btn-primary{% else %}btn-outline-secondary{% endif %}" href="{{ action.url }}">{{ action.label }}</a>
+    {% endfor %}
+  </div>
+
+  <dl class="skill-facts requirement-evidence-facts">
+    <div>
+      <dt>Required quantity</dt>
+      <dd>{{ row.requirement.required_quantity }}</dd>
+    </div>
+    <div>
+      <dt>Entered effort</dt>
+      <dd>
+        {% if row.requirement.estimated_effort_hours is None %}
+          Not entered
+        {% else %}
+          {{ row.requirement.estimated_effort_hours|decimal_hours }}
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>Current coverage</dt>
+      <dd>{{ row.covered_quantity }} of {{ row.requirement.required_quantity }}</dd>
+    </div>
+    <div>
+      <dt>Remaining quantity</dt>
+      <dd>{{ row.remaining_quantity }}</dd>
+    </div>
+    <div>
+      <dt>Qualified active employees</dt>
+      <dd>{% if row.assessment_available %}{{ row.qualified_count }}{% else %}Not assessed{% endif %}</dd>
+    </div>
+    <div>
+      <dt>Combined qualified capacity</dt>
+      <dd>{% if row.qualified_capacity is not None %}{{ row.qualified_capacity|decimal_hours }}{% else %}Not assessed{% endif %}</dd>
+    </div>
+  </dl>
+
+  <div class="requirement-evidence-states">
+    <div class="planning-input-state planning-input-state--{{ row.coverage_state.tone }}" role="status" data-requirement-state="{{ row.coverage_state.code }}">
+      <strong>{{ row.coverage_state.label }}</strong>
+      <p>{{ row.coverage_state.message }}</p>
+    </div>
+    <div class="planning-input-state planning-input-state--{{ row.qualification_state.tone }}" role="status" data-requirement-state="{{ row.qualification_state.code }}">
+      <strong>{{ row.qualification_state.label }}</strong>
+      <p>{{ row.qualification_state.message }}</p>
+    </div>
+    <div class="planning-input-state planning-input-state--{{ row.capacity_state.tone }}" role="status" data-requirement-state="{{ row.capacity_state.code }}">
+      <strong>{{ row.capacity_state.label }}</strong>
+      <p>{{ row.capacity_state.message }}</p>
+      {% if row.leave_restricted %}<p>Approved dated leave can affect this value, but your access does not include leave records.</p>{% endif %}
+    </div>
+  </div>
+
+  <section class="requirement-evidence-table" aria-labelledby="{{ row.anchor_id }}-qualified-title">
+    <h4 id="{{ row.anchor_id }}-qualified-title">Qualified employee evidence</h4>
+    {% if row.assessment_available and row.qualified_rows %}
+      {% include "frontend/components/table.html" with caption="Active employees meeting this requirement and their service-calculated project capacity" headers=qualified_employee_headers rows=row.qualified_rows row_template="frontend/planning/_qualified_employee_row.html" only %}
+    {% elif row.assessment_available %}
+      <div class="profile-empty" role="status">
+        <strong>No qualified active employees</strong>
+        <p>No active employee currently meets this skill and proficiency level.</p>
+        <p>Review the employee skill evidence above, then use employee profiles to inspect or maintain proficiency when permitted.</p>
+      </div>
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>Qualification evidence not assessed</strong>
+        <p>Resolve the planning-readiness blockers before reviewing qualified employees.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="requirement-evidence-table" aria-labelledby="{{ row.anchor_id }}-coverage-title">
+    <h4 id="{{ row.anchor_id }}-coverage-title">Current assignment coverage</h4>
+    {% if row.coverage_rows %}
+      {% include "frontend/components/table.html" with caption="Planned or active assignments currently linked to this requirement" headers=requirement_coverage_headers rows=row.coverage_rows row_template="frontend/planning/_requirement_coverage_row.html" only %}
+    {% else %}
+      <div class="profile-empty" role="status">
+        <strong>No current assignment coverage</strong>
+        <p>No planned or active assignment is linked to this requirement.</p>
+        {% if row.repair_actions %}<p>Use the permitted next steps above to review the skill or add staffing.</p>{% endif %}
+      </div>
+    {% endif %}
+  </section>
+</article>

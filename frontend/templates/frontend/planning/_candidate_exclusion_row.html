@@ -1,0 +1,15 @@
+<tr id="candidate-exclusion-{{ row.employee.employee_id }}" data-exclusion-reason="{{ row.reason_code }}">
+  <th scope="row">
+    <a class="profile-table-primary" href="{{ row.profile_url }}">{{ row.employee }}</a>
+    <span class="profile-table-secondary">{{ row.employee.position }} · {{ row.employee.department }}</span>
+  </th>
+  <td>
+    <strong>{{ row.reason_label }}</strong>
+    <span class="profile-table-secondary">{{ row.reason_message }}</span>
+  </td>
+  <td>
+    <a href="{{ row.profile_url }}">Review employee profile</a>
+    <span class="profile-table-secondary"><a href="{{ row.requirements_url }}">Review project requirements</a></span>
+    {% if row.repair_action %}<span class="profile-table-secondary"><a href="{{ row.repair_action.url }}">{{ row.repair_action.label }}</a></span>{% else %}<span class="profile-table-secondary">No permitted update action is available here.</span>{% endif %}
+  </td>
+</tr>

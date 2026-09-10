@@ -1,0 +1,141 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}{{ project.name }} recommendation result | Workforce Planning{% endblock %}
+{% block meta_description %}Review the latest explicitly generated recommendation result for {{ project.name }}.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Team recommendations" title=project.name description="Review the outcome of this explicit recommendation run before returning to the planning workspace." only %}
+
+  <section class="profile-panel surface-card" aria-labelledby="recommendation-run-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Current run</p>
+        <h2 id="recommendation-run-title">Recommendation result</h2>
+      </div>
+      <span>{{ run.label }}</span>
+    </div>
+
+    <div class="planning-input-state planning-input-state--{{ run.tone }}" role="{% if run.state == 'error' %}alert{% else %}status{% endif %}">
+      <strong>{{ run.title }}</strong>
+      <p>{{ run.message }}</p>
+    </div>
+
+    <dl class="skill-facts project-planning-facts mt-3">
+      <div>
+        <dt>Project period</dt>
+        <dd>{{ project.start_date|workforce_date }} through {{ project.end_date|workforce_date }}</dd>
+      </div>
+      <div>
+        <dt>Project estimate</dt>
+        <dd>{{ project.estimated_hours|decimal_hours }}</dd>
+      </div>
+      <div>
+        <dt>Selected strategies</dt>
+        <dd>{% if run.recommendation_count is None %}Not available{% else %}{{ run.recommendation_count }}{% endif %}</dd>
+      </div>
+      <div>
+        <dt>Pipeline elapsed time</dt>
+        <dd>{% if run.elapsed_seconds is None %}Not available{% else %}{{ run.elapsed_seconds|floatformat:3 }} seconds{% endif %}</dd>
+      </div>
+    </dl>
+
+    <div class="planning-input-state mt-3" role="note">
+      <strong>This run did not change staffing records.</strong>
+      <p>Recommendation generation is advisory. No project assignment or requirement coverage was created, changed, or removed.</p>
+    </div>
+  </section>
+
+  {% if run.strategies.cards %}
+    <section class="profile-panel surface-card" aria-labelledby="recommendation-summary-title">
+      <div class="profile-panel__header">
+        <div>
+          <p class="profile-kicker">First-look comparison</p>
+          <h2 id="recommendation-summary-title">Recommendation summary</h2>
+        </div>
+        <span>{{ run.recommendation_count }} strateg{{ run.recommendation_count|pluralize:"y,ies" }}</span>
+      </div>
+
+      <p class="capacity-assumption">Compare the selected strategies in the exact order returned by the recommendation service for {{ project.start_date|workforce_date }} through {{ project.end_date|workforce_date }}. Team size, score, capacity, allocation, and utilization values are the existing pipeline results.</p>
+
+      <nav class="recommendation-evidence-nav" aria-label="Recommendation evidence context">
+        {% if run.strategies.navigation.project_url %}<a href="{{ run.strategies.navigation.project_url }}">Review project profile</a>{% endif %}
+        {% if run.strategies.navigation.requirements_url %}<a href="{{ run.strategies.navigation.requirements_url }}">Review stored requirements</a>{% endif %}
+        {% if run.strategies.navigation.candidates_url %}<a href="{{ run.strategies.navigation.candidates_url }}">Review candidate evidence</a>{% endif %}
+      </nav>
+
+      <div class="recommendation-strategy-grid">
+        {% for strategy in run.strategies.cards %}
+          {% include "frontend/recommendations/_strategy_card.html" with strategy=strategy strategy_index=forloop.counter run=run only %}
+        {% endfor %}
+      </div>
+
+      <div class="data-table-shell recommendation-strategy-summary">
+        <table class="data-table">
+          <caption>Team-level evidence for the selected recommendation strategies during the current project period.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Strategy</th>
+              <th scope="col">Team score</th>
+              <th scope="col">Team size</th>
+              <th scope="col">Available capacity</th>
+              <th scope="col">Allocated effort</th>
+              <th scope="col">Remaining capacity</th>
+              <th scope="col">Maximum utilization</th>
+              <th scope="col">Utilization spread</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for strategy in run.strategies.cards %}
+              <tr>
+                <th scope="row">{{ strategy.label }}</th>
+                <td>{{ strategy.team_score|floatformat:2 }} out of 100</td>
+                <td>{{ strategy.team_size }} {% if strategy.team_size == 1 %}person{% else %}people{% endif %}</td>
+                <td>{{ strategy.total_available_hours|decimal_hours }}</td>
+                <td>{{ strategy.total_allocated_hours|decimal_hours }}</td>
+                <td>{{ strategy.remaining_capacity_hours|decimal_hours }}</td>
+                <td>{{ strategy.max_utilization|percentage }}</td>
+                <td>{{ strategy.utilization_spread|floatformat:2 }} percentage points</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    {% include "frontend/recommendations/_decision_evidence.html" with evidence=run.decision_evidence only %}
+
+    <section class="profile-panel surface-card recommendation-details" aria-labelledby="recommendation-details-title">
+      <div class="profile-panel__header">
+        <div>
+          <p class="profile-kicker">Detailed optimization evidence</p>
+          <h2 id="recommendation-details-title">Allocation and requirement details</h2>
+        </div>
+        <span>{{ run.recommendation_count }} strateg{{ run.recommendation_count|pluralize:"y,ies" }}</span>
+      </div>
+
+      <p class="capacity-assumption">Review the exact employee allocations, capacity usage, feasibility outcome, and requirement coverage returned for each selected strategy.</p>
+
+      <div class="recommendation-detail-list">
+        {% for strategy in run.strategies.cards %}
+          <article class="recommendation-detail-card" aria-labelledby="recommendation-strategy-{{ forloop.counter }}-evidence-title">
+            <header class="recommendation-detail-card__header">
+              <div>
+                <p class="profile-kicker">Strategy {{ forloop.counter }} of {{ run.recommendation_count }}</p>
+                <h3 id="recommendation-strategy-{{ forloop.counter }}-evidence-title">{{ strategy.label }}</h3>
+              </div>
+              <span>Detailed evidence</span>
+            </header>
+            {% include "frontend/recommendations/_allocation_evidence.html" with evidence=strategy.allocation_evidence strategy=strategy strategy_index=forloop.counter only %}
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <div class="directory-footer-actions">
+    <a class="btn btn-primary" href="{{ planning_url }}">Return to planning workspace</a>
+    <a class="btn btn-outline-secondary" href="{{ project_detail_url }}">Return to project profile</a>
+  </div>
+{% endblock %}

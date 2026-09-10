@@ -1,0 +1,8 @@
+<tr>
+  <th scope="row">
+    <a class="profile-table-primary" href="{{ row.profile_url }}">{{ row.employee }}</a>
+  </th>
+  <td>{{ row.role }}</td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.assignment_status label=row.assignment_status_label only %}</td>
+  <td><a href="{{ row.coverage_url }}">Review assignment coverage</a></td>
+</tr>

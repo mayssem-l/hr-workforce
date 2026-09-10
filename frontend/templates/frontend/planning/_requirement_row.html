@@ -1,0 +1,25 @@
+{% load frontend_format %}
+<tr>
+  <th scope="row">
+    <span class="profile-table-primary">{{ row.skill.name }}</span><br>
+    <span class="profile-table-secondary">{{ row.skill.category }}</span>
+  </th>
+  <td>Level {{ row.required_level }} of 5</td>
+  <td class="data-table__number">{{ row.required_quantity }}</td>
+  <td class="data-table__number">
+    {% if row.estimated_effort_hours is None %}
+      <span class="profile-table-secondary">Not entered</span>
+    {% else %}
+      {{ row.estimated_effort_hours|decimal_hours }}
+    {% endif %}
+  </td>
+  <td>{{ row.get_priority_display }}</td>
+  <td>{% if row.is_mandatory %}Mandatory{% else %}Optional{% endif %}</td>
+  <td>
+    {% if row.repair_edit_url %}
+      <a href="{{ row.repair_edit_url }}">Edit requirement</a>
+    {% else %}
+      <span class="profile-table-secondary">Read-only</span>
+    {% endif %}
+  </td>
+</tr>

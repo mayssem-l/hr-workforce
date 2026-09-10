@@ -1,0 +1,17 @@
+{% load frontend_format %}
+<tr>
+  <th scope="row">{{ row.date|workforce_date }}</th>
+  <td>{% include "frontend/components/status_badge.html" with status=row.status only %}</td>
+  <td>
+    {% if row.arrival_time or row.departure_time %}
+      <span class="profile-table-primary">
+        {% if row.arrival_time %}Arrival {{ row.arrival_time|time:"g:i A" }}{% else %}Arrival not recorded{% endif %}
+      </span><br>
+      <span class="profile-table-secondary">
+        {% if row.departure_time %}Departure {{ row.departure_time|time:"g:i A" }}{% else %}Departure not recorded{% endif %}
+      </span>
+    {% else %}
+      <span class="profile-table-secondary">Times not recorded</span>
+    {% endif %}
+  </td>
+</tr>

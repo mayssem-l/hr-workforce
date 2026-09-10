@@ -1,0 +1,31 @@
+{% load frontend_format %}
+<tr>
+  <th scope="row">
+    <span class="profile-table-primary">{{ row.employee }}</span><br>
+    <span class="profile-table-secondary">{{ row.employee.position }} · {{ row.employee.department }}</span>
+  </th>
+  <td>{{ row.role_on_project }}</td>
+  <td>{{ row.start_date|workforce_date }}&ndash;{{ row.end_date|workforce_date }}</td>
+  <td class="data-table__number">{{ row.allocation_percentage|percentage }}</td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.status only %}</td>
+  <td>
+    {% if row.profile_coverage %}
+      <ul class="project-coverage-list">
+        {% for coverage in row.profile_coverage %}
+          <li>
+            {{ coverage.project_skill_requirement.skill.name }}
+            <span>Level {{ coverage.project_skill_requirement.required_level }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <span class="profile-table-secondary">No requirements linked</span>
+    {% endif %}
+  </td>
+  <td>
+    <div class="skill-profile-list__actions" aria-label="Review {{ row.employee }} assignment">
+      <a href="{{ row.repair_coverage_url }}">Review coverage</a>
+      {% if row.repair_edit_url %}<a href="{{ row.repair_edit_url }}">Edit assignment</a>{% endif %}
+    </div>
+  </td>
+</tr>

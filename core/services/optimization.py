@@ -1,4 +1,12 @@
-from core.models import Employee, EmployeeSkill, ProjectSkillRequirement
+from django.db.models import Prefetch
+
+from core.models import (
+    Assignment,
+    Employee,
+    EmployeeSkill,
+    Leave,
+    ProjectSkillRequirement,
+)
 from itertools import combinations
 from core.services.matching import calculate_employee_project_match
 from decimal import Decimal
@@ -16,6 +24,14 @@ def employee_can_cover_requirement(employee, requirement):
     Retourne True si l'employé possède le skill demandé
     avec un niveau >= au niveau requis.
     """
+
+    prefetched_skills = getattr(employee, "optimization_skills", None)
+    if prefetched_skills is not None:
+        return any(
+            employee_skill.skill_id == requirement.skill_id
+            and employee_skill.level >= requirement.required_level
+            for employee_skill in prefetched_skills
+        )
 
     return EmployeeSkill.objects.filter(
         employee=employee,
@@ -71,8 +87,6 @@ def build_project_coverage_matrix(project):
                 "eligible_employees": eligible_employees,
             }
         )
-
-        
 
     return coverage
 def evaluate_team_coverage(team, project):
@@ -363,15 +377,117 @@ def units_to_hours(units):
         Decimal(units) / Decimal(HOUR_SCALE)
     ).quantize(Decimal("0.01"))
 
+
+def get_requirement_capacity_evidence(
+    requirement,
+    employees,
+    available_hours,
+    *,
+    eligible_ids=None,
+):
+    """Return the existing pre-solver evidence for one requirement."""
+
+    employees = tuple(employees)
+    employee_ids = {
+        employee.employee_id
+        for employee in employees
+    }
+    if eligible_ids is None:
+        eligible_ids = {
+            employee.employee_id
+            for employee in employees
+            if employee_can_cover_requirement(employee, requirement)
+        }
+    qualified_ids = employee_ids & set(eligible_ids)
+    qualified_employees = tuple(
+        employee
+        for employee in employees
+        if employee.employee_id in qualified_ids
+    )
+    qualified_capacity_units = sum(
+        available_hours[employee_id]
+        for employee_id in qualified_ids
+    )
+    effort = requirement.estimated_effort_hours
+    required_units = (
+        hours_to_units(effort)
+        if effort is not None and effort > 0
+        else None
+    )
+    return {
+        "qualified_ids": qualified_ids,
+        "qualified_employees": qualified_employees,
+        "qualified_count": len(qualified_ids),
+        "required_count": requirement.required_quantity,
+        "qualified_capacity_units": qualified_capacity_units,
+        "required_units": required_units,
+        "has_sufficient_headcount": (
+            len(qualified_ids) >= requirement.required_quantity
+        ),
+        "has_sufficient_capacity": (
+            qualified_capacity_units >= required_units
+            if required_units is not None
+            else None
+        ),
+    }
+
 def build_optimization_context(project):
     """
     Précalcule une seule fois les informations qui ne changent
     pas d'une combinaison d'équipe à une autre.
     """
 
+    employee_skills = EmployeeSkill.objects.only(
+        "employee_skill_id",
+        "employee_id",
+        "skill_id",
+        "level",
+    )
+    assignments = (
+        Assignment.objects.filter(
+            start_date__lte=project.end_date,
+            end_date__gte=project.start_date,
+        )
+        .exclude(status=Assignment.Status.CANCELLED)
+        .exclude(project=project)
+        .only(
+            "assignment_id",
+            "employee_id",
+            "project_id",
+            "start_date",
+            "end_date",
+            "allocation_percentage",
+            "status",
+        )
+    )
+    approved_leaves = Leave.objects.filter(
+        status=Leave.Status.APPROVED,
+        start_date__lte=project.end_date,
+        end_date__gte=project.start_date,
+    ).only(
+        "leave_id",
+        "employee_id",
+        "start_date",
+        "end_date",
+        "status",
+    )
     employees = list(
-        Employee.objects.filter(
-            status=Employee.Status.ACTIVE
+        Employee.objects.filter(status=Employee.Status.ACTIVE).prefetch_related(
+            Prefetch(
+                "employee_skills",
+                queryset=employee_skills,
+                to_attr="optimization_skills",
+            ),
+            Prefetch(
+                "assignments",
+                queryset=assignments,
+                to_attr="optimization_assignments",
+            ),
+            Prefetch(
+                "leaves",
+                queryset=approved_leaves,
+                to_attr="optimization_leaves",
+            ),
         )
     )
 
@@ -393,6 +509,8 @@ def build_optimization_context(project):
         hours = calculate_available_hours_for_project(
             employee,
             project,
+            assignment_records=employee.optimization_assignments,
+            leave_records=employee.optimization_leaves,
         )
 
         available_hours[employee.employee_id] = (
@@ -440,16 +558,15 @@ def build_optimization_context(project):
         "total_required_effort": total_required_effort,
     }
 
-def passes_fast_feasibility_checks(team, context):
-    """
-    Rejette rapidement les équipes manifestement impossibles
-    avant de lancer OR-Tools.
-    """
+def get_fast_feasibility_issues(team, context, *, stop_at_first=False):
+    """Return deterministic reasons a team fails the pre-solver checks."""
 
     team_ids = {
         employee.employee_id
         for employee in team
     }
+
+    issues = []
 
     # ---------------------------------------------------------
     # 1. Chaque membre doit pouvoir contribuer
@@ -465,7 +582,14 @@ def passes_fast_feasibility_checks(team, context):
         )
 
         if not can_contribute:
-            return False
+            issues.append(
+                {
+                    "code": "employee_cannot_contribute",
+                    "employee": employee,
+                }
+            )
+            if stop_at_first:
+                return issues
 
     # ---------------------------------------------------------
     # 2. Capacité totale suffisante ?
@@ -476,11 +600,16 @@ def passes_fast_feasibility_checks(team, context):
         for employee_id in team_ids
     )
 
-    if (
-        total_team_capacity
-        < context["total_required_effort"]
-    ):
-        return False
+    if total_team_capacity < context["total_required_effort"]:
+        issues.append(
+            {
+                "code": "insufficient_total_capacity",
+                "available_units": total_team_capacity,
+                "required_units": context["total_required_effort"],
+            }
+        )
+        if stop_at_first:
+            return issues
 
     # ---------------------------------------------------------
     # 3. Vérifications requirement par requirement
@@ -492,34 +621,53 @@ def passes_fast_feasibility_checks(team, context):
             requirement.project_skill_requirement_id
         )
 
-        qualified_ids = (
-            team_ids
-            & context["eligible_by_requirement"][
-                requirement_id
-            ]
+        evidence = get_requirement_capacity_evidence(
+            requirement,
+            team,
+            context["available_hours"],
+            eligible_ids=context["eligible_by_requirement"][requirement_id],
         )
 
         # Pas assez de personnes qualifiées
-        if (
-            len(qualified_ids)
-            < requirement.required_quantity
-        ):
-            return False
+        if not evidence["has_sufficient_headcount"]:
+            issues.append(
+                {
+                    "code": "insufficient_eligible_headcount",
+                    "requirement": requirement,
+                    "eligible_count": evidence["qualified_count"],
+                    "required_count": evidence["required_count"],
+                }
+            )
+            if stop_at_first:
+                return issues
 
         # Pas assez de capacité qualifiée pour ce skill
-        qualified_capacity = sum(
-            context["available_hours"][employee_id]
-            for employee_id in qualified_ids
-        )
+        if not evidence["has_sufficient_capacity"]:
+            issues.append(
+                {
+                    "code": "insufficient_qualified_capacity",
+                    "requirement": requirement,
+                    "available_units": evidence["qualified_capacity_units"],
+                    "required_units": evidence["required_units"],
+                }
+            )
+            if stop_at_first:
+                return issues
 
-        required_effort = hours_to_units(
-            requirement.estimated_effort_hours
-        )
+    return issues
 
-        if qualified_capacity < required_effort:
-            return False
 
-    return True
+def passes_fast_feasibility_checks(team, context):
+    """
+    Rejette rapidement les équipes manifestement impossibles
+    avant de lancer OR-Tools.
+    """
+
+    return not get_fast_feasibility_issues(
+        team,
+        context,
+        stop_at_first=True,
+    )
 
 def solve_team_effort_allocation(team, project, optimization_context=None):
     """
@@ -721,7 +869,7 @@ def solve_team_effort_allocation(team, project, optimization_context=None):
         # à au moins un requirement.
         model.Add(
             sum(employee_participations) >= 1
-        )        
+        )
 
     # ---------------------------------------------------------
     # 6. Capacité totale de chaque employé
@@ -960,8 +1108,6 @@ def solve_team_effort_allocation(team, project, optimization_context=None):
             ),
             "allocations": [],
         }
-
-    
 
     # ---------------------------------------------------------
     # 12. Lire les allocations
@@ -1667,18 +1813,23 @@ def build_recommendation_explanations(
 
         if category == "compact_match":
 
+            team_size_label = (
+                "person" if result["team_size"] == 1 else "people"
+            )
             strengths.append(
-                f"Mobilise seulement {result['team_size']} employés."
+                f"Uses the smallest feasible team: "
+                f"{result['team_size']} {team_size_label}."
             )
 
             strengths.append(
-                f"Matching moyen élevé : {result['team_score']:.2f}."
+                f"High average match score: {result['team_score']:.2f}."
             )
 
             strengths.append(
                 (
-                    f"Répartition de charge très homogène : "
-                    f"écart de {metrics['utilization_spread']:.2f} points."
+                    f"Very even workload distribution: "
+                    f"{metrics['utilization_spread']:.2f} percentage-point "
+                    f"spread."
                 )
             )
 
@@ -1694,9 +1845,8 @@ def build_recommendation_explanations(
                 if capacity_change > 0:
                     tradeoffs.append(
                         (
-                            f"Dispose de {capacity_change:.2f} h "
-                            f"de capacité restante en moins que "
-                            f"l'alternative équilibrée."
+                            f"Has {capacity_change:.2f} h less remaining "
+                            f"capacity than the balanced alternative."
                         )
                     )
 
@@ -1707,9 +1857,9 @@ def build_recommendation_explanations(
                 if max_util_change < 0:
                     tradeoffs.append(
                         (
-                            f"Charge maximale supérieure de "
-                            f"{abs(max_util_change):.2f} points "
-                            f"à l'alternative équilibrée."
+                            f"Maximum utilization is "
+                            f"{abs(max_util_change):.2f} percentage points "
+                            f"higher than the balanced alternative."
                         )
                     )
 
@@ -1731,8 +1881,7 @@ def build_recommendation_explanations(
                 if size_change > 0:
                     tradeoffs.append(
                         (
-                            f"Mobilise {size_change} employé(s) "
-                            f"supplémentaire(s)."
+                            f"Increases team size by {size_change}."
                         )
                     )
 
@@ -1743,7 +1892,7 @@ def build_recommendation_explanations(
                 if score_change > 0:
                     strengths.append(
                         (
-                            f"Améliore le matching moyen de "
+                            f"Improves the average match score by "
                             f"{score_change:.2f} points."
                         )
                     )
@@ -1751,7 +1900,7 @@ def build_recommendation_explanations(
                 elif score_change < 0:
                     tradeoffs.append(
                         (
-                            f"Réduit le matching moyen de "
+                            f"Reduces the average match score by "
                             f"{abs(score_change):.2f} points."
                         )
                     )
@@ -1763,15 +1912,15 @@ def build_recommendation_explanations(
                 if capacity_change > 0:
                     strengths.append(
                         (
-                            f"Ajoute {capacity_change:.2f} h "
-                            f"de capacité restante."
+                            f"Adds {capacity_change:.2f} h of remaining "
+                            f"capacity."
                         )
                     )
 
                 elif capacity_change < 0:
                     tradeoffs.append(
                         (
-                            f"Réduit la capacité restante de "
+                            f"Reduces remaining capacity by "
                             f"{abs(capacity_change):.2f} h."
                         )
                     )
@@ -1783,16 +1932,16 @@ def build_recommendation_explanations(
                 if max_util_change < 0:
                     strengths.append(
                         (
-                            f"Réduit la charge maximale de "
-                            f"{abs(max_util_change):.2f} points."
+                            f"Reduces maximum utilization by "
+                            f"{abs(max_util_change):.2f} percentage points."
                         )
                     )
 
                 elif max_util_change > 0:
                     tradeoffs.append(
                         (
-                            f"Augmente la charge maximale de "
-                            f"{max_util_change:.2f} points."
+                            f"Increases maximum utilization by "
+                            f"{max_util_change:.2f} percentage points."
                         )
                     )
 
@@ -1803,16 +1952,16 @@ def build_recommendation_explanations(
                 if spread_change < 0:
                     strengths.append(
                         (
-                            f"Améliore l'équilibre de charge de "
-                            f"{abs(spread_change):.2f} points."
+                            f"Improves workload balance by "
+                            f"{abs(spread_change):.2f} percentage points."
                         )
                     )
 
                 elif spread_change > 0:
                     tradeoffs.append(
                         (
-                            f"Augmente l'écart de charge de "
-                            f"{spread_change:.2f} points."
+                            f"Increases the utilization spread by "
+                            f"{spread_change:.2f} percentage points."
                         )
                     )
 

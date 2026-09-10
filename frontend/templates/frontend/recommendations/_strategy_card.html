@@ -1,0 +1,64 @@
+{% load frontend_format %}
+
+<article class="recommendation-strategy-card" aria-labelledby="recommendation-strategy-{{ strategy_index }}-title" data-strategy-category="{{ strategy.category }}">
+  <header class="recommendation-strategy-card__header">
+    <div>
+      <p class="profile-kicker">Strategy {{ strategy_index }} of {{ run.recommendation_count }}</p>
+      <h3 id="recommendation-strategy-{{ strategy_index }}-title">{{ strategy.label }}</h3>
+    </div>
+    <span>{{ strategy.team_size }} {% if strategy.team_size == 1 %}person{% else %}people{% endif %}</span>
+  </header>
+
+  <p class="recommendation-strategy-card__reason">{{ strategy.reason }}</p>
+
+  <dl class="recommendation-strategy-metrics">
+    <div>
+      <dt>Team score</dt>
+      <dd>{{ strategy.team_score|floatformat:2 }} <small>out of 100</small></dd>
+    </div>
+    <div>
+      <dt>Team size</dt>
+      <dd>{{ strategy.team_size }} <small>{% if strategy.team_size == 1 %}person{% else %}people{% endif %}</small></dd>
+    </div>
+    <div>
+      <dt>Available capacity</dt>
+      <dd>{{ strategy.total_available_hours|decimal_hours }}</dd>
+    </div>
+    <div>
+      <dt>Allocated effort</dt>
+      <dd>{{ strategy.total_allocated_hours|decimal_hours }}</dd>
+    </div>
+    <div>
+      <dt>Remaining capacity</dt>
+      <dd>{{ strategy.remaining_capacity_hours|decimal_hours }}</dd>
+    </div>
+    <div>
+      <dt>Maximum utilization</dt>
+      <dd>{{ strategy.max_utilization|percentage }}</dd>
+    </div>
+    <div>
+      <dt>Utilization spread</dt>
+      <dd>{{ strategy.utilization_spread|floatformat:2 }} <small>percentage points</small></dd>
+    </div>
+  </dl>
+
+  <section class="recommendation-team-members" aria-labelledby="recommendation-strategy-{{ strategy_index }}-members-title">
+    <div class="recommendation-team-members__heading">
+      <h4 id="recommendation-strategy-{{ strategy_index }}-members-title">Selected team members</h4>
+      <span>For this project period</span>
+    </div>
+    <ol>
+      {% for member in strategy.members %}
+        <li>
+          <span aria-hidden="true">{{ forloop.counter }}</span>
+          {% if member.profile_url %}
+            <a href="{{ member.profile_url }}">{{ member.label }}</a>
+          {% else %}
+            <strong>{{ member.label }}</strong>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  </section>
+
+</article>

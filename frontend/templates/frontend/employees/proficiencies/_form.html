@@ -44,7 +44,7 @@
   </section>
 
   <div class="employee-form-actions proficiency-form-actions">
-    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Cancel</a>
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">{{ cancel_label|default:"Cancel" }}</a>
     <button class="btn btn-primary" type="submit" data-loading-label="Saving proficiency…">
       {{ submit_label }}
     </button>

@@ -29,6 +29,8 @@ from frontend.views.employees import (
     employee_update,
 )
 from frontend.views.landing import landing
+from frontend.views.planning import project_planning
+from frontend.views.recommendations import project_recommendation_generate
 from frontend.views.leaves import (
     leave_create,
     leave_delete,
@@ -128,6 +130,16 @@ urlpatterns = [
         "<int:coverage_id>/remove/",
         project_assignment_coverage_remove,
         name="project_assignment_coverage_remove",
+    ),
+    path(
+        "projects/<int:project_id>/planning/",
+        project_planning,
+        name="project_planning",
+    ),
+    path(
+        "projects/<int:project_id>/recommendations/generate/",
+        project_recommendation_generate,
+        name="project_recommendation_generate",
     ),
     path("projects/<int:project_id>/", project_detail, name="project_detail"),
     path("employees/", employee_list, name="employee_list"),

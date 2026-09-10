@@ -1,10 +1,27 @@
+from calendar import monthrange
+
 from django import forms
 
 from core.models import Employee, Project
 
 
-class DashboardFilterForm(forms.Form):
-    """Validate the shared, read-only dashboard reporting context."""
+MAX_REPORTING_PERIOD_DAYS = 366
+
+
+def with_default_reporting_period(query_data, *, today):
+    """Return a mutable query mapping with the shared calendar-month defaults."""
+    data = query_data.copy()
+    if "start_date" not in data:
+        data["start_date"] = today.replace(day=1).isoformat()
+    if "end_date" not in data:
+        data["end_date"] = today.replace(
+            day=monthrange(today.year, today.month)[1]
+        ).isoformat()
+    return data
+
+
+class ReportingPeriodForm(forms.Form):
+    """Validate the inclusive reporting-period contract shared by read views."""
 
     start_date = forms.DateField(
         label="Start date",
@@ -24,6 +41,31 @@ class DashboardFilterForm(forms.Form):
         },
         widget=forms.DateInput(attrs={"type": "date"}),
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+        if start_date and end_date and start_date > end_date:
+            self.add_error(
+                "end_date",
+                "The end date must be on or after the start date.",
+            )
+        elif (
+            start_date
+            and end_date
+            and (end_date - start_date).days + 1 > MAX_REPORTING_PERIOD_DAYS
+        ):
+            self.add_error(
+                "end_date",
+                "Choose a reporting period of 366 days or fewer.",
+            )
+        return cleaned_data
+
+
+class DashboardFilterForm(ReportingPeriodForm):
+    """Validate the shared, read-only dashboard reporting context."""
+
     department = forms.CharField(
         required=False,
         label="Department",
@@ -70,14 +112,3 @@ class DashboardFilterForm(forms.Form):
         status = self.cleaned_data["project_status"]
         valid_statuses = {value for value, _label in Project.Status.choices}
         return status if status in valid_statuses else ""
-
-    def clean(self):
-        cleaned_data = super().clean()
-        start_date = cleaned_data.get("start_date")
-        end_date = cleaned_data.get("end_date")
-        if start_date and end_date and start_date > end_date:
-            self.add_error(
-                "end_date",
-                "The end date must be on or after the start date.",
-            )
-        return cleaned_data

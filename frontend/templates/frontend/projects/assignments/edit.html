@@ -5,5 +5,5 @@
 
 {% block content %}
   {% include "frontend/components/page_header.html" with eyebrow="Project workforce" title="Edit assignment" description=project.name only %}
-  {% include "frontend/projects/assignments/_form.html" with form=form project=project assignment=assignment cancel_url=cancel_url submit_label="Save assignment" csrf_token=csrf_token only %}
+  {% include "frontend/projects/assignments/_form.html" with form=form project=project assignment=assignment cancel_url=cancel_url cancel_label=cancel_label submit_label="Save assignment" csrf_token=csrf_token only %}
 {% endblock %}

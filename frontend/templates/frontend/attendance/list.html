@@ -37,11 +37,26 @@
         <span>Showing {{ page_obj.start_index }}&ndash;{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</span>
       {% endif %}
     </div>
-    <span class="directory-toolbar__note">Operational history only; attendance does not affect staffing recommendations</span>
+    {% if navigation_context.employee_profile_url %}
+      <a href="{{ navigation_context.employee_profile_url }}">Return to employee profile</a>
+    {% elif navigation_context %}
+      <a href="{{ dashboard_url }}">Return to dashboard</a>
+    {% else %}
+      <span class="directory-toolbar__note">Operational history only; attendance does not affect staffing recommendations</span>
+    {% endif %}
   </div>
 
+  {% if navigation_context %}
+    <div class="dashboard-summary__notice" role="status">
+      <div>
+        <strong>Reporting period preserved.</strong>
+        <span>Attendance records remain filtered to the inclusive dates used by the employee insight.</span>
+      </div>
+    </div>
+  {% endif %}
+
   {% if page_obj.object_list %}
-    {% include "frontend/components/table.html" with caption="Attendance directory results" headers=attendance_headers rows=page_obj.object_list row_template="frontend/attendance/_attendance_row.html" perms=perms only %}
+    {% include "frontend/components/table.html" with caption="Attendance directory results" headers=attendance_headers rows=page_obj.object_list row_template="frontend/attendance/_attendance_row.html" perms=perms profile_query_string=profile_query_string only %}
     {% include "frontend/components/pagination.html" with page_obj=page_obj pagination_label="Attendance directory pages" only %}
   {% elif has_active_filters %}
     {% url 'frontend:attendance_list' as attendance_list_url %}

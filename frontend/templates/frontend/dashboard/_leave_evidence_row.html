@@ -1,0 +1,16 @@
+{% load frontend_format %}
+<tr>
+  <th scope="row">
+    <a class="profile-table-primary" href="{{ row.profile_url }}">{{ row.employee }}</a>
+    <span class="profile-table-secondary">{{ row.employee.department }} · {{ row.employee.get_status_display }}</span>
+  </th>
+  <td class="data-table__number">{{ row.leaves|length }}</td>
+  <td>
+    <ul class="timeline-context-list">
+      {% for leave in row.leaves %}
+        <li><strong>{{ leave.get_type_display }} leave</strong><span>{{ leave.start_date|workforce_date }} to {{ leave.end_date|workforce_date }}</span></li>
+      {% endfor %}
+    </ul>
+  </td>
+  <td><a href="{{ row.records_url }}">View approved leave records</a></td>
+</tr>

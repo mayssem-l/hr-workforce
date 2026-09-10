@@ -310,7 +310,13 @@ class RecommendationServiceContractTests(TestCase):
             for explanation in explanations
             for message in explanation["strengths"] + explanation["tradeoffs"]
         )
-        self.assertIn("employé", explanation_text)
+        self.assertIn("Uses the smallest feasible team: 1 person.", explanation_text)
+        self.assertIn("High average match score", explanation_text)
+        self.assertIn("percentage points", explanation_text)
+        self.assertNotRegex(
+            explanation_text,
+            r"Mobilise|employé|Améliore|Réduit|Augmente|capacité|équilibre",
+        )
         self.assertNotRegex(explanation_text, r"Ã|Â|â€|�")
 
     def test_preflight_blocks_missing_or_zero_mandatory_effort_before_team_search(self):

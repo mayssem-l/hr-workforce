@@ -75,7 +75,7 @@ class TemplateAndStaticVerificationTests(SimpleTestCase):
 class InitialPagePerformanceBaselineTests(TestCase):
     SAMPLE_COUNT = 25
     LOGIN_QUERY_COUNT = 0
-    LANDING_QUERY_COUNT = 5
+    LANDING_QUERY_COUNT = 7
 
     @classmethod
     def setUpTestData(cls):
@@ -111,7 +111,7 @@ class InitialPagePerformanceBaselineTests(TestCase):
         )
 
         print(
-            "\nM1.6 initial-page baseline "
+            "\nM4.2 initial-page baseline "
             f"({self.SAMPLE_COUNT} warm Django test-client GETs per page):\n"
             f"  login:   queries={self.LOGIN_QUERY_COUNT}, "
             f"median={login_result['median_ms']:.3f} ms, "
