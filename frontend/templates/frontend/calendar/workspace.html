@@ -1,0 +1,196 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+
+{% block title %}Shared Calendar | Workforce Planning{% endblock %}
+{% block meta_description %}Set the date range and view for the shared planning calendar.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Calendar" title="Shared planning calendar" description="Choose the period, view, sources, and planning context for the shared schedule." only %}
+
+  <section class="directory-filter-panel" aria-labelledby="calendar-view-title">
+    <div class="section-heading dashboard-filter-heading">
+      <div>
+        <h2 id="calendar-view-title">Calendar filters</h2>
+        <p>The current calendar month and all available sources are used by default. Start and end dates are both included.</p>
+      </div>
+    </div>
+    <form method="get" action="{% url 'frontend:calendar_workspace' %}">
+      <input type="hidden" name="filters" value="1">
+      <div class="dashboard-filter-grid">
+        {% include "frontend/components/form_field.html" with field=view_form.start_date only %}
+        {% include "frontend/components/form_field.html" with field=view_form.end_date only %}
+        {% include "frontend/components/form_field.html" with field=view_form.view only %}
+        {% include "frontend/components/form_field.html" with field=view_form.department only %}
+        {% include "frontend/components/form_field.html" with field=view_form.employee only %}
+        {% include "frontend/components/form_field.html" with field=view_form.project only %}
+        <fieldset class="calendar-source-filter{% if view_form.source.errors %} calendar-source-filter--invalid{% endif %}" aria-describedby="id_source_helptext{% if view_form.source.errors %} id_source_error{% endif %}"{% if view_form.source.errors %} aria-invalid="true"{% endif %}>
+          <legend>{{ view_form.source.label }} <span class="required-indicator" aria-hidden="true">*</span><span class="visually-hidden">required</span></legend>
+          <p id="id_source_helptext">{{ view_form.source.help_text }}</p>
+          <div class="calendar-source-options">
+            {% for checkbox in view_form.source %}
+              <label class="calendar-source-option" for="{{ checkbox.id_for_label }}">
+                {{ checkbox.tag }}
+                <span>{{ checkbox.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          {% if view_form.source.errors %}
+            <div class="invalid-feedback d-block" id="id_source_error">
+              {% for error in view_form.source.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+          {% endif %}
+        </fieldset>
+        <div class="directory-filter-actions">
+          <button class="btn btn-primary" type="submit">Apply filters</button>
+          <a class="btn btn-outline-secondary" href="{% url 'frontend:calendar_workspace' %}">Reset</a>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  {% if view_context %}
+    <div class="directory-toolbar" role="status" aria-live="polite">
+      <div>
+        <strong>{{ view_context.start_date_label }} &ndash; {{ view_context.end_date_label }}</strong>
+        <span>{{ view_context.view_label }} view selected</span>
+      </div>
+      <div>
+        <span class="directory-toolbar__note">Inclusive period &middot; {{ configured_timezone }} timezone</span>
+        <a href="{{ calendar_filter_url }}">Current calendar view</a>
+      </div>
+    </div>
+
+    <section class="workspace-intro" aria-labelledby="calendar-context-title">
+      <div class="workspace-intro__copy">
+        <p class="page-eyebrow">Current calendar context</p>
+        <h2 id="calendar-context-title">One shared schedule, grounded in existing planning records.</h2>
+        <p>
+          The selected period runs from <strong>{{ view_context.start_date_label }}</strong>
+          through <strong>{{ view_context.end_date_label }}</strong>. Both boundary dates are included.
+        </p>
+      </div>
+      <div class="workspace-intro__signal">
+        <small>Selected view</small>
+        <strong>{{ view_context.view_label }}</strong>
+        <span class="signal-line">Dates use the {{ configured_timezone }} timezone</span>
+      </div>
+    </section>
+  {% else %}
+    <div class="planning-input-state planning-input-state--warning" role="alert">
+      <strong>Calendar settings need attention</strong>
+      <p>Correct the highlighted fields or reset the view before continuing.</p>
+    </div>
+  {% endif %}
+
+  <section aria-labelledby="calendar-sources-title"{% if calendar_event_url %} data-calendar-events-url="{{ calendar_event_url }}"{% endif %}>
+    <div class="section-heading">
+      <div>
+        <p class="page-eyebrow">Shared schedule scope</p>
+        <h2 id="calendar-sources-title">Calendar sources</h2>
+        <p>Color identifies the source; the text state confirms whether it is included, empty, or restricted.</p>
+      </div>
+    </div>
+    <div class="module-grid module-grid--three">
+      {% for source in source_context %}
+        <article class="module-card calendar-source-card calendar-source-card--{{ source.source|default:source.key }} calendar-source-card--{{ source.state|default:'available' }}" aria-labelledby="calendar-source-{{ source.key }}">
+          <span class="module-card__number">0{{ forloop.counter }} / SOURCE</span>
+          <h3 id="calendar-source-{{ source.key }}"><span class="calendar-source-marker" aria-hidden="true"></span>{{ source.title }}</h3>
+          <p>{{ source.description }}</p>
+          <span class="module-card__state">{{ source.state_label }}</span>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if filter_context %}
+    <section class="planning-input-state" aria-labelledby="calendar-filter-summary-title">
+      <strong id="calendar-filter-summary-title">Current filter context</strong>
+      <p>
+        Sources: {{ filter_context.source_labels|join:", " }}.
+        Department: {{ filter_context.department_label }}.
+        Employee: {{ filter_context.employee_label }}.
+        Project: {{ filter_context.project_label }}.
+      </p>
+      <p>People filters apply to assignments and approved leave. Project filters apply to projects and assignments. Combined filters require each entry to match every applicable context.</p>
+    </section>
+  {% endif %}
+
+  {% if filter_context %}
+    <section class="calendar-visualization" aria-labelledby="calendar-visualization-title" data-calendar-workspace data-calendar-enabled="{% if filter_context.view == 'list' %}false{% else %}true{% endif %}" data-calendar-events-url="{{ calendar_event_url }}" data-calendar-view="{{ filter_context.view }}" data-calendar-start-date="{{ filter_context.start_date|date:'Y-m-d' }}" data-calendar-timezone="{{ configured_timezone }}">
+      <div class="section-heading">
+        <div>
+          <p class="page-eyebrow">Schedule visualization</p>
+          <h2 id="calendar-visualization-title">{{ filter_context.view_label }} calendar view</h2>
+          <p>The visualization uses the same permitted events and filters as the complete chronological list below.</p>
+        </div>
+        <nav class="calendar-view-switcher" aria-label="Calendar views">
+          {% for view_link in filter_context.view_links %}
+            <a class="calendar-view-switcher__link{% if view_link.is_current %} is-current{% endif %}" href="{{ view_link.url }}"{% if view_link.is_current %} aria-current="page"{% endif %}>{{ view_link.label }}</a>
+          {% endfor %}
+        </nav>
+      </div>
+      {% if filter_context.view == "list" %}
+        <div class="planning-input-state">
+          <strong>List view selected</strong>
+          <p>The complete chronological calendar list is shown below. Choose Month or Week to add the interactive visual view.</p>
+        </div>
+      {% else %}
+        <div class="calendar-visualization__status" data-calendar-status role="status" aria-live="polite" hidden></div>
+        <div class="calendar-visualization__notice" data-calendar-large-result role="note" hidden></div>
+        <div class="calendar-visualization__viewport" data-calendar-viewport hidden>
+          <div data-calendar-canvas aria-label="Interactive {{ filter_context.view_label|lower }} calendar for the selected period"></div>
+        </div>
+        <noscript>
+          <div class="planning-input-state planning-input-state--warning">
+            <strong>Interactive calendar unavailable</strong>
+            <p>JavaScript is turned off. The complete chronological calendar entries remain available below.</p>
+          </div>
+        </noscript>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  <section aria-labelledby="calendar-list-title">
+    <div class="section-heading">
+      <div>
+        <p class="page-eyebrow">Accessible schedule evidence</p>
+        <h2 id="calendar-list-title">Calendar entries</h2>
+        <p>This chronological list is the complete read-only calendar evidence and remains available without JavaScript.</p>
+      </div>
+    </div>
+    {% if filter_context %}
+      <div class="directory-toolbar" role="status" aria-live="polite">
+        <div>
+          <strong>{{ event_page.paginator.count }} calendar entr{{ event_page.paginator.count|pluralize:"y,ies" }}</strong>
+          {% if event_page.paginator.count %}
+            <span>Showing {{ event_page.start_index }}&ndash;{{ event_page.end_index }} of {{ event_page.paginator.count }}</span>
+          {% endif %}
+        </div>
+        <span class="directory-toolbar__note">Chronological order &middot; inclusive dates</span>
+      </div>
+      {% if event_page.object_list %}
+        {% include "frontend/components/table.html" with caption="Calendar entries for the selected inclusive period" headers=calendar_event_headers rows=event_page.object_list row_template="frontend/calendar/_event_row.html" only %}
+        {% include "frontend/components/pagination.html" with page_obj=event_page pagination_label="Calendar entry pages" only %}
+      {% elif has_narrowing_filters %}
+        {% url 'frontend:calendar_workspace' as calendar_reset_url %}
+        {% include "frontend/components/empty_state.html" with state_id="calendar-filter-empty" title="No calendar entries match these filters" message="Try a different source, department, employee, project, or date range." action_url=calendar_reset_url action_label="Reset calendar filters" only %}
+      {% else %}
+        {% include "frontend/components/empty_state.html" with state_id="calendar-period-empty" title="No calendar entries in this period" message="No permitted project, assignment, or approved-leave schedule overlaps the selected dates." only %}
+      {% endif %}
+    {% else %}
+      {% include "frontend/components/empty_state.html" with state_id="calendar-invalid-empty" title="Calendar entries are unavailable" message="Correct the calendar settings above before reviewing schedule evidence." only %}
+    {% endif %}
+  </section>
+
+  <section class="planning-input-state" aria-labelledby="calendar-capacity-guidance-title">
+    <strong id="calendar-capacity-guidance-title">Weekday capacity context</strong>
+    <p>Capacity evidence will continue to use Monday through Friday and does not include public holidays. This page does not calculate capacity.</p>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  {% if filter_context and filter_context.view != "list" %}
+    <script src="{% static 'frontend/vendor/fullcalendar-6.1.21.index.global.min.js' %}"></script>
+    <script src="{% static 'frontend/js/calendar.js' %}"></script>
+  {% endif %}
+{% endblock %}

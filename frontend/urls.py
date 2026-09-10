@@ -11,6 +11,7 @@ from frontend.views.assignments import (
     project_assignment_create,
     project_assignment_update,
 )
+from frontend.views.calendar import calendar_events, calendar_workspace
 from frontend.views.coverage import (
     project_assignment_coverage,
     project_assignment_coverage_create,
@@ -30,7 +31,10 @@ from frontend.views.employees import (
 )
 from frontend.views.landing import landing
 from frontend.views.planning import project_planning
-from frontend.views.recommendations import project_recommendation_generate
+from frontend.views.recommendations import (
+    project_recommendation_generate,
+    project_recommendation_result,
+)
 from frontend.views.assignment_handoff import project_recommendation_confirm
 from frontend.views.leaves import (
     leave_create,
@@ -54,6 +58,7 @@ from frontend.views.requirements import (
     project_requirement_remove,
     project_requirement_update,
 )
+from frontend.views.timeline import project_timeline
 from frontend.views.skills import (
     skill_create,
     skill_detail,
@@ -74,6 +79,8 @@ urlpatterns = [
         name="login",
     ),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("calendar/", calendar_workspace, name="calendar_workspace"),
+    path("calendar/events/", calendar_events, name="calendar_events"),
     path("projects/", project_list, name="project_list"),
     path("projects/new/", project_create, name="project_create"),
     path(
@@ -143,11 +150,21 @@ urlpatterns = [
         name="project_recommendation_generate",
     ),
     path(
+        "projects/<int:project_id>/recommendations/results/<str:run_id>/",
+        project_recommendation_result,
+        name="project_recommendation_result",
+    ),
+    path(
         "projects/<int:project_id>/recommendations/confirm/<slug:category>/",
         project_recommendation_confirm,
         name="project_recommendation_confirm",
     ),
     path("projects/<int:project_id>/", project_detail, name="project_detail"),
+    path(
+        "projects/<int:project_id>/timeline/",
+        project_timeline,
+        name="project_timeline",
+    ),
     path("employees/", employee_list, name="employee_list"),
     path("employees/new/", employee_create, name="employee_create"),
     path(

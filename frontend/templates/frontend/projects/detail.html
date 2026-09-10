@@ -64,6 +64,9 @@
         {% if perms.core.view_employee and perms.core.view_skill %}
           <a class="btn btn-sm btn-outline-secondary" href="{% url 'frontend:project_planning' profile.project.project_id %}">Open planning workspace</a>
         {% endif %}
+        {% if perms.core.view_assignment and perms.core.view_employee %}
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'frontend:project_timeline' profile.project.project_id %}">View project timeline</a>
+        {% endif %}
       </div>
     </div>
 

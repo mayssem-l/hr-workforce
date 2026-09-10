@@ -18,6 +18,9 @@
       <strong>{{ workspace.project.start_date|workforce_date }} &ndash; {{ workspace.project.end_date|workforce_date }}</strong>
       <span class="signal-line">{{ workspace.project.get_status_display }}</span>
       <a class="link-light mt-3" href="{{ project_detail_url }}">Return to project profile</a>
+      {% if perms.core.view_assignment and perms.core.view_employee %}
+        <a class="link-light mt-3" href="{% url 'frontend:project_timeline' workspace.project.project_id %}">View project timeline</a>
+      {% endif %}
     </div>
   </section>
 

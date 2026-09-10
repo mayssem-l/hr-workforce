@@ -1,0 +1,102 @@
+{% extends "frontend/base.html" %}
+{% load frontend_format %}
+
+{% block title %}{{ project.name }} project timeline | Workforce Planning{% endblock %}
+{% block meta_description %}Review the stored schedule, assignments, and approved leave for {{ project.name }} on one timeline.{% endblock %}
+
+{% block content %}
+  {% include "frontend/components/page_header.html" with eyebrow="Project schedule" title=project.name description="Review this project's stored period, its assignments, and approved leave for assigned employees on one read-only timeline." only %}
+
+  <section class="profile-panel surface-card" aria-labelledby="project-timeline-period-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Stored project period</p>
+        <h2 id="project-timeline-period-title">Project timeline</h2>
+      </div>
+      <span>{{ project.get_status_display }}</span>
+    </div>
+
+    <p class="capacity-assumption">Bands show stored start and end dates only. Overlapping bands are separate records shown together; the timeline infers no conflict, score, or feasibility. The complete evidence table below carries the same entries with record links.</p>
+
+    <dl class="skill-facts project-planning-facts">
+      <div>
+        <dt>Project period</dt>
+        <dd>{{ period_start|workforce_date }} through {{ period_end|workforce_date }}</dd>
+      </div>
+      <div>
+        <dt>Scheduled entries</dt>
+        <dd>{{ event_count }} entr{{ event_count|pluralize:"y,ies" }}</dd>
+      </div>
+    </dl>
+
+    {% if bands %}
+      <div class="project-timeline-shell" data-timeline-viewport>
+        <div class="project-timeline" aria-hidden="true">
+          {% for band in bands %}
+            <div class="project-timeline__row">
+              <span class="project-timeline__label">{{ band.label }}</span>
+              <span class="project-timeline__track">
+                <span class="project-timeline__band project-timeline__band--{{ band.source }}" style="left: {{ band.start_percent }}%; width: {{ band.width_percent }}%;">{% if band.starts_before %}<span aria-hidden="true">&larr;</span>{% endif %}{{ band.label }}{% if band.ends_after %}<span aria-hidden="true">&rarr;</span>{% endif %}</span>
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="planning-input-state" role="status">
+        <strong>No scheduled entries in this period</strong>
+        <p>No stored project, assignment, or approved-leave schedule overlaps the project period for the records you may view.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section aria-labelledby="project-timeline-sources-title">
+    <div class="section-heading">
+      <div>
+        <p class="page-eyebrow">Schedule scope</p>
+        <h2 id="project-timeline-sources-title">Timeline sources</h2>
+        <p>Color identifies the source; the text state confirms whether it is included, empty, or restricted.</p>
+      </div>
+    </div>
+    <div class="module-grid module-grid--three">
+      {% for source in legend %}
+        <article class="module-card calendar-source-card calendar-source-card--{{ source.source|default:source.key }} calendar-source-card--{{ source.state|default:'available' }}" aria-labelledby="timeline-source-{{ source.key }}">
+          <span class="module-card__number">0{{ forloop.counter }} / SOURCE</span>
+          <h3 id="timeline-source-{{ source.key }}"><span class="calendar-source-marker" aria-hidden="true"></span>{{ source.title }}</h3>
+          <p>{{ source.description }}</p>
+          <span class="module-card__state">{{ source.state_label }}</span>
+        </article>
+      {% endfor %}
+    </div>
+    {% if leave_restricted %}
+      <div class="planning-input-state mt-3" role="note">
+        <strong>Approved leave is restricted.</strong>
+        <p>Your current access does not include leave records, so leave context is omitted without revealing its contents.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="profile-panel surface-card" aria-labelledby="project-timeline-evidence-title">
+    <div class="profile-panel__header">
+      <div>
+        <p class="profile-kicker">Complete schedule evidence</p>
+        <h2 id="project-timeline-evidence-title">Timeline entries</h2>
+      </div>
+      <span>{{ event_count }} entr{{ event_count|pluralize:"y,ies" }}</span>
+    </div>
+
+    {% if timeline_rows %}
+      {% include "frontend/components/table.html" with caption="Timeline entries for the stored project period in chronological order" headers=timeline_event_headers rows=timeline_rows row_template="frontend/calendar/_event_row.html" only %}
+    {% else %}
+      <div class="planning-input-state" role="status">
+        <strong>No timeline entries to show</strong>
+        <p>There are no permitted project, assignment, or approved-leave schedules to list for this period.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <div class="directory-footer-actions">
+    <a class="btn btn-primary" href="{{ planning_url }}">Return to planning workspace</a>
+    <a class="btn btn-outline-secondary" href="{{ project_detail_url }}">Return to project profile</a>
+  </div>
+{% endblock %}

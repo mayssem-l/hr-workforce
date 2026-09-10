@@ -379,14 +379,63 @@ class AssignmentHandoffTests(TestCase):
         self.assertEqual(review.status_code, 200)
         self.assertEqual(before, self._counts())
 
-    def test_overlapping_assignment_blocks_review_and_save(self):
-        Assignment.objects.create(
+    def test_same_project_overlap_reconciles_as_update(self):
+        existing = Assignment.objects.create(
             employee=self.employee,
             project=self.project,
             start_date=self.project.start_date,
             end_date=self.project.end_date,
-            allocation_percentage=25,
+            allocation_percentage=50,
             role_on_project="Existing work",
+            status=Assignment.Status.ACTIVE,
+        )
+        before = self._counts()
+        review = self._get_review()
+        self.assertEqual(review.status_code, 200)
+        rows = review.context["review"]["rows"]
+        self.assertEqual(rows[0]["action"], "UPDATE")
+        self.assertEqual(rows[0]["current_allocation"], 50)
+        self.assertEqual(rows[0]["allocation_percentage"], 25)
+        self.assertContains(review, "UPDATE")
+        self.assertEqual(before, self._counts())
+
+        token = review.context["review"]["form"][
+            "submission_token"
+        ].value()
+        with patch(
+            "frontend.views.assignment_handoff.run_recommendation_pipeline",
+            return_value=self._pipeline_result(),
+        ):
+            saved = self.client.post(
+                self.confirm_url, {"submission_token": token}
+            )
+        self.assertEqual(saved.status_code, 302)
+        self.assertEqual(
+            (Assignment.objects.count(), AssignmentSkill.objects.count()),
+            (before[0], before[1] + 1),
+        )
+        existing.refresh_from_db()
+        self.assertEqual(existing.allocation_percentage, 25)
+        self.assertEqual(existing.status, Assignment.Status.ACTIVE)
+
+    def test_other_project_overload_blocks_review_and_save(self):
+        other_project = Project.objects.create(
+            name="M67 other workload",
+            description="Overload fixture.",
+            start_date=self.project.start_date,
+            end_date=self.project.end_date,
+            estimated_hours=Decimal("8.00"),
+            status=Project.Status.PLANNED,
+            priority=Project.Priority.HIGH,
+            criticality=Project.Criticality.HIGH,
+        )
+        Assignment.objects.create(
+            employee=self.employee,
+            project=other_project,
+            start_date=other_project.start_date,
+            end_date=other_project.end_date,
+            allocation_percentage=78,
+            role_on_project="Other work",
             status=Assignment.Status.ACTIVE,
         )
         before = self._counts()
@@ -395,7 +444,7 @@ class AssignmentHandoffTests(TestCase):
         self.assertTrue(review.context["review"]["has_error"])
         self.assertIsNone(review.context["review"]["form"])
         self.assertContains(
-            review, "already has an overlapping assignment", status_code=422
+            review, "Maximum allowed workload is 100%", status_code=422
         )
 
         from frontend.selectors.recommendations import (
@@ -502,8 +551,44 @@ class AssignmentHandoffTests(TestCase):
             assignment=covering_assignment,
             project_skill_requirement=self.requirement,
         )
+        team = [self.employee, self.unskilled]
+        capacities = [
+            {
+                "employee": member,
+                "available_hours": Decimal("32.00"),
+                "allocated_hours": Decimal("8.00"),
+                "utilization_rate": 25.0,
+            }
+            for member in team
+        ]
+        allocations = [
+            {
+                "employee": member,
+                "requirement": self.requirement,
+                "skill": self.python,
+                "hours": Decimal("8.00"),
+            }
+            for member in team
+        ]
+        oversubscribed = self._pipeline_result()
+        oversubscribed["recommendations"][0]["result"]["team"] = team
+        oversubscribed["recommendations"][0]["result"]["team_size"] = 2
+        oversubscribed["recommendations"][0]["result"][
+            "effort_solution"
+        ] = {
+            "is_feasible": True,
+            "employee_capacities": capacities,
+            "allocations": allocations,
+        }
+        oversubscribed["explanations"][0]["team"] = [
+            str(member) for member in team
+        ]
         before_quantity = self._counts()
-        review = self._get_review()
+        with patch(
+            "frontend.views.assignment_handoff.run_recommendation_pipeline",
+            return_value=oversubscribed,
+        ):
+            review = self.client.get(self.confirm_url)
         self.assertEqual(review.status_code, 422)
         self.assertContains(
             review, "required quantity", status_code=422

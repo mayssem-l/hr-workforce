@@ -51,6 +51,7 @@ def present_handoff_review(
     form,
     confirm_url,
     planning_url,
+    back_url=None,
 ):
     rows = []
     for proposal, row_errors in zip(proposals, validation["rows"]):
@@ -64,8 +65,10 @@ def present_handoff_review(
                 coverage_labels.append(skill_label)
             else:
                 coverage_labels.append("Requirement record unavailable")
+        action = proposal.get("action", "ADD")
         rows.append(
             {
+                "action": action,
                 "employee": employee,
                 "label": label,
                 "profile_url": _employee_profile_url(
@@ -73,6 +76,7 @@ def present_handoff_review(
                 ),
                 "start_date": proposal["start_date"],
                 "end_date": proposal["end_date"],
+                "current_allocation": proposal.get("current_allocation"),
                 "allocation_percentage": proposal[
                     "allocation_percentage"
                 ],
@@ -96,4 +100,5 @@ def present_handoff_review(
         "form": form,
         "confirm_url": confirm_url,
         "planning_url": planning_url,
+        "back_url": back_url,
     }

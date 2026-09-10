@@ -1,0 +1,30 @@
+{% load frontend_format %}
+<tr class="calendar-event-row calendar-event-row--{{ row.event.source }}">
+  <td>
+    <div class="skill-directory-identity">
+      <strong>{{ row.event.title }}</strong>
+      <small class="calendar-event-source calendar-event-source--{{ row.event.source }}">
+        <span class="calendar-source-marker" aria-hidden="true"></span>
+        {{ row.event.source_label }}
+      </small>
+    </div>
+  </td>
+  <td>
+    <time datetime="{{ row.event.start_date }}">{{ row.start_date_value|workforce_date }}</time>
+    &ndash;
+    <time datetime="{{ row.event.end_date }}">{{ row.end_date_value|workforce_date }}</time>
+  </td>
+  <td>{% include "frontend/components/status_badge.html" with status=row.event.status.value label=row.event.status.label only %}</td>
+  <td>{% if row.event.project %}{{ row.event.project.label }}{% else %}<span class="profile-table-secondary">Not applicable</span>{% endif %}</td>
+  <td>{% if row.event.employee %}{{ row.event.employee.label }}{% else %}<span class="profile-table-secondary">Not applicable</span>{% endif %}</td>
+  <td>{% if row.event.leave_type %}{{ row.event.leave_type.label }}{% else %}<span class="profile-table-secondary">Not applicable</span>{% endif %}</td>
+  <td>
+    {% if row.event.links %}
+      <div class="skill-profile-list__actions" aria-label="Evidence for {{ row.event.title }}">
+        {% for link in row.event.links %}<a href="{{ link.url }}">{{ link.label }}</a>{% endfor %}
+      </div>
+    {% else %}
+      <span class="profile-table-secondary">No additional link available</span>
+    {% endif %}
+  </td>
+</tr>

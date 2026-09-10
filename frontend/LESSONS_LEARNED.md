@@ -207,6 +207,29 @@ Review this file before starting a task and update it immediately after discover
 - **Consequence:** Asserting only the duplicate message makes the replay test brittle, and validating each coverage link in isolation can let two proposals jointly exceed a requirement quantity.
 - **Action:** Validate the token before claiming it, assert replay safety as 409 plus a single save rather than one fixed message, prove true duplicate behavior with a no-save failure that leaves the snapshot unchanged, check existing plus all proposed coverage against each required quantity together, and wrap the compound assignment/coverage save in `transaction.atomic()`.
 
+### Use TransactionTestCase for threaded concurrency tests
+
+- **Observation:** `TestCase` wraps each test in an uncommitted transaction, so worker threads hitting the same SQLite database fail with `database table is locked` even for reads.
+- **Consequence:** A threaded duplicate-submit test errors instead of proving single-run semantics.
+- **Action:** Put threaded tests in a `TransactionTestCase` with per-test fixtures, keep thread workers to request handling with clients authenticated beforehand, and retain plain `TestCase` everywhere else.
+
+### Keep real-solver verification fixtures tiny and mocked envelopes complete
+
+- **Observation:** Real team enumeration grows combinatorially (15 feasible teams from 4 employees runs ~1 s; the 10-employee sample needs ~20 s), while mocked pipeline envelopes missing `effort_solution`/coverage render empty evidence instead of exercising the full result path.
+- **Consequence:** Oversized verification fixtures make the suite slow, and minimal mocks silently skip allocation, capacity, and coverage assertions.
+- **Action:** Profile and reconcile against real services on 2–4 employee fixtures, mock the pipeline for presentation/query tests, and always include capacities, allocations, and coverage rows in mocked envelopes so completeness checks stay meaningful.
+
+### Prefer ephemeral run caches over history models for back-navigation
+- **Observation:** Returning to an exact generated result without rerunning a 20-second pipeline tempts permanent recommendation history, yet the requirement is only to revisit the current run until inputs change or staffing is confirmed.
+- **Consequence:** A history model adds migrations, retention policy, and audit questions for a navigation need that expires within the hour.
+- **Action:** Store the exact pipeline result plus summaries in the configured cache under an unguessable run ID bound to project/user/snapshot with a short TTL, revalidate snapshot and references on every back-navigation, redirect to planning with a fresh-recommendation message on any drift, and invalidate the run on successful confirmation. No model or migration is needed.
+
+### Reconcile staffing as a diff, not as blind creates
+
+- **Observation:** Re-planning a staffed project fails when every recommended member is proposed as a new assignment, and per-link coverage validation reports quantity conflicts that the planned removals already resolve.
+- **Consequence:** Valid re-plans look like duplicate/overlap errors, and membership swaps look like quantity overflows.
+- **Action:** Diff target-period staffing per employee into KEEP/UPDATE/ADD/REMOVE (cancel, never delete, assignments to stay within planner permissions), diff coverage into KEEP/ADD/REMOVE, validate quantities on final surviving-plus-proposed counts while still running full model validation for skill/project/overlap/leave rules, and gate link deletions on the existing remove permission at save time.
+
 ## Presentation and configuration
 
 ### Separate stored planning context from staged service assessment
@@ -220,6 +243,24 @@ Review this file before starting a task and update it immediately after discover
 - **Observation:** A distribution table and its supplemental bars can drift when each representation rounds percentages, orders bands, or handles unclassified records independently.
 - **Consequence:** Visually plausible bars may disagree with the accessible evidence, and browser-side recalculation can create a second interpretation of service-owned workforce values.
 - **Action:** Define band boundaries and deterministic display serialization in one presenter, then render both the primary table and supplemental visual from that same ordered sequence. Test every boundary plus the count, share text, and visual width for exact agreement; keep the visual hidden from assistive technology when the table already provides the complete evidence.
+
+### Enhance progressively without moving evidence into the browser
+
+- **Observation:** An interactive calendar is tempting to build as the primary event surface with the table as an afterthought, fetching and reshaping records in JavaScript.
+- **Consequence:** Disabled, failed, or slow scripts remove the evidence, and browser-side reshaping creates a second interpretation of dates, order, and permissions.
+- **Action:** Always render the complete server-side evidence first, drive the widget exclusively from the existing permission-safe endpoint payload through data attributes, gate initialization on an explicit enabled flag plus library presence, keep every failure path on a status region while the list stays intact, and assert the absence of date, overlap, permission, and planning logic in scripts and templates.
+
+### Never render a measuring widget inside a hidden container
+
+- **Observation:** FullCalendar rendered a blank grid with compressed slivers despite successfully loading events, because `calendar.render()` ran while its viewport still carried the `hidden` attribute and measured zero width.
+- **Consequence:** A correct endpoint, correct assets, and a success status still produce an unusable visual, easily mistaken for missing styles or broken data.
+- **Action:** Un-hide the container immediately before rendering (and re-hide only if rendering throws, preserving the failure UI); assert the source order in tests. When triaging blank-widget reports, check container measurability first: bundle CSS presence, app CSS overrides, then render timing.
+
+### Scope new reads through existing selectors with internal-only filter shapes
+
+- **Observation:** A project timeline needs approved leave for exactly the assigned employees, while the shared calendar selector only accepts a single employee filter choice and drops the project band whenever any employee filter is present.
+- **Consequence:** Calling the selector per employee creates N+1 reads, and reusing the display list for leave scope would silently change which records qualify.
+- **Action:** Widen the selector's filter to also accept an internal employee-ID set while keeping the validated single-string path byte-for-byte compatible, then compose two fixed selector calls (project-scoped project plus assignments, then leave for the assigned IDs) and merge them in the selector's own deterministic order. Prove single-choice behavior is unchanged with the existing suites.
 
 ### Let scalar services consume prefetched records on aggregate pages
 
@@ -280,6 +321,24 @@ Review this file before starting a task and update it immediately after discover
 - **Observation:** A planning workspace can link into several existing edit and evidence flows, but a generic return parameter can become an open redirect, cross-project context switch, or stale dead end. Forms without an explicit action retain their query string, while filter forms and confirmation forms with explicit destinations need the return value forwarded deliberately.
 - **Consequence:** Host-only URL checks do not prove that a return target is the intended application workflow, and inconsistent forwarding can send a manager to a different project or lose their planning context after a valid save, filter, cancel, or confirmation.
 - **Action:** Resolve the supplied path to one allow-listed named route, reject scheme/host/query/fragment additions, bind project-scoped workflows to the same project ID, confirm the target still exists, and rebuild the canonical URL. Preserve only each destination's supported filters, pass the return context through GET filters and explicit form actions, and retain the established default redirect whenever validation fails.
+
+### Distinguish an omitted multi-value GET filter from an explicit empty selection
+
+- **Observation:** An absent checkbox parameter can mean either “use the default selection” on an initial GET or “the user cleared every option” after submitting the form. A multi-value field alone cannot distinguish those states because unchecked checkboxes are omitted by the browser.
+- **Consequence:** Applying defaults whenever the parameter is absent silently reverses an explicit user choice, while never applying them leaves the initial view invalid or unexpectedly empty.
+- **Action:** Include an allow-listed submission marker in the GET form, apply permitted defaults only when both the multi-value parameter and marker are absent, and treat a submitted marker with no values as an ordinary validation error. Serialize the marker into canonical view URLs so later controls preserve the same meaning.
+
+### Do not use paginated collection truthiness as a validation-state signal
+
+- **Observation:** An empty Django `Page` object is falsey even when it represents a valid, successfully evaluated query. Using `{% if page_obj %}` to distinguish valid and invalid request state therefore sends a valid empty result through the invalid-state branch.
+- **Consequence:** Managers see corrective error wording for a legitimate period with no records, and tests can miss the difference when they cover only populated pages.
+- **Action:** Carry or reuse an explicit validated-context signal for control flow, and inspect `page_obj.object_list` only when choosing populated versus valid-empty presentation. Test valid unfiltered empty, valid filtered empty, and invalid request states separately.
+
+### Enforce multi-source read access before both selection and serialization
+
+- **Observation:** A consolidated endpoint can combine records governed by different model permissions. Omitting a restricted source at query time is necessary, but a later selector change or unexpected result could still cross the serialization boundary.
+- **Consequence:** Trusting only the query branch makes permission safety depend on every upstream caller continuing to honor an implicit source contract.
+- **Action:** Resolve source access before querying, pass it explicitly into the selector, and apply the same allow-list again before serialization. Keep record links behind their destination view's complete permission contract as a separate check.
 
 ### Verify navigation state across complete route families
 

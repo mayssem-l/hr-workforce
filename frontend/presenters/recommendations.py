@@ -485,7 +485,9 @@ def build_recommendation_allocation_evidence(
     }
 
 
-def build_recommendation_strategy_cards(project, recommendations, user):
+def build_recommendation_strategy_cards(
+    project, recommendations, user, run_id=None
+):
     """Present selected strategies without changing their order or metrics."""
 
     navigation = _recommendation_navigation(project, user)
@@ -496,22 +498,23 @@ def build_recommendation_strategy_cards(project, recommendations, user):
     for recommendation in recommendations:
         result = recommendation["result"]
         metrics = result["metrics"]
+        handoff_url = None
+        if can_confirm:
+            handoff_url = reverse(
+                "frontend:project_recommendation_confirm",
+                args=[
+                    project.project_id,
+                    recommendation["category"],
+                ],
+            )
+            if run_id:
+                handoff_url = f"{handoff_url}?{urlencode({'run': run_id})}"
         cards.append(
             {
                 "category": recommendation["category"],
                 "label": recommendation["label"],
                 "reason": recommendation["reason"],
-                "handoff_url": (
-                    reverse(
-                        "frontend:project_recommendation_confirm",
-                        args=[
-                            project.project_id,
-                            recommendation["category"],
-                        ],
-                    )
-                    if can_confirm
-                    else None
-                ),
+                "handoff_url": handoff_url,
                 "members": tuple(
                     _present_team_member(
                         employee,
@@ -992,6 +995,7 @@ def build_recommendation_result_foundation(
     pipeline_result,
     user,
     manager_summaries=None,
+    run_id=None,
 ):
     recommendation_count = len(pipeline_result["recommendations"])
     feasible_team_count = len(pipeline_result["feasible_teams"])
@@ -1044,6 +1048,7 @@ def build_recommendation_result_foundation(
         project,
         pipeline_result["recommendations"],
         user,
+        run_id,
     )
     decision_evidence = build_recommendation_decision_evidence(
         pipeline_result["recommendations"],

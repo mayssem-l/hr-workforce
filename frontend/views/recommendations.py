@@ -1,9 +1,10 @@
 import logging
 
+from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from core.models import (
     Assignment,
@@ -29,6 +30,11 @@ from frontend.presenters.recommendations import (
     build_recommendation_result_foundation,
 )
 from frontend.recommendation_execution import claim_recommendation_submission
+from frontend.recommendation_runs import (
+    fetch_recommendation_run,
+    issue_recommendation_run_id,
+    store_recommendation_run,
+)
 from frontend.presenters.planning import build_project_planning_readiness
 from frontend.selectors.projects import get_project_profile
 from frontend.selectors.recommendations import (
@@ -41,7 +47,7 @@ from frontend.selectors.recommendations import (
 logger = logging.getLogger(__name__)
 
 
-def _result_context(project, run):
+def _result_context(project, run, run_id=None):
     project_is_available = run["state"] != "project_changed"
     planning_url = (
         reverse(
@@ -78,14 +84,15 @@ def _result_context(project, run):
         "project_detail_url": project_detail_url,
         "project_list_url": reverse("frontend:project_list"),
         "run": run,
+        "recommendation_run_id": run_id,
     }
 
 
-def _render_result(request, project, run, *, status=200):
+def _render_result(request, project, run, *, status=200, run_id=None):
     return render(
         request,
         "frontend/recommendations/result.html",
-        _result_context(project, run),
+        _result_context(project, run, run_id),
         status=status,
     )
 
@@ -293,11 +300,13 @@ def project_recommendation_generate(request, project_id):
         )
 
     try:
+        run_id = issue_recommendation_run_id()
         run = build_recommendation_result_foundation(
             project,
             pipeline_result,
             request.user,
             manager_summaries,
+            run_id=run_id,
         )
     except Exception:
         logger.exception(
@@ -312,4 +321,84 @@ def project_recommendation_generate(request, project_id):
             ),
             status=503,
         )
-    return _render_result(request, project, run)
+    store_recommendation_run(
+        run_id,
+        project_id=project.project_id,
+        user_id=request.user.pk,
+        input_signature=presentation_snapshot["signature"],
+        pipeline_result=pipeline_result,
+        manager_summaries=manager_summaries,
+    )
+    return _render_result(request, project, run, run_id=run_id)
+
+
+@read_models_permission_required(
+    Project,
+    ProjectSkillRequirement,
+    Assignment,
+    AssignmentSkill,
+    Employee,
+    Skill,
+)
+@require_GET
+def project_recommendation_result(request, project_id, run_id):
+    """Re-render one cached generation result without rerunning the pipeline."""
+
+    try:
+        project = get_project_profile(project_id)
+    except Project.DoesNotExist as exc:
+        raise Http404("Project not found.") from exc
+
+    planning_url = reverse(
+        "frontend:project_planning", args=[project.project_id]
+    )
+
+    def _fresh_required():
+        messages.warning(
+            request,
+            "This recommendation result is no longer current. "
+            "Generate a fresh recommendation from the planning workspace.",
+        )
+        return redirect(planning_url)
+
+    record = fetch_recommendation_run(run_id)
+    if (
+        record is None
+        or record.get("project_id") != project.project_id
+        or record.get("user_id") != request.user.pk
+    ):
+        return _fresh_required()
+
+    pipeline_result = record.get("pipeline_result")
+    manager_summaries = record.get("manager_summaries")
+    if not isinstance(pipeline_result, dict):
+        return _fresh_required()
+
+    try:
+        current_snapshot = get_recommendation_input_snapshot(project_id)
+    except Project.DoesNotExist:
+        return _fresh_required()
+    if (
+        record.get("input_signature") != current_snapshot["signature"]
+        or not recommendation_pipeline_result_is_complete(pipeline_result)
+        or not recommendation_references_are_current(
+            pipeline_result, current_snapshot
+        )
+    ):
+        return _fresh_required()
+
+    try:
+        run = build_recommendation_result_foundation(
+            project,
+            pipeline_result,
+            request.user,
+            manager_summaries,
+            run_id=run_id,
+        )
+    except Exception:
+        logger.exception(
+            "Cached recommendation result failed for project %s.",
+            project.project_id,
+        )
+        return _fresh_required()
+    return _render_result(request, project, run, run_id=run_id)

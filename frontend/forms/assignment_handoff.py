@@ -15,6 +15,10 @@ class AssignmentHandoffForm(forms.Form):
             "required": "This staffing confirmation is no longer valid.",
         },
     )
+    run_id = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput,
+    )
 
     def __init__(
         self,
@@ -23,6 +27,7 @@ class AssignmentHandoffForm(forms.Form):
         user,
         category,
         input_signature=None,
+        run_id=None,
         **kwargs,
     ):
         self.project = project
@@ -41,6 +46,8 @@ class AssignmentHandoffForm(forms.Form):
                     input_signature=input_signature,
                 ),
             )
+            if run_id:
+                initial.setdefault("run_id", run_id)
         super().__init__(*args, **kwargs)
 
     def clean_submission_token(self):

@@ -23,17 +23,26 @@
         <small>People and capacity</small>
       </span>
     </a>
-    <a class="app-nav__item{% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_planning' or request.resolver_match.url_name == 'project_recommendation_generate' or request.resolver_match.url_name == 'project_recommendation_confirm' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_requirement_create' or request.resolver_match.url_name == 'project_requirement_update' or request.resolver_match.url_name == 'project_requirement_remove' or request.resolver_match.url_name == 'project_assignment_create' or request.resolver_match.url_name == 'project_assignment_update' or request.resolver_match.url_name == 'project_assignment_delete' or request.resolver_match.url_name == 'project_assignment_coverage' or request.resolver_match.url_name == 'project_assignment_coverage_create' or request.resolver_match.url_name == 'project_assignment_coverage_remove' %} is-active{% endif %}"
+    <a class="app-nav__item{% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_timeline' or request.resolver_match.url_name == 'project_planning' or request.resolver_match.url_name == 'project_recommendation_generate' or request.resolver_match.url_name == 'project_recommendation_result' or request.resolver_match.url_name == 'project_recommendation_confirm' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_requirement_create' or request.resolver_match.url_name == 'project_requirement_update' or request.resolver_match.url_name == 'project_requirement_remove' or request.resolver_match.url_name == 'project_assignment_create' or request.resolver_match.url_name == 'project_assignment_update' or request.resolver_match.url_name == 'project_assignment_delete' or request.resolver_match.url_name == 'project_assignment_coverage' or request.resolver_match.url_name == 'project_assignment_coverage_create' or request.resolver_match.url_name == 'project_assignment_coverage_remove' %} is-active{% endif %}"
        href="{% url 'frontend:project_list' %}"
-       {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_planning' or request.resolver_match.url_name == 'project_recommendation_generate' or request.resolver_match.url_name == 'project_recommendation_confirm' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_requirement_create' or request.resolver_match.url_name == 'project_requirement_update' or request.resolver_match.url_name == 'project_requirement_remove' or request.resolver_match.url_name == 'project_assignment_create' or request.resolver_match.url_name == 'project_assignment_update' or request.resolver_match.url_name == 'project_assignment_delete' or request.resolver_match.url_name == 'project_assignment_coverage' or request.resolver_match.url_name == 'project_assignment_coverage_create' or request.resolver_match.url_name == 'project_assignment_coverage_remove' %}aria-current="page"{% endif %}>
+       {% if request.resolver_match.url_name == 'project_list' or request.resolver_match.url_name == 'project_detail' or request.resolver_match.url_name == 'project_timeline' or request.resolver_match.url_name == 'project_planning' or request.resolver_match.url_name == 'project_recommendation_generate' or request.resolver_match.url_name == 'project_recommendation_result' or request.resolver_match.url_name == 'project_recommendation_confirm' or request.resolver_match.url_name == 'project_create' or request.resolver_match.url_name == 'project_update' or request.resolver_match.url_name == 'project_delete' or request.resolver_match.url_name == 'project_requirement_create' or request.resolver_match.url_name == 'project_requirement_update' or request.resolver_match.url_name == 'project_requirement_remove' or request.resolver_match.url_name == 'project_assignment_create' or request.resolver_match.url_name == 'project_assignment_update' or request.resolver_match.url_name == 'project_assignment_delete' or request.resolver_match.url_name == 'project_assignment_coverage' or request.resolver_match.url_name == 'project_assignment_coverage_create' or request.resolver_match.url_name == 'project_assignment_coverage_remove' %}aria-current="page"{% endif %}>
       <span class="app-nav__index" aria-hidden="true">03</span>
       <span class="app-nav__copy">
         <strong>Projects</strong>
         <small>Demand and requirements</small>
       </span>
     </a>
-    <span class="app-nav__item is-disabled" aria-disabled="true">
+    <a class="app-nav__item{% if request.resolver_match.url_name == 'calendar_workspace' %} is-active{% endif %}"
+       href="{% url 'frontend:calendar_workspace' %}"
+       {% if request.resolver_match.url_name == 'calendar_workspace' %}aria-current="page"{% endif %}>
       <span class="app-nav__index" aria-hidden="true">04</span>
+      <span class="app-nav__copy">
+        <strong>Calendar</strong>
+        <small>Shared schedules</small>
+      </span>
+    </a>
+    <span class="app-nav__item is-disabled" aria-disabled="true">
+      <span class="app-nav__index" aria-hidden="true">05</span>
       <span class="app-nav__copy">
         <strong>Planning</strong>
         <small>Assignments and scenarios</small>
@@ -41,7 +50,7 @@
       <span class="app-nav__soon">Soon</span>
     </span>
     <span class="app-nav__item is-disabled" aria-disabled="true">
-      <span class="app-nav__index" aria-hidden="true">05</span>
+      <span class="app-nav__index" aria-hidden="true">06</span>
       <span class="app-nav__copy">
         <strong>Recommendations</strong>
         <small>Feasible team options</small>
